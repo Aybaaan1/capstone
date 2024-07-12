@@ -12,7 +12,7 @@ export default function Navbar() {
   ];
 
   return (
-    <div className="w-full h-20 bg-[rgb(255,211,23)] flex items-center justify-around px-28">
+    <div className="w-full h-20 bg-[rgb(255,211,70)] flex items-center justify-around px-28">
       <Image src="/imgs/ssglogo.png" height={200} width={200} />
       <nav className="flex items-center justify-between gap-5">
         {navs.map((nav) => (
