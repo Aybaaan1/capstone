@@ -22,9 +22,7 @@ export default function Navbar() {
         ))}
       </nav>
 
-      <Button bgColor="black" txtColor="white" paddingX="3" paddingY="2">
-        Log out
-      </Button>
+      <button className="bg-black px-3 py-2 rounded-2xl text-sm">Log out</button>
     </div>
   );
 }
