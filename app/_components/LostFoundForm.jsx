@@ -1,9 +1,10 @@
-import React from "react";
-
-const LostFoundForm = ({ formLabel }) => {
+const LostFoundForm = ({ formLabel, setClose }) => {
   return (
-    <form className="w-[80%] bg-red-200 p-10 flex">
+    <form className="absolute top-0 left-1/2 -translate-x-1/2  w-[80%] bg-white shadow-lg p-10 flex">
       <div className="p-8 flex-1">
+        <button onClick={setClose} className="absolute top-6 right-6">
+          ❌
+        </button>
         <h3 className="text-3xl font-bold mb-4">{formLabel}</h3>
         <p>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do

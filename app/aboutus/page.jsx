@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import LostFoundForm from "../_components/LostFoundForm";
 
 const AboutUs = () => {
   const [activeAchievement, setActiveAchievement] = useState(0);
