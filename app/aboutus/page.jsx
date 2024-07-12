@@ -76,7 +76,7 @@ const AboutUs = () => {
             {ssgAchievements[activeAchievement].description}
           </p>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 flex justify-center">
           <Image
             src={ssgAchievements[activeAchievement].image}
             width={400}
