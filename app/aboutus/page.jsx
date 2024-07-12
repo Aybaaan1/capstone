@@ -26,6 +26,13 @@ const AboutUs = () => {
     },
   ];
 
+  const sociallinks = [
+    { image: "/imgs/fb-icon.png", href: "/" },
+    { image: "/imgs/twitter-icon.png", href: "/" },
+    { image: "/imgs/instagram-icon.png", href: "/" },
+    { image: "/imgs/youtube-icon.png", href: "/" },
+  ];
+
   const handleNextClick = () => {
     if (activeAchievement < ssgAchievements.length - 1) {
       setActiveAchievement((prev) => prev + 1);
@@ -128,6 +135,32 @@ const AboutUs = () => {
             />
           </div>
         </div>
+      </section>
+      <section className="flex items-center justify-between px-24 overflow-hidden py-10">
+        <div className="text-black w-[450px] flex flex-col gap-7">
+          <h1 className="font-medium text-4xl">Follow us</h1>
+          <div className="flex flex-col ">
+            <p className="text-slate-600">
+              @https://www.facebook.com/SSGCTUArgao
+            </p>
+            <p className="text-slate-600">
+              To stay updated with the latest news, promotions, and offerings
+              from the poke , make sure to follow us social media accounts.
+              Don't miss out on any updates
+            </p>
+          </div>
+          <div className="flex pr-48 items-center justify-between">
+            {sociallinks.map((links) => (
+              <Image
+                src={links.image}
+                href={links.href}
+                height={40}
+                width={40}
+              />
+            ))}
+          </div>
+        </div>
+        <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
       </section>
     </div>
   );
