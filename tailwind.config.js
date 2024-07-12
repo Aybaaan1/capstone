@@ -14,7 +14,6 @@ module.exports = {
       },
       colors: {
         primary: "#6D31EDFF",
-        bgslate: "#f5f5f5",
       },
     },
   },

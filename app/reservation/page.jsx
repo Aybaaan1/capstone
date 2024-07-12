@@ -1,4 +1,5 @@
 import Image from "next/image";
+import ReservationForm from "../_components/reservationForm";
 
 export default function Reservation() {
   const reserve = [
@@ -67,6 +68,7 @@ export default function Reservation() {
           </div>
         </div>
       </section>
+      <ReservationForm formLabel="Reservation Form" />
     </div>
   );
 }
