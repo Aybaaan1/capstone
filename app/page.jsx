@@ -35,11 +35,11 @@ export default function Home(){
                 <p>The SSG Connect is a comprehensive digital platform meticulously designed to streamline student services and enhance engagement within CTU Argao (CTU-AC). Through its innovative features and user-friendly interface, this system aims to empower students by providing convenient access to essential resources and support systems
                 </p>
             </section>
-            <section className=" text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10">
+            <section className=" text-black w-full bg-[#f5f5f5] flex flex-col items-center justify-center py-16 gap-10">
                 <h1 className="font-bold text-4xl text-black">University Merchandise</h1>
                 <div className="flex items-center justify-between w-4/5">
                     {Merchandise.map((merchs) =>(
-                        <div className="text-black flex flex-col gap-3 bg-white py-9 px-5 rounded-xl">
+                        <div className="text-black flex flex-col gap-3 shadow-md py-9 px-5 rounded-xl">
                             <Image src={merchs.picture} height={200} width={200} alt="Item picture"/>
                             <p>{merchs.item}</p>
                             <p>Price: P{merchs.price}</p>
@@ -51,7 +51,7 @@ export default function Home(){
                 </div>
                 <button className="border-black border px-10 py-3 rounded-full">Explore more</button>
             </section>
-            <section className="flex items-center justify-between px-24 overflow-hidden">
+            <section className="flex items-center justify-between px-24 overflow-hidden py-10">
                 <div className="text-black w-[450px] flex flex-col gap-7">
                     <h1 className="font-medium text-4xl">Follow us</h1>
                     <div className="flex flex-col ">
