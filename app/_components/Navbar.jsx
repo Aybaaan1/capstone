@@ -22,7 +22,7 @@ export default function Navbar() {
         ))}
       </nav>
 
-      <button className="bg-black px-3 py-2 rounded-2xl text-sm">Log out</button>
+      <button className="bg-black px-3 py-2 rounded-2xl text-sm text-white">Log out</button>
     </div>
   );
 }
