@@ -3,18 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-
 export default function Navbar() {
   const navs = [
     { path: "Home", href: "/" },
     { path: "Purchase", href: "/purchase" },
     { path: "Lost & Found", href: "/lostandfound" },
     { path: "Reserve", href: "/reservation" },
-<<<<<<< HEAD
     { path: "Emergency Assistance", href: "/tambayayong" },
-=======
-    { path: "Emergency Assistance", href: "/emergencyassistance" },
->>>>>>> ffa6995c06113534260488b6c408680fa4350c03
     { path: "About us", href: "/aboutus" },
   ];
 
@@ -31,12 +26,13 @@ export default function Navbar() {
         ))}
       </nav>
 
-      <button onClick={() => setIsSigninClicked(true)} className="bg-black px-3 py-2 rounded-2xl text-sm text-white">
+      <button
+        onClick={() => setIsSigninClicked(true)}
+        className="bg-black px-3 py-2 rounded-2xl text-sm text-white"
+      >
         Log in
       </button>
-      {isSigninClicked ? (
-        <Signin/>
-      ) : null}
+      {isSigninClicked ? <Signin /> : null}
     </div>
   );
 }
