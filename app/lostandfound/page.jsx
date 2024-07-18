@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import LostFoundForm from "../_components/LostFoundForm";
 
+
 export default function page() {
   const [isLostFormClicked, setIsLostFormClicked] = useState(false);
   const [isFoundFormClicked, setIsFoundFormClicked] = useState(false);
@@ -62,12 +63,18 @@ export default function page() {
           See All
         </button>
       </section>
-      <section className=" flex flex-col items-center justify-center py-10 gap-20">
+      <section className=" flex flex-col items-center justify-center py-10 gap-20 relative">
         <div className="flex items-center justify-end gap-44 w-4/5 px-6">
           <h1 className="font-bold text-5xl">Lost Items</h1>
-          <button className="bg-primary text-white px-6 py-4 rounded-full text-sm">
+          <button onClick={() => setIsLostFormClicked(true)} className="bg-primary text-white px-6 py-4 rounded-full text-sm">
             Report Lost Item
           </button>
+          {isLostFormClicked ? (
+            <LostFoundForm
+              formLabel="Report Lost Item"
+              setClose={() => setIsLostFormClicked(false)}
+            />
+          ) : null}
         </div>
         <div className="grid grid-cols-4 place-items-center gap-14">
           {items.map((item) => (
@@ -104,6 +111,7 @@ export default function page() {
         </div>
         <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
       </section>
+      <form action=""></form>
     </div>
   );
 }
