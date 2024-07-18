@@ -163,7 +163,7 @@ const AboutUs = () => {
         </div>
         <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
       </section>
-      <SignInModal />
+      {/* <SignInModal /> */}
     </div>
   );
 };

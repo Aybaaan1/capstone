@@ -1,7 +1,8 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import SignInModal from "./SignInModal";
 
 
 export default function Navbar() {
@@ -15,6 +16,19 @@ export default function Navbar() {
   ];
 
   const [isSigninClicked, setIsSigninClicked] = useState(false);
+
+  // useEffect(() => {
+  //   if (isSigninClicked) {
+  //     document.body.style.overflow = "hidden";
+  //   } else {
+  //     document.body.style.overflow = "auto";
+  //   }
+
+  //   // Cleanup function to reset the overflow when the component unmounts
+  //   return () => {
+  //     document.body.style.overflow = "auto";
+  //   };
+  // }, [isSigninClicked]);
 
   return (
     <div className="w-full h-20 bg-[rgb(255,211,70)] flex items-center justify-around px-28">
@@ -31,7 +45,8 @@ export default function Navbar() {
         Log in
       </button>
       {isSigninClicked ? (
-        <Signin/>
+          <SignInModal/>
+        
       ) : null}
     </div>
   );
