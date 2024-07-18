@@ -1,7 +1,11 @@
+"use client";
 import Image from "next/image";
 import ReservationForm from "../_components/reservationForm";
+import { useState } from "react";
 
 export default function Reservation() {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   const reserve = [
     {
       picture: "/imgs/tshirt.png",
@@ -59,16 +63,21 @@ export default function Reservation() {
                   alt="Item picture"
                 />
                 <div>
-                  <button className="bg-primary text-white mt-3 px-3 py-2 rounded-full">
+                  <button
+                    className="bg-primary text-white mt-3 px-3 py-2 rounded-full"
+                    onClick={() => setIsFormOpen(true)}
+                  >
                     Reserve now
                   </button>
                 </div>
+                {isFormOpen === true ? (
+                  <ReservationForm formLabel="Reservation Form" />
+                ) : null}
               </div>
             ))}
           </div>
         </div>
       </section>
-      <ReservationForm formLabel="Reservation Form" />
     </div>
   );
 }

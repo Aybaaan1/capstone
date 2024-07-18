@@ -6,8 +6,8 @@ export default function Navbar() {
     { path: "Home", href: "/" },
     { path: "Purchase", href: "/purchase" },
     { path: "Lost & Found", href: "/lostandfound" },
-    { path: "Reserve", href: "/reserve" },
-    { path: "Emergency Assistance", href: "/emergencyassistance" },
+    { path: "Reserve", href: "/reservation" },
+    { path: "Emergency Assistance", href: "/tambayayong" },
     { path: "About us", href: "/aboutus" },
   ];
 

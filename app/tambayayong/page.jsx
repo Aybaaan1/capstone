@@ -1,6 +1,9 @@
+"use client";
 import Image from "next/image";
-
+import { useState } from "react";
+import TambayayongForm from "../_components/TambayayongForm";
 export default function Tambayayong() {
+  const [isFormOpen, setIsFormOpen] = useState(false);
   return (
     <div>
       <section
@@ -25,10 +28,14 @@ export default function Tambayayong() {
           <h3>6. Dapat Sheshable</h3>
           <h3>7. Dapat Maligo</h3>
           <h3>8. Dapat Lig-on</h3>
-          <button className="bg-primary py-1 px-4 mt-2 rounded-lg absolute right-4 bottom-3 text-[12px] text-white">
+          <button
+            className="bg-primary py-1 px-4 mt-2 rounded-lg absolute right-4 bottom-3 text-[12px] text-white"
+            onClick={() => setIsFormOpen(true)}
+          >
             Request now
           </button>
         </div>
+        {isFormOpen === true ? <TambayayongForm /> : null}
       </section>
     </div>
   );
