@@ -4,14 +4,13 @@ import Link from "next/link";
 import { useState,useEffect } from "react";
 import SignInModal from "./SignInModal";
 
-
 export default function Navbar() {
   const navs = [
     { path: "Home", href: "/" },
     { path: "Purchase", href: "/purchase" },
     { path: "Lost & Found", href: "/lostandfound" },
     { path: "Reserve", href: "/reservation" },
-    { path: "Emergency Assistance", href: "/emergencyassistance" },
+    { path: "Emergency Assistance", href: "/tambayayong" },
     { path: "About us", href: "/aboutus" },
   ];
 
@@ -41,13 +40,20 @@ export default function Navbar() {
         ))}
       </nav>
 
-      <button onClick={() => setIsSigninClicked(true)} className="bg-black px-3 py-2 rounded-2xl text-sm text-white">
+      <button
+        onClick={() => setIsSigninClicked(true)}
+        className="bg-black px-3 py-2 rounded-2xl text-sm text-white"
+      >
         Log in
       </button>
+<<<<<<< HEAD
       {isSigninClicked ? (
           <SignInModal/>
         
       ) : null}
+=======
+      {isSigninClicked ? <Signin /> : null}
+>>>>>>> fda395965a65edf8433bad8125a021ba7056a8ab
     </div>
   );
 }
