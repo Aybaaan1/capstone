@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import SignInModal from "../_components/SignInModal";
 
 const AboutUs = () => {
   const [activeAchievement, setActiveAchievement] = useState(0);
@@ -162,6 +163,7 @@ const AboutUs = () => {
         </div>
         <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
       </section>
+      <SignInModal />
     </div>
   );
 };
