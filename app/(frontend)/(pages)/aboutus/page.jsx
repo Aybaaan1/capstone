@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import SignInModal from "../_components/SignInModal";
+import SignInModal from "../../../(components)/_components/SignInModal";
 
 const AboutUs = () => {
   const [activeAchievement, setActiveAchievement] = useState(0);

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import SignInModal from "./SignInModal";
 
 export default function Navbar() {
@@ -46,14 +46,7 @@ export default function Navbar() {
       >
         Log in
       </button>
-<<<<<<< HEAD
-      {isSigninClicked ? (
-          <SignInModal/>
-        
-      ) : null}
-=======
       {isSigninClicked ? <Signin /> : null}
->>>>>>> fda395965a65edf8433bad8125a021ba7056a8ab
     </div>
   );
 }
