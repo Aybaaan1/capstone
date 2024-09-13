@@ -2,9 +2,12 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import SignInModal from "../_components/SignInModal";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const AboutUs = () => {
+  // const { data: session } = useSession();
+
   const [activeAchievement, setActiveAchievement] = useState(0);
   const ssgAchievements = [
     {
@@ -46,9 +49,13 @@ const AboutUs = () => {
     }
   };
 
+  // console.log(session?.user);
+
   return (
     <div className="w-full">
+      <button onClick={() => signOut()}>signOut</button>
       <section className="w-full h-screen mx-auto ">
+        {/* {session.user.email} */}
         <div
           className="w-full h-1/2 bg-cover bg-center bg-no-repeat flex items-end justify-center "
           style={{ backgroundImage: "url('/imgs/aboutus_hero.png')" }}

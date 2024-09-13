@@ -1,10 +1,15 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState,useEffect } from "react";
-import SignInModal from "./SignInModal";
+import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
 
 export default function Navbar() {
+  const router = useRouter(); // Initialize the router
+
+  const handleLoginClick = () => {
+    router.push("/signin"); // Navigate to the /signin page
+  };
+
   const navs = [
     { path: "Home", href: "/" },
     { path: "Purchase", href: "/purchase" },
@@ -14,24 +19,9 @@ export default function Navbar() {
     { path: "About us", href: "/aboutus" },
   ];
 
-  const [isSigninClicked, setIsSigninClicked] = useState(false);
-
-  // useEffect(() => {
-  //   if (isSigninClicked) {
-  //     document.body.style.overflow = "hidden";
-  //   } else {
-  //     document.body.style.overflow = "auto";
-  //   }
-
-  //   // Cleanup function to reset the overflow when the component unmounts
-  //   return () => {
-  //     document.body.style.overflow = "auto";
-  //   };
-  // }, [isSigninClicked]);
-
   return (
     <div className="w-full h-20 bg-[rgb(255,211,70)] flex items-center justify-around px-28">
-      <Image src="/imgs/ssglogo.png" height={200} width={200} />
+      <Image src="/imgs/ssglogo.png" height={200} width={200} alt="Logo" />
       <nav className="flex items-center justify-between gap-5">
         {navs.map((nav) => (
           <Link key={nav.path} className="text-sm text-black" href={nav.href}>
@@ -41,19 +31,11 @@ export default function Navbar() {
       </nav>
 
       <button
-        onClick={() => setIsSigninClicked(true)}
+        onClick={handleLoginClick} // Update to handleLoginClick
         className="bg-black px-3 py-2 rounded-2xl text-sm text-white"
       >
         Log in
       </button>
-<<<<<<< HEAD
-      {isSigninClicked ? (
-          <SignInModal/>
-        
-      ) : null}
-=======
-      {isSigninClicked ? <Signin /> : null}
->>>>>>> fda395965a65edf8433bad8125a021ba7056a8ab
     </div>
   );
 }

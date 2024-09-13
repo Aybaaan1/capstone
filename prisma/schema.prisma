@@ -13,14 +13,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  age   String?
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  idnumber       String   @unique
+  firstname      String
+  lastname       String
+  program        String
+  password       String
+  role           Role     @default(STUDENT) // Default role is set to 'STUDENT'
+  image          String?  // Optional field for user profile image
 }
 
-model Todolist{
-  id    Int     @id @default(autoincrement())
-  type  String?
-  des   String?
+enum Role {
+  STUDENT
+  ADMIN
 }
