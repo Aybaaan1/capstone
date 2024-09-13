@@ -12,6 +12,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+<<<<<<< HEAD
 model User {
   id             Int      @id @default(autoincrement())
   email          String   @unique
@@ -27,4 +28,46 @@ model User {
 enum Role {
   STUDENT
   ADMIN
+=======
+
+
+// ******************************** MODELS ******************************** //
+
+enum UserRole {
+  ADMIN
+  STUDENT
+}
+
+model User {
+  id          String    @id @default(uuid())
+  name        String
+  email       String    @unique
+  phoneNumber String?
+  userType    UserRole
+  items       Item[]    @relation("ReportedItems")
+  claims      Claim[]
+}
+
+model Item {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  category    String
+  status      String
+  reportDate  DateTime  @default(now())
+  reporterId  String
+  reporter    User      @relation("ReportedItems", fields: [reporterId], references: [id])
+  claims      Claim[]
+}
+
+model Claim {
+  id        String   @id @default(uuid())
+  userId    String
+  itemId    String
+  claimDate DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  item      Item     @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+>>>>>>> 2733bed142748b005cdaffba8ecef1ab5c06d8db
 }
