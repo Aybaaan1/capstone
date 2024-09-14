@@ -2,12 +2,8 @@
 
 import Image from "next/image";
 import { useState } from "react";
-<<<<<<< HEAD:app/aboutus/page.jsx
 import { useSession } from "next-auth/react";
 import { signOut } from "next-auth/react";
-=======
-import SignInModal from "../../../(components)/_components/SignInModal";
->>>>>>> 2733bed142748b005cdaffba8ecef1ab5c06d8db:app/(frontend)/(pages)/aboutus/page.jsx
 
 const AboutUs = () => {
   // const { data: session } = useSession();
