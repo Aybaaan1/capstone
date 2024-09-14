@@ -12,23 +12,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-<<<<<<< HEAD
-model User {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  idnumber       String   @unique
-  firstname      String
-  lastname       String
-  program        String
-  password       String
-  role           Role     @default(STUDENT) // Default role is set to 'STUDENT'
-  image          String?  // Optional field for user profile image
-}
-
-enum Role {
-  STUDENT
-  ADMIN
-=======
 
 
 // ******************************** MODELS ******************************** //
@@ -69,5 +52,4 @@ model Claim {
   item      Item     @relation(fields: [itemId], references: [id])
 
   @@unique([userId, itemId])
->>>>>>> 2733bed142748b005cdaffba8ecef1ab5c06d8db
 }

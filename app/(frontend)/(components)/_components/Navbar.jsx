@@ -1,12 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-<<<<<<< HEAD:app/_components/Navbar.jsx
 import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
-=======
-import { useState, useEffect } from "react";
-import SignInModal from "./SignInModal";
->>>>>>> 2733bed142748b005cdaffba8ecef1ab5c06d8db:app/(frontend)/(components)/_components/Navbar.jsx
 
 export default function Navbar() {
   const router = useRouter(); // Initialize the router
@@ -41,10 +36,6 @@ export default function Navbar() {
       >
         Log in
       </button>
-<<<<<<< HEAD:app/_components/Navbar.jsx
-=======
-      {isSigninClicked ? <Signin /> : null}
->>>>>>> 2733bed142748b005cdaffba8ecef1ab5c06d8db:app/(frontend)/(components)/_components/Navbar.jsx
     </div>
   );
 }

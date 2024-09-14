@@ -7,3 +7,4 @@ const Provider = ({ children, session }) => {
 };
 
 export default Provider;
+``;

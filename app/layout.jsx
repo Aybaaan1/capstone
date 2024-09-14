@@ -1,6 +1,6 @@
 import { Poppins } from "next/font/google";
-import Navbar from "./_components/Navbar";
-import Footer from "./_components/Footer";
+import Navbar from "./(frontend)/(components)/_components/Navbar";
+import Footer from "./(frontend)/(components)/_components/Footer";
 import Provider from "./_components/Provider";
 
 import "./globals.css";
