@@ -13,14 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-// ******************************** MODELS ******************************** //
-
-enum UserRole {
-  ADMIN
-  STUDENT
-}
-
 model User {
   id             Int      @id @default(autoincrement())
   email          String   @unique
@@ -31,6 +23,78 @@ model User {
   password       String
   role           Role     @default(STUDENT) // Default role is set to 'STUDENT'
   image          String?  // Optional field for user profile image
+  orders         Order[]
+  items          Item[]
+  reserves       Reserve[]
+  assistances    Assistance[]
+}
+
+model Merch {
+  id     Int     @id @default(autoincrement())
+  name   String
+  price  Float
+  image  String?
+  stocks Int
+  type   String
+  orders Order[]
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  merchId     Int
+  paymentMode String
+  proof       String?
+  status      String
+
+  user        User     @relation(fields: [userId], references: [id])
+  merch       Merch    @relation(fields: [merchId], references: [id])
+}
+
+model Item {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  place     String
+  dateTime  DateTime
+  image     String?
+  type      String
+  status    String
+  reserves  Reserve[]
+  
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model ItemReservation {
+  id     Int     @id @default(autoincrement())
+  image  String?
+  type   String
+  status String
+}
+
+model Reserve {
+  id              Int      @id @default(autoincrement())
+  itemId          Int
+  userId          Int
+  reserveDateTime DateTime
+  returnDateTime  DateTime
+  purpose         String
+
+  item            Item     @relation(fields: [itemId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+}
+
+model Assistance {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  patience  Int
+  dateTime  DateTime
+  gcash     String
+  proof     String?
+  status    String
+
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 enum Role {
