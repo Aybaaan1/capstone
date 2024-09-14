@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 const AboutUs = () => {
   // const { data: session } = useSession();

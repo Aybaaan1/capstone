@@ -2,7 +2,7 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-      "@/_components/*": ["app/(frontend)/(components)/_components/*"]
+      "@/_components/*": ["./app/(frontend)/(components)/_components/*"]
     }
   }
 }
