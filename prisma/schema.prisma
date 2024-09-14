@@ -22,34 +22,18 @@ enum UserRole {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  name        String
-  email       String    @unique
-  phoneNumber String?
-  userType    UserRole
-  items       Item[]    @relation("ReportedItems")
-  claims      Claim[]
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
+  idnumber       String   @unique
+  firstname      String
+  lastname       String
+  program        String
+  password       String
+  role           Role     @default(STUDENT) // Default role is set to 'STUDENT'
+  image          String?  // Optional field for user profile image
 }
 
-model Item {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  category    String
-  status      String
-  reportDate  DateTime  @default(now())
-  reporterId  String
-  reporter    User      @relation("ReportedItems", fields: [reporterId], references: [id])
-  claims      Claim[]
-}
-
-model Claim {
-  id        String   @id @default(uuid())
-  userId    String
-  itemId    String
-  claimDate DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  item      Item     @relation(fields: [itemId], references: [id])
-
-  @@unique([userId, itemId])
+enum Role {
+  STUDENT
+  ADMIN
 }
