@@ -74,6 +74,7 @@ const Registration = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="Enter your email"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -87,6 +88,7 @@ const Registration = () => {
               name="idnumber"
               value={formData.idnumber}
               onChange={handleChange}
+              placeholder="Enter your student ID number"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -100,6 +102,7 @@ const Registration = () => {
               name="firstname"
               value={formData.firstname}
               onChange={handleChange}
+              placeholder="Enter your first name"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -113,6 +116,7 @@ const Registration = () => {
               name="lastname"
               value={formData.lastname}
               onChange={handleChange}
+              placeholder="Enter your last name"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -121,14 +125,29 @@ const Registration = () => {
             <label className="block text-gray-700 font-semibold mb-1">
               Program:
             </label>
-            <input
-              type="text"
+            <select
               name="program"
               value={formData.program}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option value="">Select a program</option>
+              <option value="BEED">BEED</option>
+              <option value="BTLED">BTLED</option>
+              <option value="BSED-MATH">BSED-MATH</option>
+              <option value="BIT">BIT</option>
+              <option value="BSIT">BSIT</option>
+              <option value="BSIE">BSIE</option>
+              <option value="BAEL">BAEL</option>
+              <option value="BALIT">BALIT</option>
+              <option value="BSP">BSP</option>
+              <option value="BSF">BSF</option>
+              <option value="BSA">BSA</option>
+              <option value="BSES">BSES</option>
+              <option value="BSHM">BSHM</option>
+              <option value="BSTM">BSTM</option>
+            </select>
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-1">
@@ -139,6 +158,7 @@ const Registration = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="Enter your password"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -152,6 +172,7 @@ const Registration = () => {
               name="confirm_password"
               value={formData.confirm_password}
               onChange={handleChange}
+              placeholder="Confirm your password"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

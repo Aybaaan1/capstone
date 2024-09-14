@@ -32,7 +32,7 @@ const SignIn = () => {
         setSuccess("Login successful!");
         setError(""); // Clear any previous error
         // Optionally, redirect the user to another page after successful login
-        window.location.href = "/aboutus"; // Redirect to home or another page
+        window.location.href = "/"; // Redirect to home or another page
       }
     } catch (error) {
       setError("Something went wrong. Please try again.");
@@ -57,6 +57,7 @@ const SignIn = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              placeholder="Enter your email"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -70,6 +71,7 @@ const SignIn = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="Enter your password"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
