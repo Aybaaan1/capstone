@@ -60,8 +60,7 @@ model Item {
   image     String?
   type      String
   status    String
-  reserves  Reserve[]
-  
+
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -70,18 +69,20 @@ model ItemReservation {
   image  String?
   type   String
   status String
+  res    Reserve[]
+  
 }
 
 model Reserve {
-  id              Int      @id @default(autoincrement())
+  id              Int             @id @default(autoincrement())
   itemId          Int
   userId          Int
   reserveDateTime DateTime
   returnDateTime  DateTime
   purpose         String
-
-  item            Item     @relation(fields: [itemId], references: [id])
-  user            User     @relation(fields: [userId], references: [id])
+ 
+  item            ItemReservation @relation(fields: [itemId], references: [id])
+  user            User            @relation(fields: [userId], references: [id])
 }
 
 model Assistance {

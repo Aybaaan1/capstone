@@ -1,6 +1,11 @@
+"use client";
+import { useState } from "react";
 import Image from "next/image";
 
 export default function Purchase() {
+  const [cart, setCart] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
   const merchandise = [
     {
       picture: "/imgs/tshirt.png",
@@ -17,30 +22,11 @@ export default function Purchase() {
       item: "University Tote Bag",
       price: "160.00",
     },
-    { picture: "/imgs/flask.png", item: "University Tumbler", price: "299.00" },
     {
-      picture: "/imgs/tshirt.png",
-      item: "University T-Shirt",
-      price: "250.00",
+      picture: "/imgs/flask.png",
+      item: "University Tumbler",
+      price: "299.00",
     },
-    {
-      picture: "/imgs/lanyards.png",
-      item: "Department Lanyards",
-      price: "85.00",
-    },
-    {
-      picture: "/imgs/totebag.png",
-      item: "University Tote Bag",
-      price: "160.00",
-    },
-    { picture: "/imgs/flask.png", item: "University Tumbler", price: "299.00" },
-  ];
-
-  const sociallinks = [
-    { image: "/imgs/fb-icon.png", href: "/" },
-    { image: "/imgs/twitter-icon.png", href: "/" },
-    { image: "/imgs/instagram-icon.png", href: "/" },
-    { image: "/imgs/youtube-icon.png", href: "/" },
   ];
 
   const order = [
@@ -57,10 +43,11 @@ export default function Purchase() {
       text: "Choose an item.",
     },
     {
-      picture: "/imgs/totebag.png",
+      picture: "/imgs/flask.png",
       text: "Choose an item.",
     },
   ];
+
   const order1 = [
     {
       picture: "/imgs/tshirt.png",
@@ -75,10 +62,11 @@ export default function Purchase() {
       text: "Select what you want to buy.",
     },
     {
-      picture: "/imgs/totebag.png",
+      picture: "/imgs/flask.png",
       text: "Select what you want to buy.",
     },
   ];
+
   const order2 = [
     {
       picture: "/imgs/tshirt.png",
@@ -93,10 +81,11 @@ export default function Purchase() {
       text: "Click Order now.",
     },
     {
-      picture: "/imgs/totebag.png",
+      picture: "/imgs/flask.png",
       text: "Click Order now.",
     },
   ];
+
   const order3 = [
     {
       picture: "/imgs/tshirt.png",
@@ -111,26 +100,85 @@ export default function Purchase() {
       text: "Click view items.",
     },
     {
-      picture: "/imgs/totebag.png",
+      picture: "/imgs/flask.png",
       text: "Click view items.",
     },
   ];
 
+  const handleAddToCart = (item) => {
+    setCart([...cart, item]);
+  };
+
+  const handleToggleCart = () => {
+    setIsCartOpen(!isCartOpen);
+  };
+
   return (
     <div>
-      <section
-        style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
-        className="w-full h-56 mt-10"
-      ></section>
+      <header className="relative">
+        <section
+          style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
+          className="w-full h-56 mt-10"
+        ></section>
+      </header>
       <section>
         <div>
           <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
             University Merchandise
           </h1>
         </div>
+        <div>
+          <div className="flex flex-wrap justify-center">
+            <button
+              onClick={handleToggleCart}
+              className="absolute top-4 right-10 bg-transparent p-2 rounded-full"
+            >
+              <Image
+                src="/imgs/cart-icon.png"
+                height={35}
+                width={35}
+                alt="Cart Icon"
+              />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                  {cart.length}
+                </span>
+              )}
+            </button>
+            {isCartOpen && (
+              <div className="absolute top-16 right-4 bg-white p-4 shadow-lg rounded-lg">
+                <h2 className="font-bold">Cart</h2>
+                {cart.length > 0 ? (
+                  cart.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Image
+                        src={item.picture}
+                        height={50}
+                        width={50}
+                        alt={item.item}
+                      />
+                      <div>
+                        <p>{item.item}</p>
+                        <p>Price: P{item.price}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>Your cart is empty.</p>
+                )}
+                <button className="mt-2 bg-primary text-white px-4 py-2 rounded-full">
+                  Checkout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="grid grid-cols-4 place-items-center px-20">
-          {merchandise.map((merch) => (
-            <div className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl">
+          {merchandise.map((merch, index) => (
+            <div
+              key={index}
+              className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl"
+            >
               <Image
                 src={merch.picture}
                 height={200}
@@ -140,7 +188,10 @@ export default function Purchase() {
               <p>{merch.item}</p>
               <p>Price: P{merch.price}</p>
               <div>
-                <button className="bg-primary text-white  px-3 py-2 rounded-full">
+                <button
+                  onClick={() => handleAddToCart(merch)}
+                  className="bg-primary text-white px-3 py-2 rounded-full"
+                >
                   Order now
                 </button>
               </div>
@@ -166,8 +217,11 @@ export default function Purchase() {
         </div>
         <section>
           <div className="grid grid-cols-4 place-items-center px-20">
-            {order.map((merch) => (
-              <div className="text-black flex flex-col gap-2 items-center bg-white py-12">
+            {order.map((merch, index) => (
+              <div
+                key={index}
+                className="text-black flex flex-col gap-2 items-center bg-white py-12"
+              >
                 <Image
                   className="rounded-full"
                   src={merch.picture}
@@ -191,8 +245,11 @@ export default function Purchase() {
         </div>
         <section>
           <div className="grid grid-cols-4 place-items-center px-20">
-            {order1.map((merch) => (
-              <div className="text-black flex flex-col gap-2 items-center bg-white py-12">
+            {order1.map((merch, index) => (
+              <div
+                key={index}
+                className="text-black flex flex-col gap-2 items-center bg-white py-12"
+              >
                 <Image
                   className="rounded-full"
                   src={merch.picture}
@@ -216,8 +273,11 @@ export default function Purchase() {
         </div>
         <section>
           <div className="grid grid-cols-4 place-items-center px-20">
-            {order2.map((merch) => (
-              <div className="text-black flex flex-col gap-2 items-center bg-white py-12">
+            {order2.map((merch, index) => (
+              <div
+                key={index}
+                className="text-black flex flex-col gap-2 items-center bg-white py-12"
+              >
                 <Image
                   className="rounded-full"
                   src={merch.picture}
@@ -241,8 +301,11 @@ export default function Purchase() {
         </div>
         <section>
           <div className="grid grid-cols-4 place-items-center px-20">
-            {order3.map((merch) => (
-              <div className="text-black flex flex-col gap-2 items-center bg-white py-12">
+            {order3.map((merch, index) => (
+              <div
+                key={index}
+                className="text-black flex flex-col gap-2 items-center bg-white py-12"
+              >
                 <Image
                   className="rounded-full"
                   src={merch.picture}
@@ -255,32 +318,6 @@ export default function Purchase() {
             ))}
           </div>
         </section>
-      </section>
-      <section className="flex items-center justify-between px-24 overflow-hidden py-10">
-        <div className="text-black w-[450px] flex flex-col gap-7">
-          <h1 className="font-medium text-4xl">Follow us</h1>
-          <div className="flex flex-col ">
-            <p className="text-slate-600">
-              @https://www.facebook.com/SSGCTUArgao
-            </p>
-            <p className="text-slate-600">
-              To stay updated with the latest news, promotions, and offerings
-              from the poke , make sure to follow us social media accounts.
-              Don't miss out on any updates
-            </p>
-          </div>
-          <div className="flex pr-48 items-center justify-between">
-            {sociallinks.map((links) => (
-              <Image
-                src={links.image}
-                href={links.href}
-                height={40}
-                width={40}
-              />
-            ))}
-          </div>
-        </div>
-        <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
       </section>
     </div>
   );
