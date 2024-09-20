@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
-import TambayayongForm from "../_components/TambayayongForm";
+import LostFoundForm from "../../(components)/_components/TambayayongForm";
 export default function Tambayayong() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   return (

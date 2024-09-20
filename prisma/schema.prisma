@@ -27,6 +27,8 @@ model User {
   items          Item[]
   reserves       Reserve[]
   assistances    Assistance[]
+
+  
 }
 
 model Merch {

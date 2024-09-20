@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { sendNotification } from "@/lib/notifier"; // Import the notifier
 
 const SignIn = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -27,18 +25,33 @@ const SignIn = () => {
 
       if (result.error) {
         setError(result.error);
-        setSuccess(""); // Clear success message
+        setSuccess("");
       } else {
         setSuccess("Login successful!");
-        setError(""); // Clear any previous error
-        // Optionally, redirect the user to another page after successful login
+        setError("");
+
+        // Send SMS notification via API route
+        const response = await fetch("/api/sendNotifications", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: "+639947933405", // User's phone number
+            message: "You have successfully logged in!",
+          }),
+        });
+
+        if (!response.ok) {
+          console.error("Failed to send SMS notification");
+        }
+
         window.location.href = "/"; // Redirect to home or another page
       }
     } catch (error) {
       setError("Something went wrong. Please try again.");
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="max-w-md w-full bg-white p-8 border border-gray-200 rounded-lg shadow-md">
