@@ -1,12 +1,18 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { sendNotification } from "@/lib/notifier"; // Import the notifier
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const SignIn = () => {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const { data: session } = useSession();
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,33 +31,25 @@ const SignIn = () => {
 
       if (result.error) {
         setError(result.error);
-        setSuccess("");
+        setSuccess(""); // Clear success message
       } else {
         setSuccess("Login successful!");
-        setError("");
+        setError(""); // Clear any previous error
 
-        // Send SMS notification via API route
-        const response = await fetch("/api/sendNotifications", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            to: "+639947933405", // User's phone number
-            message: "You have successfully logged in!",
-          }),
-        });
-
-        if (!response.ok) {
-          console.error("Failed to send SMS notification");
+        // Check user session and redirect based on role
+        if (session?.user?.role === "ADMIN") {
+          router.push("/admin");
+        } else if (session?.user?.role === "STUDENT") {
+          router.push("/");
+        } else {
+          router.push("/signin"); // Default redirect
         }
-
-        window.location.href = "/"; // Redirect to home or another page
       }
     } catch (error) {
       setError("Something went wrong. Please try again.");
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="max-w-md w-full bg-white p-8 border border-gray-200 rounded-lg shadow-md">

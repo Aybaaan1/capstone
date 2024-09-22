@@ -2,8 +2,11 @@
 import Image from "next/image";
 import Button from "./(frontend)/(components)/_components/Button";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
+  const { data: session } = useSession();
+  console.log("ROLE: ", session?.role);
   const [activeAchievement, setActiveAchievement] = useState(0);
   const ssgAchievements = [
     {
