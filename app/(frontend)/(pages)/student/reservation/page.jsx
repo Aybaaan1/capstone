@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import LostFoundForm from "../../(components)/_components/ReservationForm";
+import ReservationForm from "../../../(components)/_components/ReservationForm";
 import { useState } from "react";
 
 export default function Reservation() {

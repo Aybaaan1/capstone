@@ -192,7 +192,7 @@ export default function Purchase() {
                   onClick={() => handleAddToCart(merch)}
                   className="bg-primary text-white px-3 py-2 rounded-full"
                 >
-                  Order now
+                  Add to cart
                 </button>
               </div>
             </div>

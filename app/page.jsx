@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
-  console.log("ROLE: ", session?.role);
+
   const [activeAchievement, setActiveAchievement] = useState(0);
   const ssgAchievements = [
     {
@@ -70,7 +70,7 @@ export default function Home() {
   return (
     <div className=" w-full bg-white">
       <section className="flex items-center justify-center border-b-2 border-gray-100 h-[513px] gap-20">
-        <div className="text-black flex flex-col gap-6 h-[300px]">
+        <div className="text-black flex flex-col gap-5 h-[300px]">
           <h1 className="font-bold text-7xl">
             SSG <br /> Connect
           </h1>

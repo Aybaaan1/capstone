@@ -1,3 +1,4 @@
+"use client";
 const LostFoundForm = ({ formLabel, setClose }) => {
   return (
     <form className="absolute top-0 left-1/2 -translate-x-1/2  w-[80%] bg-white shadow-lg p-10 flex">

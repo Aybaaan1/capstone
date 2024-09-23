@@ -2,8 +2,7 @@
 import Image from "next/image";
 
 import { useState } from "react";
-import LostFoundForm from "../../(components)/_components/LostFoundForm";
-
+import LostFoundForm from "../../../(components)/_components/LostFoundForm";
 export default function page() {
   const [isLostFormClicked, setIsLostFormClicked] = useState(false);
   const [isFoundFormClicked, setIsFoundFormClicked] = useState(false);

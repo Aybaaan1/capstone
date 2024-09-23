@@ -31,7 +31,7 @@ model User {
   
 }
 
-model Merch {
+model Merch { //form for admin to add merch items
   id     Int     @id @default(autoincrement())
   name   String
   price  Float
@@ -41,7 +41,7 @@ model Merch {
   orders Order[]
 }
 
-model Order {
+model Order { //form for user in purchase
   id          Int      @id @default(autoincrement())
   userId      Int
   merchId     Int
@@ -53,7 +53,7 @@ model Order {
   merch       Merch    @relation(fields: [merchId], references: [id])
 }
 
-model Item {
+model Item { //form for user for lost&found
   id        Int      @id @default(autoincrement())
   userId    Int
   name      String
@@ -66,7 +66,7 @@ model Item {
   user      User     @relation(fields: [userId], references: [id])
 }
 
-model ItemReservation {
+model ItemReservation { //form for admin to add item
   id     Int     @id @default(autoincrement())
   image  String?
   type   String
@@ -75,7 +75,7 @@ model ItemReservation {
   
 }
 
-model Reserve {
+model Reserve { //form for user to reserve items
   id              Int             @id @default(autoincrement())
   itemId          Int
   userId          Int
@@ -87,11 +87,11 @@ model Reserve {
   user            User            @relation(fields: [userId], references: [id])
 }
 
-model Assistance {
+model Assistance { //form for user to request cash assistance
   id        Int      @id @default(autoincrement())
   userId    Int
   name      String
-  patience  Int
+  patience  String
   dateTime  DateTime
   gcash     String
   proof     String?
