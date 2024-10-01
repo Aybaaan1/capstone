@@ -1,10 +1,12 @@
-"use client";
-
 import { SessionProvider } from "next-auth/react";
+import "@/styles/globals.css";
 
-const Provider = ({ children, session }) => {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
-};
+function MyApp({ Component, pageProps: { session, ...pageProps } }) {
+  return (
+    <SessionProvider session={session}>
+      <Component {...pageProps} />
+    </SessionProvider>
+  );
+}
 
-export default Provider;
-``;
+export default MyApp;

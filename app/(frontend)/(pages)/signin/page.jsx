@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const SignIn = () => {
@@ -36,10 +36,13 @@ const SignIn = () => {
         setSuccess("Login successful!");
         setError(""); // Clear any previous error
 
-        // Check user session and redirect based on role
-        if (session?.user?.role === "ADMIN") {
+        // Fetch the updated session data after login
+        const updatedSession = await getSession();
+
+        // Check user role and redirect accordingly
+        if (updatedSession?.user?.role === "ADMIN") {
           router.push("/admin");
-        } else if (session?.user?.role === "STUDENT") {
+        } else if (updatedSession?.user?.role === "STUDENT") {
           router.push("/");
         } else {
           router.push("/signin"); // Default redirect

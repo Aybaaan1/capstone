@@ -125,7 +125,7 @@ const ReservationDashboard = () => {
           </li>
           <li>
             <a
-              href="#"
+              href="/admin/reserve"
               className="block py-2 px-4 rounded-md bg-gray-900 text-white"
             >
               Reservation
@@ -137,6 +137,14 @@ const ReservationDashboard = () => {
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
               Tambayayong
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/item"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Item Reservation Form
             </a>
           </li>
         </ul>
