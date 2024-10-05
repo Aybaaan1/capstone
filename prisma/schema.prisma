@@ -77,7 +77,7 @@ model ItemReservation { //form for admin to add item
 
 model Reserve { //form for user to reserve items
   id              Int             @id @default(autoincrement())
-  itemId          Int
+  itemId          Int             @unique
   userId          Int
   reserveDateTime DateTime
   returnDateTime  DateTime

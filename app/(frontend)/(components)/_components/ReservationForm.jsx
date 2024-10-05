@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar } from "@nextui-org/react";
 import { today, getLocalTimeZone, isWeekend } from "@internationalized/date";
 import { useLocale } from "@react-aria/i18n";
+import { useSession } from "next-auth/react"; // Import useSession
 
 const ReservationForm = ({
   formLabel,
@@ -10,7 +11,7 @@ const ReservationForm = ({
   itemId,
   onReservationSuccess,
 }) => {
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState(null); // Initialize userId to null
   const [purpose, setPurpose] = useState("");
   const [reserveDateTime, setReserveDateTime] = useState("");
   const [returnDateTime, setReturnDateTime] = useState("");
@@ -32,15 +33,41 @@ const ReservationForm = ({
         date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0
     );
 
+  // Use the useSession hook
+  const { data: session, status } = useSession();
+
+  // Fetch the user ID when the session is authenticated
+  useEffect(() => {
+    if (status === "authenticated" && session) {
+      setUserId(session.user.id);
+    }
+  }, [status, session]); // Dependency on 'status' and 'session'
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Ensure itemId and userId are passed as integers
     const reservationData = {
-      itemId,
-      userId,
-      reserveDateTime,
-      returnDateTime,
+      itemId: parseInt(itemId, 10), // Convert itemId to integer
+      userId, // The userId is now from the session
+      reserveDateTime: new Date(reserveDateTime).toISOString(), // Convert to ISO string
+      returnDateTime: new Date(returnDateTime).toISOString(), // Convert to ISO string
       purpose,
     };
+
+    console.log("Submitting reservation data:", reservationData);
+
+    // Validate required fields
+    if (
+      !reservationData.itemId ||
+      !reservationData.userId ||
+      !reserveDateTime ||
+      !returnDateTime ||
+      !purpose
+    ) {
+      alert("All fields are required.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/reserve", {
@@ -50,11 +77,17 @@ const ReservationForm = ({
         },
         body: JSON.stringify(reservationData),
       });
-      if (!response.ok) throw new Error("Failed to reserve item");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || "Failed to reserve item"}`);
+        return;
+      }
+
       await onReservationSuccess();
       onClose();
     } catch (error) {
-      alert(error.message);
+      alert(`Error: ${error.message}`);
     }
   };
 
@@ -69,24 +102,6 @@ const ReservationForm = ({
             ❌
           </button>
           <h3 className="text-2xl font-bold mb-4 text-center">{formLabel}</h3>
-
-          <div className="mt-2">
-            <label
-              htmlFor="name"
-              className="block text-sm font-semibold text-gray-700"
-            >
-              Your Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Your name"
-              className="p-2 mt-1 w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              required
-            />
-          </div>
 
           <div className="mt-2">
             <label
@@ -109,27 +124,6 @@ const ReservationForm = ({
           </div>
 
           <div className="grid grid-cols-2 mt-4 gap-2">
-            <div>
-              <label
-                htmlFor="item"
-                className="block text-sm font-semibold text-gray-700"
-              >
-                Item
-              </label>
-              <select
-                name="item"
-                id="item"
-                className="mt-1.5 w-full p-2 rounded-md border-gray-300 text-gray-700 sm:text-sm"
-                defaultValue={itemId}
-                required
-              >
-                <option value="">Select an item</option>
-                <option value="TV">TV</option>
-                <option value="Tables">Tables</option>
-                {/* Add other item options */}
-              </select>
-            </div>
-
             <div>
               <label
                 htmlFor="reserveDateTime"

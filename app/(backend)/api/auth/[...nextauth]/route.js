@@ -36,7 +36,7 @@ export const authOptions = {
             return null;
           }
 
-          // Return the user object
+          // Return the user object (this is the key fix)
           return {
             id: user.id,
             email: user.email,
@@ -45,7 +45,10 @@ export const authOptions = {
           };
         } catch (err) {
           console.log("Error during login", err);
-          return null;
+          return NextResponse.json(
+            { error: "Authentication failed" },
+            { status: 401 }
+          ); // Return an error response
         }
       },
     }),
@@ -62,7 +65,7 @@ export const authOptions = {
         session.role = token.user.role;
         session.image = token.user.image;
       }
-      return session;
+      return session; // Ensure you're returning the session object
     },
     async jwt({ token, user }) {
       if (user) {
@@ -70,7 +73,7 @@ export const authOptions = {
         token.role = user.role;
         token.image = user.image;
       }
-      return token;
+      return token; // Ensure you're returning the token object
     },
   },
   session: {
@@ -78,7 +81,7 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/signin",
+    signIn: "/auth/signin",
   },
 };
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/db"; // Ensure this path is correct
 
+// api/reserveitem.js
 export async function GET(request) {
   try {
     // Fetch all items from the ItemReservation model
