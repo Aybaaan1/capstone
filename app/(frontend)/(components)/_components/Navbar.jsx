@@ -1,27 +1,33 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useSession, signOut } from "next-auth/react"; // Import useSession and signOut from next-auth
+import Modal from "./Modal"; // Modal component
+import SignIn from "./Signin"; // SignIn component
+import Registration from "./Registration"; // Registration component
 
-export default function Navbar() {
-  const { data: session } = useSession(); // Get session data
-  const router = useRouter(); // Initialize the router
+const Navbar = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const [showModal, setShowModal] = useState(false); // Modal visibility
+  const [isRegistering, setIsRegistering] = useState(false); // Toggle between sign-in and registration
 
   const handleLoginClick = () => {
-    router.push("/signin"); // Navigate to the /signin page
+    setIsRegistering(false); // Show Sign In form
+    setShowModal(true); // Open the modal
   };
 
   const handleLogoutClick = async () => {
-    await signOut(); // Sign out the user
-    router.push("/signin"); // Redirect to the /signin page after logging out
+    await signOut();
+    router.push("/signin");
   };
 
   const handleNavClick = (href) => {
     if (!session) {
-      alert("Please log in first to access this page."); // Alert message for unauthenticated users
+      alert("Please log in first to access this page.");
     } else {
-      router.push(href); // Navigate to the desired page if authenticated
+      router.push(href);
     }
   };
 
@@ -36,13 +42,13 @@ export default function Navbar() {
 
   return (
     <div className="w-full h-20 bg-[rgb(255,211,70)] flex items-center justify-around px-28">
-      <Image src="/imgs/ssglogo.png" height={200} width={200} alt="Logo" />
+      <img src="/imgs/ssglogo.png" alt="Logo" />
       <nav className="flex items-center justify-between gap-5">
         {navs.map((nav) => (
           <button
             key={nav.path}
             className="text-sm text-black"
-            onClick={() => handleNavClick(nav.href)} // Use handleNavClick for navigation
+            onClick={() => handleNavClick(nav.href)}
           >
             {nav.path}
           </button>
@@ -64,6 +70,19 @@ export default function Navbar() {
           Log in
         </button>
       )}
+
+      {/* Modal for Sign In and Registration */}
+      {showModal && (
+        <Modal onClose={() => setShowModal(false)}>
+          {isRegistering ? (
+            <Registration />
+          ) : (
+            <SignIn switchToRegister={() => setIsRegistering(true)} />
+          )}
+        </Modal>
+      )}
     </div>
   );
-}
+};
+
+export default Navbar;

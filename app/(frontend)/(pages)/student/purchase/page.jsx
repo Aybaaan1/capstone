@@ -5,112 +5,57 @@ import Image from "next/image";
 export default function Purchase() {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [editedCart, setEditedCart] = useState([]);
 
   const merchandise = [
-    {
-      picture: "/imgs/tshirt.png",
-      item: "University T-Shirt",
-      price: "250.00",
-    },
-    {
-      picture: "/imgs/lanyards.png",
-      item: "Department Lanyards",
-      price: "85.00",
-    },
-    {
-      picture: "/imgs/totebag.png",
-      item: "University Tote Bag",
-      price: "160.00",
-    },
-    {
-      picture: "/imgs/flask.png",
-      item: "University Tumbler",
-      price: "299.00",
-    },
-  ];
-
-  const order = [
-    {
-      picture: "/imgs/tshirt.png",
-      text: "Choose an item.",
-    },
-    {
-      picture: "/imgs/lanyards.png",
-      text: "Choose an item.",
-    },
-    {
-      picture: "/imgs/totebag.png",
-      text: "Choose an item.",
-    },
-    {
-      picture: "/imgs/flask.png",
-      text: "Choose an item.",
-    },
-  ];
-
-  const order1 = [
-    {
-      picture: "/imgs/tshirt.png",
-      text: "Select what you want to buy.",
-    },
-    {
-      picture: "/imgs/lanyards.png",
-      text: "Select what you want to buy.",
-    },
-    {
-      picture: "/imgs/totebag.png",
-      text: "Select what you want to buy.",
-    },
-    {
-      picture: "/imgs/flask.png",
-      text: "Select what you want to buy.",
-    },
-  ];
-
-  const order2 = [
-    {
-      picture: "/imgs/tshirt.png",
-      text: "Click Order now.",
-    },
-    {
-      picture: "/imgs/lanyards.png",
-      text: "Click Order now.",
-    },
-    {
-      picture: "/imgs/totebag.png",
-      text: "Click Order now.",
-    },
-    {
-      picture: "/imgs/flask.png",
-      text: "Click Order now.",
-    },
-  ];
-
-  const order3 = [
-    {
-      picture: "/imgs/tshirt.png",
-      text: "Click view items.",
-    },
-    {
-      picture: "/imgs/lanyards.png",
-      text: "Click view items.",
-    },
-    {
-      picture: "/imgs/totebag.png",
-      text: "Click view items.",
-    },
-    {
-      picture: "/imgs/flask.png",
-      text: "Click view items.",
-    },
+    { picture: "/imgs/tshirt.png", item: "University T-Shirt", price: 250.0 },
+    { picture: "/imgs/lanyards.png", item: "Department Lanyards", price: 85.0 },
+    { picture: "/imgs/totebag.png", item: "University Tote Bag", price: 160.0 },
+    { picture: "/imgs/flask.png", item: "University Tumbler", price: 299.0 },
   ];
 
   const handleAddToCart = (item) => {
-    setCart([...cart, item]);
+    setCart([...cart, { ...item, quantity: 1, size: null }]); // Set size to null
+    setTotalPrice((prevPrice) => prevPrice + item.price);
   };
 
   const handleToggleCart = () => {
     setIsCartOpen(!isCartOpen);
+  };
+
+  const handleCheckout = () => {
+    setEditedCart(cart); // Prepopulate modal with current cart
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateItem = (index, key, value) => {
+    const updatedCart = [...editedCart];
+    updatedCart[index][key] = value;
+
+    // Recalculate total price
+    const updatedTotal = updatedCart.reduce((total, item) => {
+      return total + item.price * item.quantity;
+    }, 0);
+
+    setEditedCart(updatedCart);
+    setTotalPrice(updatedTotal);
+  };
+
+  const handleConfirmEdit = () => {
+    setCart(editedCart); // Update the cart with edited values
+    setIsModalOpen(false); // Close the modal
+  };
+
+  const handleRemoveItem = (index) => {
+    const updatedCart = cart.filter((_, i) => i !== index);
+    const removedItem = cart[index];
+
+    // Recalculate total price after removing the item
+    const updatedTotal = totalPrice - removedItem.price * removedItem.quantity;
+    setCart(updatedCart);
+    setTotalPrice(updatedTotal);
   };
 
   return (
@@ -160,15 +105,35 @@ export default function Purchase() {
                       <div>
                         <p>{item.item}</p>
                         <p>Price: P{item.price}</p>
+                        <p>Quantity: {item.quantity}</p>
+                        {item.size && <p>Size: {item.size}</p>}{" "}
+                        {/* Show size if available */}
                       </div>
+                      <button
+                        onClick={() => handleRemoveItem(index)}
+                        className="ml-auto"
+                      >
+                        <Image
+                          src="/imgs/remove.png"
+                          height={20}
+                          width={20}
+                          alt="Remove Icon"
+                          className="hover:opacity-75"
+                        />
+                      </button>
                     </div>
                   ))
                 ) : (
                   <p>Your cart is empty.</p>
                 )}
-                <button className="mt-2 bg-primary text-white px-4 py-2 rounded-full">
-                  Checkout
-                </button>
+                {cart.length > 0 && (
+                  <button
+                    onClick={handleCheckout}
+                    className="mt-2 bg-primary text-white px-4 py-2 rounded-full"
+                  >
+                    Checkout
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -198,127 +163,79 @@ export default function Purchase() {
             </div>
           ))}
         </div>
-        <div className="flex justify-center items-center">
-          <button className="border-black border-[1px] text-base rounded-full px-20 py-2">
-            See All
-          </button>
-        </div>
       </section>
-      <section className="text-center mt-16">
-        <h1 className="text-3xl font-bold">How to Order?</h1>
-        <div className="flex items-center gap-2 mt-20 px-32">
-          <div>
-            <h1 className="text-6xl font-bold text-gray-300">1</h1>
-          </div>
-          <div className="flex flex-col items-start">
-            <p className="text-[12px]">Step 1</p>
-            <h3 className="font-bold">Choose an Item</h3>
-          </div>
-        </div>
-        <section>
-          <div className="grid grid-cols-4 place-items-center px-20">
-            {order.map((merch, index) => (
-              <div
-                key={index}
-                className="text-black flex flex-col gap-2 items-center bg-white py-12"
-              >
-                <Image
-                  className="rounded-full"
-                  src={merch.picture}
-                  height={200}
-                  width={200}
-                  alt="Order picture"
-                />
-                <p className="py-2 px-2 mt-2 ">{merch.text}</p>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg">
+            <h2 className="text-xl font-bold mb-4">Edit Cart Items</h2>
+            {editedCart.map((item, index) => (
+              <div key={index} className="mb-4">
+                <div className="flex items-center gap-4">
+                  <Image
+                    src={item.picture}
+                    height={50}
+                    width={50}
+                    alt={item.item}
+                  />
+                  <div>
+                    <p>{item.item}</p>
+                    <p>Price: P{item.price}</p>
+                    <div className="mt-2">
+                      <label>Size: </label>
+                      <select
+                        value={item.size || ""} // Use empty string if size is null
+                        onChange={(e) =>
+                          handleUpdateItem(index, "size", e.target.value)
+                        }
+                        className="border rounded px-2 py-1"
+                      >
+                        <option value="">Select Size</option>
+                        <option value="S">Small</option>
+                        <option value="M">Medium</option>
+                        <option value="L">Large</option>
+                      </select>
+                    </div>
+                    <div className="mt-2">
+                      <label>Quantity: </label>
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) =>
+                          handleUpdateItem(
+                            index,
+                            "quantity",
+                            parseInt(e.target.value)
+                          )
+                        }
+                        className="border rounded px-2 py-1"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
-          </div>
-        </section>
-        <div className="flex items-center gap-2 mt-5 px-32">
-          <div>
-            <h1 className="text-6xl font-bold text-gray-300">2</h1>
-          </div>
-          <div className="flex flex-col items-start">
-            <p className="text-[12px]">Step 2</p>
-            <h3 className="font-bold">Click your Item.</h3>
+            <div className="mt-4">
+              <h3>Total Price: P{totalPrice.toFixed(2)}</h3>
+            </div>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleConfirmEdit}
+                className="bg-primary text-white px-4 py-2 rounded-full"
+              >
+                Confirm
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-red-500 text-white px-4 py-2 rounded-full ml-2"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
-        <section>
-          <div className="grid grid-cols-4 place-items-center px-20">
-            {order1.map((merch, index) => (
-              <div
-                key={index}
-                className="text-black flex flex-col gap-2 items-center bg-white py-12"
-              >
-                <Image
-                  className="rounded-full"
-                  src={merch.picture}
-                  height={200}
-                  width={200}
-                  alt="Order picture"
-                />
-                <p className="py-2 px-2 mt-2 ">{merch.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-        <div className="flex items-center gap-2 mt-5 px-32">
-          <div>
-            <h1 className="text-6xl font-bold text-gray-300">3</h1>
-          </div>
-          <div className="flex flex-col items-start">
-            <p className="text-[12px]">Step 3</p>
-            <h3 className="font-bold">Click Order Now.</h3>
-          </div>
-        </div>
-        <section>
-          <div className="grid grid-cols-4 place-items-center px-20">
-            {order2.map((merch, index) => (
-              <div
-                key={index}
-                className="text-black flex flex-col gap-2 items-center bg-white py-12"
-              >
-                <Image
-                  className="rounded-full"
-                  src={merch.picture}
-                  height={200}
-                  width={200}
-                  alt="Order picture"
-                />
-                <p className="py-2 px-2 mt-2 ">{merch.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-        <div className="flex items-center gap-2 mt-5 px-32">
-          <div>
-            <h1 className="text-6xl font-bold text-gray-300">4</h1>
-          </div>
-          <div className="flex flex-col items-start">
-            <p className="text-[12px]">Step 4</p>
-            <h3 className="font-bold">Process Payment</h3>
-          </div>
-        </div>
-        <section>
-          <div className="grid grid-cols-4 place-items-center px-20">
-            {order3.map((merch, index) => (
-              <div
-                key={index}
-                className="text-black flex flex-col gap-2 items-center bg-white py-12"
-              >
-                <Image
-                  className="rounded-full"
-                  src={merch.picture}
-                  height={200}
-                  width={200}
-                  alt="Order picture"
-                />
-                <p className="py-2 px-2 mt-2 ">{merch.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </section>
+      )}
     </div>
   );
 }

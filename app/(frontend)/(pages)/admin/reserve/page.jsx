@@ -109,7 +109,7 @@ const ReservationDashboard = () => {
           </li>
           <li>
             <a
-              href="#"
+              href="/admin/purchase"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
               Purchase
@@ -117,7 +117,7 @@ const ReservationDashboard = () => {
           </li>
           <li>
             <a
-              href="#"
+              href="/admin/lostfound"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
               Lost & Found
@@ -133,7 +133,7 @@ const ReservationDashboard = () => {
           </li>
           <li>
             <a
-              href="#"
+              href="/admin/tambayayong"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
               Tambayayong

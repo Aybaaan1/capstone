@@ -125,12 +125,7 @@ const Purchase = () => {
       {/* Main Content */}
       <main className="flex-1 p-10">
         <header className="flex justify-between mb-5">
-          <h2 className="text-2xl font-medium">Purchase Dashboard</h2>
-          <div className="flex space-x-4">
-            <button className="text-lg">🔔</button>
-            <button className="text-lg">❓</button>
-            <button className="text-lg">👤</button>
-          </div>
+          <h1 className="text-2xl font-medium">Purchase Dashboard</h1>
         </header>
 
         {/* Purchase Table */}
