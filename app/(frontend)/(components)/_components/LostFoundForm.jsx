@@ -1,175 +1,125 @@
 "use client";
-const LostFoundForm = ({ formLabel, setClose }) => {
+import { useState } from "react";
+
+const LostFoundForm = ({
+  formLabel,
+  setClose,
+  selectedItemId,
+  currentUserId,
+}) => {
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [place, setPlace] = useState("");
+  const [dateTime, setDateTime] = useState("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const response = await fetch("/api/reserve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemId: selectedItemId, // Ensure this value is correctly passed in
+        userId: currentUserId, // Ensure this value is correctly passed in
+        reserveDateTime: dateTime, // Use the selected datetime
+        returnDateTime: dateTime, // Adjust this as needed
+        purpose: name, // Use the name as the purpose
+      }),
+    });
+
+    if (response.ok) {
+      alert("Reservation successful!");
+      setClose(); // Close the modal after submission
+    } else {
+      const errorData = await response.json();
+      console.error("Error details:", errorData); // Log the error details to the console
+      alert(`Error: ${errorData.error}`);
+    }
+  };
+
   return (
-    <form className="absolute top-0 left-1/2 -translate-x-1/2  w-[80%] bg-white shadow-lg p-10 flex">
-      <div className="p-8 flex-1">
-        <button onClick={setClose} className="absolute top-6 right-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-[80%] max-w-[900px] bg-white shadow-lg p-10 flex"
+      >
+        <button
+          type="button"
+          onClick={setClose}
+          className="absolute top-6 right-6 text-gray-500 hover:text-gray-700"
+        >
           ❌
         </button>
-        <h3 className="text-3xl font-bold mb-4">{formLabel}</h3>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum
-          dolor sit amet, consectetur adipiscing elit.
-        </p>
+        <div className="p-8 flex-1">
+          <h3 className="text-3xl font-bold mb-4">{formLabel}</h3>
+          <p>Please provide details about the reservation.</p>
 
-        <div className="mt-6">
-          <label
-            htmlFor="name"
-            className="block text-sm font-semibold text-gray-700"
+          <div className="mt-6">
+            <label
+              htmlFor="name"
+              className="block text-sm font-semibold text-gray-700"
+            >
+              Your Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              className="p-2 mt-1 w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 mt-4 gap-4">
+            <div>
+              <label
+                htmlFor="place"
+                className="block text-sm font-semibold text-gray-700"
+              >
+                Place
+              </label>
+              <input
+                type="text"
+                id="place"
+                value={place}
+                onChange={(e) => setPlace(e.target.value)}
+                placeholder="Where will it be used?"
+                className="mt-1.5 w-full p-2 rounded-lg border-gray-300 text-gray-700 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="dateTime"
+                className="block text-sm font-semibold text-gray-700"
+              >
+                Date and Time
+              </label>
+              <input
+                type="datetime-local"
+                id="dateTime"
+                value={dateTime}
+                onChange={(e) => setDateTime(e.target.value)}
+                className="mt-1.5 w-full p-2 rounded-lg border-gray-300 text-gray-700 sm:text-sm"
+                required
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="bg-primary text-white py-2 col-span-2 rounded-3xl mt-4"
           >
-            {" "}
-            Your Name{" "}
-          </label>
-
-          <input
-            type="text"
-            id="name"
-            placeholder="Your name"
-            className="p-2 mt-1 w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
-          />
-        </div>
-        <div className="grid grid-cols-2 mt-4 gap-4">
-          <div>
-            <label
-              htmlFor="department"
-              className="block text-sm font-semibold text-gray-700 "
-            >
-              {" "}
-              Department{" "}
-            </label>
-
-            <select
-              name="department"
-              id="department"
-              className="mt-1.5 w-full p-2 rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-            >
-              <option value="">From what Department?</option>
-              <option value="JM">John Mayer</option>
-              <option value="SRV">Stevie Ray Vaughn</option>
-              <option value="JH">Jimi Hendrix</option>
-              <option value="BBK">B.B King</option>
-              <option value="AK">Albert King</option>
-              <option value="BG">Buddy Guy</option>
-              <option value="EC">Eric Clapton</option>
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="place"
-              className="block text-sm font-semibold text-gray-700"
-            >
-              {" "}
-              Place{" "}
-            </label>
-
-            <select
-              name="place"
-              id="place"
-              className="mt-1.5 w-full p-2 rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-            >
-              <option value="">Where you found the item</option>
-              <option value="JM">John Mayer</option>
-              <option value="SRV">Stevie Ray Vaughn</option>
-              <option value="JH">Jimi Hendrix</option>
-              <option value="BBK">B.B King</option>
-              <option value="AK">Albert King</option>
-              <option value="BG">Buddy Guy</option>
-              <option value="EC">Eric Clapton</option>
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="date"
-              className="block text-sm font-medium text-gray-700"
-            >
-              {" "}
-              Date{" "}
-            </label>
-
-            <select
-              name="date"
-              id="date"
-              className="mt-1.5 p-2 w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-            >
-              <option value="">Please select</option>
-              <option value="JM">John Mayer</option>
-              <option value="SRV">Stevie Ray Vaughn</option>
-              <option value="JH">Jimi Hendrix</option>
-              <option value="BBK">B.B King</option>
-              <option value="AK">Albert King</option>
-              <option value="BG">Buddy Guy</option>
-              <option value="EC">Eric Clapton</option>
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="time"
-              className="block text-sm font-semibold text-gray-700"
-            >
-              {" "}
-              Time{" "}
-            </label>
-
-            <select
-              name="time"
-              id="time"
-              className="mt-1.5 p-2 w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-            >
-              <option value="">Please select</option>
-              <option value="JM">John Mayer</option>
-              <option value="SRV">Stevie Ray Vaughn</option>
-              <option value="JH">Jimi Hendrix</option>
-              <option value="BBK">B.B King</option>
-              <option value="AK">Albert King</option>
-              <option value="BG">Buddy Guy</option>
-              <option value="EC">Eric Clapton</option>
-            </select>
-          </div>
-          <button className="bg-primary text-white py-2 col-span-2 rounded-3xl mt-4">
-            Report Now
+            Reserve Now
           </button>
         </div>
-      </div>
-      <div className="flex-1 h-full">
-        <h3 className="text-xl font-bold mb-4">Upload files</h3>
-        <div className="relative my-6 w-full h-full">
-          <input
-            id="id-dropzone01"
-            name="file-upload"
-            type="file"
-            className="hidden"
-          />
-          <label
-            htmlFor="id-dropzone01"
-            className="relative flex cursor-pointer flex-col items-center gap-4 rounded border border-dashed border-slate-300 px-3 py-36 text-center text-sm font-medium transition-colors"
-          >
-            <span className="inline-flex h-12 items-center justify-center self-center rounded-full bg-slate-100/70 px-3 text-slate-400">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                aria-label="File input icon"
-                role="graphics-symbol"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="h-6 w-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-                />
-              </svg>
-            </span>
-            <span className="text-slate-500">
-              Drag & drop or
-              <span className="text-primary"> upload a file</span>
-            </span>
-          </label>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

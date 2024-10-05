@@ -8,6 +8,7 @@ export default function Purchase() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [editedCart, setEditedCart] = useState([]);
+  const [isConfirmed, setIsConfirmed] = useState(false); // Confirmation state
 
   const merchandise = [
     { picture: "/imgs/tshirt.png", item: "University T-Shirt", price: 250.0 },
@@ -17,7 +18,7 @@ export default function Purchase() {
   ];
 
   const handleAddToCart = (item) => {
-    setCart([...cart, { ...item, quantity: 1, size: null }]); // Set size to null
+    setCart([...cart, { ...item, quantity: 1, size: null }]);
     setTotalPrice((prevPrice) => prevPrice + item.price);
   };
 
@@ -26,7 +27,7 @@ export default function Purchase() {
   };
 
   const handleCheckout = () => {
-    setEditedCart(cart); // Prepopulate modal with current cart
+    setEditedCart(cart);
     setIsModalOpen(true);
   };
 
@@ -34,7 +35,6 @@ export default function Purchase() {
     const updatedCart = [...editedCart];
     updatedCart[index][key] = value;
 
-    // Recalculate total price
     const updatedTotal = updatedCart.reduce((total, item) => {
       return total + item.price * item.quantity;
     }, 0);
@@ -44,26 +44,35 @@ export default function Purchase() {
   };
 
   const handleConfirmEdit = () => {
-    setCart(editedCart); // Update the cart with edited values
-    setIsModalOpen(false); // Close the modal
+    setCart(editedCart);
+    setIsModalOpen(false);
+    setIsConfirmed(true); // Set confirmed state to true
   };
 
   const handleRemoveItem = (index) => {
     const updatedCart = cart.filter((_, i) => i !== index);
     const removedItem = cart[index];
 
-    // Recalculate total price after removing the item
     const updatedTotal = totalPrice - removedItem.price * removedItem.quantity;
     setCart(updatedCart);
     setTotalPrice(updatedTotal);
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      console.log("Uploaded file: ", file.name);
+      // Handle the uploaded file as needed
+    }
+  };
+
   return (
     <div>
-      <header className="relative">
+      <header className="relative mt-10">
         <section
+          // , backgroundSize: "cover", backgroundRepeat: "no-repeat", backgroundPosition: "center center"
           style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
-          className="w-full h-56 mt-10"
+          className="w-full h-56 bg-cover bg-no-repeat bg-center "
         ></section>
       </header>
       <section>
@@ -107,7 +116,6 @@ export default function Purchase() {
                         <p>Price: P{item.price}</p>
                         <p>Quantity: {item.quantity}</p>
                         {item.size && <p>Size: {item.size}</p>}{" "}
-                        {/* Show size if available */}
                       </div>
                       <button
                         onClick={() => handleRemoveItem(index)}
@@ -184,7 +192,7 @@ export default function Purchase() {
                     <div className="mt-2">
                       <label>Size: </label>
                       <select
-                        value={item.size || ""} // Use empty string if size is null
+                        value={item.size || ""}
                         onChange={(e) =>
                           handleUpdateItem(index, "size", e.target.value)
                         }
@@ -231,6 +239,55 @@ export default function Purchase() {
                 className="bg-red-500 text-white px-4 py-2 rounded-full ml-2"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isConfirmed && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-10 rounded-lg shadow-lg relative">
+            {" "}
+            {/* Add relative positioning here */}
+            <button
+              onClick={() => setIsConfirmed(false)} // Close modal
+              className="absolute top-4 right-4 bg-red-500 text-white hover:bg-red-600 px-2 py-1 rounded-full" // Updated classes for positioning
+            >
+              &times; {/* Close icon */}
+            </button>
+            <h2 className="text-xl font-bold text-center mb-4">Payment</h2>
+            <div className="flex flex-col items-center">
+              <Image
+                src="/imgs/qrcode.png"
+                height={100}
+                width={200}
+                alt="QR Code"
+              />
+              <p className="text-center mt-2">
+                Scan this QR code to complete the payment
+              </p>
+            </div>
+            <div className="mt-4">
+              <label className="block text-center mb-2 font-semibold">
+                Upload Payment Proof:
+              </label>
+              <input
+                type="file"
+                onChange={handleFileUpload}
+                className="block mx-auto text-center"
+              />
+            </div>
+            <div className="flex justify-center mt-4">
+              {" "}
+              {/* Centering the button */}
+              <button
+                onClick={() => {
+                  // Handle the confirmation logic here
+                  console.log("Payment confirmed!");
+                }}
+                className="bg-primary text-white px-4 py-2 rounded-full"
+              >
+                Confirm
               </button>
             </div>
           </div>

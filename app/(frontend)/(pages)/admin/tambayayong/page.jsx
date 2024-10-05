@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 
-const users = [
+const initialUsers = [
   {
     id: 1,
     userID: "001",
@@ -10,7 +10,7 @@ const users = [
     date: "2024-09-01",
     gcashNumber: "09171234567",
     proof: "https://via.placeholder.com/50",
-    status: "Approved",
+    status: "Pending", // Assuming initial status can be "Pending"
   },
   {
     id: 2,
@@ -20,12 +20,28 @@ const users = [
     date: "2024-09-05",
     gcashNumber: "09181234567",
     proof: "https://via.placeholder.com/50",
-    status: "Declined",
+    status: "Pending",
   },
   // more users...
 ];
 
 const Dashboard = () => {
+  const [users, setUsers] = useState(initialUsers); // State for users
+
+  const handleApprove = (id) => {
+    // Change user status to "Approved"
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === id ? { ...user, status: "Approved" } : user
+      )
+    );
+  };
+
+  const handleDecline = (id) => {
+    // Remove user from the list
+    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
@@ -117,6 +133,10 @@ const Dashboard = () => {
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Status
                 </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Actions
+                </th>{" "}
+                {/* New Actions Column */}
               </tr>
             </thead>
             <tbody>
@@ -152,11 +172,27 @@ const Dashboard = () => {
                       className={`inline-block px-2 py-1 rounded-full text-white ${
                         user.status === "Approved"
                           ? "bg-green-500"
+                          : user.status === "Declined"
+                          ? "bg-red-500"
                           : "bg-orange-500"
                       }`}
                     >
                       {user.status}
                     </span>
+                  </td>
+                  <td className="border px-4 py-3 text-sm">
+                    <button
+                      onClick={() => handleApprove(user.id)}
+                      className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 mr-2"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleDecline(user.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                    >
+                      Decline
+                    </button>
                   </td>
                 </tr>
               ))}

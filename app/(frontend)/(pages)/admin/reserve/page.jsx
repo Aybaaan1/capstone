@@ -165,10 +165,10 @@ const ReservationDashboard = () => {
                   Select
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  User ID
+                  Reservation ID
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Item ID
+                  Item Name
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Reserve Date & Time
@@ -194,7 +194,7 @@ const ReservationDashboard = () => {
                     <input type="checkbox" />
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {reservation.userId}
+                    {reservation.id}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {reservation.itemId}
@@ -256,86 +256,91 @@ const ReservationDashboard = () => {
       {/* Update Reservation Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 sticky top-0">
             <h3 className="text-xl font-semibold mb-4">Update Reservation</h3>
-            <form>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  User ID
-                </label>
-                <input
-                  type="number"
-                  name="userId"
-                  value={updatedReservation.userId || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Item ID
-                </label>
-                <input
-                  type="number"
-                  name="itemId"
-                  value={updatedReservation.itemId || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Reserve Date & Time
-                </label>
-                <input
-                  type="datetime-local"
-                  name="reserveDateTime"
-                  value={updatedReservation.reserveDateTime || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Return Date & Time
-                </label>
-                <input
-                  type="datetime-local"
-                  name="returnDateTime"
-                  value={updatedReservation.returnDateTime || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Purpose
-                </label>
-                <input
-                  type="text"
-                  name="purpose"
-                  value={updatedReservation.purpose || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="reservationId">
+                Reservation ID
+              </label>
+              <input
+                type="text"
+                id="reservationId"
+                name="id"
+                value={updatedReservation.id}
+                onChange={handleChange}
+                readOnly
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="itemName">
+                Item Name
+              </label>
+              <input
+                type="text"
+                id="itemName"
+                name="itemId"
+                value={updatedReservation.itemId}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="reserveDateTime">
+                Reserve Date & Time
+              </label>
+              <input
+                type="datetime-local"
+                id="reserveDateTime"
+                name="reserveDateTime"
+                value={new Date(updatedReservation.reserveDateTime)
+                  .toISOString()
+                  .substring(0, 16)}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="returnDateTime">
+                Return Date & Time
+              </label>
+              <input
+                type="datetime-local"
+                id="returnDateTime"
+                name="returnDateTime"
+                value={new Date(updatedReservation.returnDateTime)
+                  .toISOString()
+                  .substring(0, 16)}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="purpose">
+                Purpose
+              </label>
+              <textarea
+                id="purpose"
+                name="purpose"
+                value={updatedReservation.purpose}
+                onChange={handleChange}
+                className="border border-gray-300 rounded-md p-2 w-full"
+              ></textarea>
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={handleSave}
+                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="ml-2 bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

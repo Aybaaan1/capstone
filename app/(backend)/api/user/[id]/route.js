@@ -1,51 +1,50 @@
-export async function handler(req, res) {
-  const { id } = req.query;
+import { NextResponse } from "next/server";
+import db from "@/lib/db"; // Adjust the import based on your project structure
 
-  if (isNaN(id)) {
-    return res.status(400).json({ error: "Invalid user ID" });
+// PUT method to update user information
+export async function PUT(request, { params }) {
+  const { id } = params;
+  const { email, idnumber, firstname, lastname, program } =
+    await request.json();
+
+  // Validate required fields
+  if (!email || !idnumber || !firstname || !lastname || !program) {
+    return NextResponse.json(
+      { error: "All fields are required" },
+      { status: 400 }
+    );
   }
 
-  const userId = Number(id);
-
-  if (req.method === "DELETE") {
-    try {
-      // Check if user exists before attempting to delete
-      const userExists = await db.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!userExists) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      await db.user.delete({
-        where: { id: userId },
-      });
-
-      res.status(200).json({ message: "User deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting user:", error); // Log the full error
-      res
-        .status(500)
-        .json({ error: "Failed to delete user", details: error.message });
-    }
-  } else if (req.method === "PUT") {
-    try {
-      const updatedUser = await db.user.update({
-        where: { id: userId },
-        data: req.body,
-      });
-      res.status(200).json(updatedUser);
-    } catch (error) {
-      console.error("Error updating user:", error); // Log the full error
-      res
-        .status(500)
-        .json({ error: "Failed to update user", details: error.message });
-    }
-  } else {
-    res.setHeader("Allow", ["DELETE", "PUT"]);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+  try {
+    const updatedUser = await db.user.update({
+      where: { id: Number(id) },
+      data: { email, idnumber, firstname, lastname, program },
+    });
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json(
+      { error: "Failed to update user" },
+      { status: 500 }
+    );
   }
 }
 
-export default handler;
+// DELETE method to delete a user
+// DELETE method to delete user
+export async function DELETE(request, { params }) {
+  const { id } = params;
+
+  try {
+    await db.user.delete({
+      where: { id: Number(id) },
+    });
+    return NextResponse.json({ success: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return NextResponse.json(
+      { error: "Failed to delete user" },
+      { status: 500 }
+    );
+  }
+}

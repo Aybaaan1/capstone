@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Ensure this is included at the top of your file
 import React, { useState, useEffect } from "react";
 
 const Dashboard = () => {
@@ -29,14 +29,21 @@ const Dashboard = () => {
   }, []);
 
   const handleDelete = async (userId) => {
+    console.log("Attempting to delete user with ID:", userId);
     if (confirm("Are you sure you want to delete this user?")) {
       try {
         const response = await fetch(`/api/user/${userId}`, {
+          // Use backticks here
           method: "DELETE",
         });
+        console.log("Response status:", response.status);
+        const responseBody = await response.text();
+        console.log("Response body:", responseBody);
+
         if (!response.ok) {
           throw new Error("Failed to delete user");
         }
+
         setUsers(users.filter((user) => user.id !== userId));
       } catch (error) {
         alert(error.message);
@@ -60,18 +67,26 @@ const Dashboard = () => {
   const handleSave = async () => {
     try {
       const response = await fetch(`/api/user/${updatedUser.id}`, {
+        // Use backticks here
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedUser),
       });
+
+      console.log("Response Status:", response.status);
+      const responseText = await response.text();
+      console.log("Response Text:", responseText);
+
       if (!response.ok) {
         throw new Error("Failed to update user");
       }
-      const updatedData = await response.json();
+
+      const responseData = JSON.parse(responseText);
+      console.log("Updated Data:", responseData);
       setUsers(
-        users.map((user) => (user.id === updatedData.id ? updatedData : user))
+        users.map((user) => (user.id === responseData.id ? responseData : user))
       );
       setIsModalOpen(false);
     } catch (error) {
@@ -245,102 +260,89 @@ const Dashboard = () => {
                 2
               </button>
               <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                3
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
                 »
               </button>
             </div>
           </div>
         </section>
-      </main>
 
-      {/* Update User Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h3 className="text-xl font-semibold mb-4">Update User</h3>
-            <form>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={updatedUser.email || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  ID Number
-                </label>
-                <input
-                  type="text"
-                  name="idnumber"
-                  value={updatedUser.idnumber || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  name="firstname"
-                  value={updatedUser.firstname || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  name="lastname"
-                  value={updatedUser.lastname || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Program
-                </label>
-                <input
-                  type="text"
-                  name="program"
-                  value={updatedUser.program || ""}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="ml-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
+        {/* Modal for Updating User */}
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg p-6 w-96">
+              <h3 className="text-lg font-semibold mb-4">Update User</h3>
+              <form>
+                <div className="mb-4">
+                  <label className="block mb-1">Email:</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={updatedUser.email || ""}
+                    onChange={handleChange}
+                    className="border rounded-md p-2 w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">ID Number:</label>
+                  <input
+                    type="text"
+                    name="idnumber"
+                    value={updatedUser.idnumber || ""}
+                    onChange={handleChange}
+                    className="border rounded-md p-2 w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">First Name:</label>
+                  <input
+                    type="text"
+                    name="firstname"
+                    value={updatedUser.firstname || ""}
+                    onChange={handleChange}
+                    className="border rounded-md p-2 w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">Last Name:</label>
+                  <input
+                    type="text"
+                    name="lastname"
+                    value={updatedUser.lastname || ""}
+                    onChange={handleChange}
+                    className="border rounded-md p-2 w-full"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block mb-1">Program:</label>
+                  <input
+                    type="text"
+                    name="program"
+                    value={updatedUser.program || ""}
+                    onChange={handleChange}
+                    className="border rounded-md p-2 w-full"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="bg-gray-300 text-black px-4 py-2 rounded-md ml-2 hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 };

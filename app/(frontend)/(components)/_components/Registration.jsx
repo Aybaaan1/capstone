@@ -50,21 +50,21 @@ const Registration = () => {
   };
 
   return (
-    <div className="flex justify-center items-center bg-transparent min-h-screen my-10">
-      <div className="w-full max-w-lg px-6 py-4 bg-white shadow-lg rounded-lg border border-gray-300">
-        <h1 className="text-xl font-bold text-center text-gray-800 mb-4">
-          Registration
-        </h1>
-        {error && <p className="text-red-500 text-center mb-2">{error}</p>}
-        {success && (
-          <p className="text-green-500 text-center mb-2">{success}</p>
-        )}
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
+    <div className="flex flex-col items-center justify-center ">
+      {" "}
+      {/* Outer div, use bg-transparent to see the background */}
+      <h1 className="text-2xl font-bold mb-6 text-center">Registration</h1>
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+      {success && <p className="text-green-500 text-center mb-4">{success}</p>}
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 w-full max-w-3xl bg-white p-8 rounded-lg shadow-md border border-gray-300"
+      >
+        {" "}
+        {/* Form has white background */}
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1">
               Email:
             </label>
             <input
@@ -74,11 +74,11 @@ const Registration = () => {
               onChange={handleChange}
               placeholder="Enter your email"
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1">
               Student ID Number:
             </label>
             <input
@@ -88,11 +88,11 @@ const Registration = () => {
               onChange={handleChange}
               placeholder="Enter your student ID number"
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1">
               Firstname:
             </label>
             <input
@@ -102,11 +102,11 @@ const Registration = () => {
               onChange={handleChange}
               placeholder="Enter your first name"
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1">
               Lastname:
             </label>
             <input
@@ -116,11 +116,11 @@ const Registration = () => {
               onChange={handleChange}
               placeholder="Enter your last name"
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="col-span-1 md:col-span-2">
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+          <div className="col-span-2">
+            <label className="block text-gray-700 font-semibold mb-1">
               Program:
             </label>
             <select
@@ -128,7 +128,7 @@ const Registration = () => {
               value={formData.program}
               onChange={handleChange}
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a program</option>
               <option value="BEED">BEED</option>
@@ -148,7 +148,7 @@ const Registration = () => {
             </select>
           </div>
           <div>
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1">
               Password:
             </label>
             <input
@@ -158,11 +158,11 @@ const Registration = () => {
               onChange={handleChange}
               placeholder="Enter your password"
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium mb-1 text-sm">
+            <label className="block text-gray-700 font-semibold mb-1">
               Confirm Password:
             </label>
             <input
@@ -172,19 +172,17 @@ const Registration = () => {
               onChange={handleChange}
               placeholder="Confirm your password"
               required
-              className="w-full h-10 px-3 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="col-span-1 md:col-span-2">
-            <button
-              type="submit"
-              className="w-full h-10 bg-blue-600 text-white text-lg font-semibold rounded-md shadow-lg hover:bg-blue-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Sign Up
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          Sign Up
+        </button>
+      </form>
     </div>
   );
 };

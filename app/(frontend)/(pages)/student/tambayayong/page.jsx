@@ -5,10 +5,11 @@ import TambayayongForm from "../../../(components)/_components/TambayayongForm";
 export default function Tambayayong() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   return (
-    <div>
+    <div className="mt-10">
       <section
+        // , backgroundSize: "cover", backgroundRepeat: "no-repeat", backgroundPosition: "center center"
         style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
-        className="w-full h-56 mt-10"
+        className="w-full h-56 bg-cover bg-no-repeat bg-center "
       ></section>
       <section>
         <div>

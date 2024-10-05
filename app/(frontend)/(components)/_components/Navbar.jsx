@@ -36,7 +36,7 @@ const Navbar = () => {
     { path: "Purchase", href: "/student/purchase" },
     { path: "Lost & Found", href: "/student/lostandfound" },
     { path: "Reserve", href: "/student/reservation" },
-    { path: "Emergency Assistance", href: "/student/tambayayong" },
+    { path: "Tambayayong", href: "/student/tambayayong" },
     { path: "About us", href: "/student/aboutus" },
   ];
 
