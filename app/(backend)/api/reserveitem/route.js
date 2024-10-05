@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/db"; // Ensure this path is correct
+import db from "@/lib/db"; // Ensure this path is correct
 
 export async function GET(request) {
   try {
