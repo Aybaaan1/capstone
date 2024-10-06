@@ -10,9 +10,10 @@ export default function Reservation() {
   const [isFormVisible, setFormVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+  // Fetch items from API
   const fetchItems = async () => {
     try {
-      const response = await fetch("/api/reserveitem"); // Adjust to your item reserve API endpoint
+      const response = await fetch("/api/reserveitem");
       if (!response.ok) throw new Error("Failed to fetch items");
       const data = await response.json();
       setItems(data);
@@ -30,8 +31,9 @@ export default function Reservation() {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  // Handle click on the "Reserve Now" button
   const handleReserveClick = (itemId) => {
-    console.log("Reserve button clicked for item ID:", itemId);
+    console.log("Item ID clicked:", itemId); // Log the clicked item ID
     setSelectedItemId(itemId);
     setFormVisible(true);
   };
@@ -39,10 +41,10 @@ export default function Reservation() {
   return (
     <div className="mt-10">
       <section
-        // , backgroundSize: "cover", backgroundRepeat: "no-repeat", backgroundPosition: "center center"
         style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
-        className="w-full h-56 bg-cover bg-no-repeat bg-center "
+        className="w-full h-56 bg-cover bg-no-repeat bg-center"
       ></section>
+
       <section>
         <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
           SSG Reservation Items
@@ -56,14 +58,14 @@ export default function Reservation() {
               <div
                 key={item.id}
                 className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl items-center justify-center relative"
-                style={{ zIndex: 2 }} // Set a higher z-index to make sure button stays on top
+                style={{ zIndex: 0 }}
               >
                 {item.image ? (
                   <Image
                     src={item.image}
                     height={200}
                     width={200}
-                    alt="Item picture"
+                    alt={`Picture of ${item.type}`}
                     style={{ zIndex: 1 }}
                   />
                 ) : (
@@ -71,28 +73,30 @@ export default function Reservation() {
                     <p>No image available</p>
                   </div>
                 )}
-                <div>{item.type}</div>
+
+                <div className="text-lg font-semibold">{item.type}</div>
                 <div
                   className={`mt-2 ${
-                    item.available ? "text-green-500" : "text-red-500"
+                    item.status === "Available"
+                      ? "text-green-500"
+                      : "text-red-500"
                   }`}
                 >
-                  {item.available ? "Available" : "Not Available"}
+                  {item.status === "Available" ? "Available" : "Not Available"}
                 </div>
+
                 <button
                   className="bg-primary text-white py-2 px-4 rounded-lg mt-4"
-                  onClick={() => handleReserveClick(item.id)} // Call handleReserveClick with the item's id
-                  disabled={!item.available}
+                  onClick={() => handleReserveClick(item.id)}
+                  disabled={item.status !== "Available"}
                   style={{
                     position: "relative",
-                    zIndex: 10, // Make sure z-index is higher than any potential overlap
-                    cursor: item.available ? "pointer" : "not-allowed", // Add pointer for clarity
+                    zIndex: 10,
+                    cursor:
+                      item.status === "Available" ? "pointer" : "not-allowed",
                   }}
                 >
                   Reserve Now
-                </button>
-                <button onClick={() => console.log("Test button works!")}>
-                  Test Button
                 </button>
               </div>
             ))
@@ -103,7 +107,7 @@ export default function Reservation() {
           <ReservationForm
             formLabel="Reserve an Item"
             onClose={() => setFormVisible(false)}
-            itemId={selectedItemId}
+            itemId={selectedItemId} // Pass the selected itemId to ReservationForm
             onReservationSuccess={fetchItems}
           />
         )}

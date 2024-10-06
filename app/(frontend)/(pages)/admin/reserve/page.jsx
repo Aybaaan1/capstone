@@ -165,10 +165,10 @@ const ReservationDashboard = () => {
                   Select
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Reservation ID
+                  User Id
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Item Name
+                  Item Id
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Reserve Date & Time

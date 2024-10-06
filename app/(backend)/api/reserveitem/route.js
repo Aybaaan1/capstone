@@ -39,7 +39,11 @@ export async function POST(request) {
       },
     });
 
-    return NextResponse.json(newItem, { status: 201 });
+    // Return the item ID, type, and status
+    return NextResponse.json(
+      { id: newItem.id, type: newItem.type, status: newItem.status },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error adding item:", error); // Log the error details
     return NextResponse.json(

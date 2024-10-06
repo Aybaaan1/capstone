@@ -1,8 +1,5 @@
-"use client";
 import React, { useState } from "react";
-import { Calendar } from "@nextui-org/react";
-import { today, getLocalTimeZone, isWeekend } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
+import { useSession } from "next-auth/react"; // Import useSession
 
 const ReservationForm = ({
   formLabel,
@@ -10,30 +7,19 @@ const ReservationForm = ({
   itemId,
   onReservationSuccess,
 }) => {
-  const [userId, setUserId] = useState("");
+  const { data: session } = useSession(); // Access the session
+  const userId = session?.user?.id; // Assuming the user ID is stored in session.user.id
+
   const [purpose, setPurpose] = useState("");
-  const [reserveDateTime, setReserveDateTime] = useState("");
-  const [returnDateTime, setReturnDateTime] = useState("");
+  const [reserveDateTime, setReserveDateTime] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
+  const [returnDateTime, setReturnDateTime] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  let now = today(getLocalTimeZone());
-
-  let disabledRanges = [
-    [now, now.add({ days: 5 })],
-    [now.add({ days: 14 }), now.add({ days: 16 })],
-    [now.add({ days: 23 }), now.add({ days: 24 })],
-  ];
-
-  let { locale } = useLocale();
-
-  let isDateUnavailable = (date) =>
-    isWeekend(date, locale) ||
-    disabledRanges.some(
-      (interval) =>
-        date.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0
-    );
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
     const reservationData = {
       itemId,
       userId,
@@ -42,19 +28,26 @@ const ReservationForm = ({
       purpose,
     };
 
+    console.log("Reservation data to be sent:", reservationData); // Debug log
+
     try {
       const response = await fetch("/api/reserve", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(reservationData),
+        body: JSON.stringify(reservationData), // Send the dynamic reservation data
       });
-      if (!response.ok) throw new Error("Failed to reserve item");
-      await onReservationSuccess();
-      onClose();
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Reservation created:", result);
+      if (onReservationSuccess) onReservationSuccess(result); // Call success callback if provided
     } catch (error) {
-      alert(error.message);
+      console.error("Error submitting reservation:", error);
     }
   };
 
@@ -70,66 +63,7 @@ const ReservationForm = ({
           </button>
           <h3 className="text-2xl font-bold mb-4 text-center">{formLabel}</h3>
 
-          <div className="mt-2">
-            <label
-              htmlFor="name"
-              className="block text-sm font-semibold text-gray-700"
-            >
-              Your Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              placeholder="Your name"
-              className="p-2 mt-1 w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="mt-2">
-            <label
-              htmlFor="department"
-              className="block text-sm font-semibold text-gray-700"
-            >
-              Department
-            </label>
-            <select
-              name="department"
-              id="department"
-              className="mt-1.5 w-full p-2 rounded-md border-gray-300 text-gray-700 sm:text-sm"
-              required
-            >
-              <option value="">From what Department?</option>
-              <option value="COEd">COEd</option>
-              <option value="CAS">CAS</option>
-              {/* Add other department options */}
-            </select>
-          </div>
-
           <div className="grid grid-cols-2 mt-4 gap-2">
-            <div>
-              <label
-                htmlFor="item"
-                className="block text-sm font-semibold text-gray-700"
-              >
-                Item
-              </label>
-              <select
-                name="item"
-                id="item"
-                className="mt-1.5 w-full p-2 rounded-md border-gray-300 text-gray-700 sm:text-sm"
-                defaultValue={itemId}
-                required
-              >
-                <option value="">Select an item</option>
-                <option value="TV">TV</option>
-                <option value="Tables">Tables</option>
-                {/* Add other item options */}
-              </select>
-            </div>
-
             <div>
               <label
                 htmlFor="reserveDateTime"
@@ -186,16 +120,6 @@ const ReservationForm = ({
           <button className="bg-primary text-white py-2 rounded-md mt-4 w-full">
             Reserve Now
           </button>
-        </div>
-
-        <div className="flex-1 h-full">
-          <h3 className="text-xl font-bold mb-4 text-center">Calendar</h3>
-          <div>
-            <Calendar
-              aria-label="Date (Unavailable)"
-              isDateUnavailable={isDateUnavailable}
-            />
-          </div>
         </div>
       </form>
     </div>

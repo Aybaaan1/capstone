@@ -3,7 +3,6 @@ import db from "@/lib/db"; // Adjust the path if necessary
 
 export async function GET(request) {
   try {
-    // Fetch reservations with related item and user information
     const reservations = await db.reserve.findMany({
       include: {
         item: true, // Include related ItemReservation data
@@ -22,34 +21,36 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const { itemId, userId, reserveDateTime, returnDateTime, purpose } =
+    await request.json();
+
+  // Convert to Date objects to ensure valid ISO-8601 format
+  const reserveDate = new Date(reserveDateTime);
+  const returnDate = new Date(returnDateTime);
+
+  // Validate dates
+  if (isNaN(reserveDate) || isNaN(returnDate)) {
+    return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
+  }
+
+  // Prepare the data for Prisma
+  const reservationData = {
+    itemId,
+    userId,
+    reserveDateTime: reserveDate, // Use the Date object
+    returnDateTime: returnDate, // Use the Date object
+    purpose,
+  };
+
   try {
-    const { itemId, userId, reserveDateTime, returnDateTime, purpose } =
-      await request.json();
-
-    // Validate inputs
-    if (!itemId || !userId || !reserveDateTime || !returnDateTime || !purpose) {
-      return NextResponse.json(
-        { error: "Missing required fields." },
-        { status: 400 }
-      );
-    }
-
-    // Create a new reservation
-    const newReservation = await db.reserve.create({
-      data: {
-        itemId,
-        userId,
-        reserveDateTime,
-        returnDateTime,
-        purpose,
-      },
+    const reservation = await prisma.reserve.create({
+      data: reservationData,
     });
-
-    return NextResponse.json(newReservation, { status: 201 });
+    return NextResponse.json(reservation, { status: 201 });
   } catch (error) {
     console.error("Error creating reservation:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Error creating reservation" },
       { status: 500 }
     );
   }
