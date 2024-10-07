@@ -15,6 +15,10 @@ export default function Purchase() {
     { picture: "/imgs/lanyards.png", item: "Department Lanyards", price: 85.0 },
     { picture: "/imgs/totebag.png", item: "University Tote Bag", price: 160.0 },
     { picture: "/imgs/flask.png", item: "University Tumbler", price: 299.0 },
+    { picture: "/imgs/tshirt.png", item: "University T-Shirt", price: 250.0 },
+    { picture: "/imgs/lanyards.png", item: "Department Lanyards", price: 85.0 },
+    { picture: "/imgs/totebag.png", item: "University Tote Bag", price: 160.0 },
+    { picture: "/imgs/flask.png", item: "University Tumbler", price: 299.0 },
   ];
 
   const handleAddToCart = (item) => {
@@ -163,7 +167,7 @@ export default function Purchase() {
               <div>
                 <button
                   onClick={() => handleAddToCart(merch)}
-                  className="bg-primary text-white px-3 py-2 rounded-full"
+                  className="bg-primary text-white px-3 py-1 rounded-lg text-m"
                 >
                   Add to cart
                 </button>
