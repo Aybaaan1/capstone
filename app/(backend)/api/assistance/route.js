@@ -12,9 +12,38 @@ export async function POST(request) {
   const { userId, name, patience, dateTime, gcash, proof, status } =
     await request.json();
 
-  const newAssistance = await db.assistance.create({
-    data: { userId, name, patience, dateTime, gcash, proof, status },
-  });
+  // Create a Date object from the incoming dateTime
+  const assistDate = new Date(dateTime);
 
-  return NextResponse.json(newAssistance);
+  // Check for an invalid date
+  if (isNaN(assistDate.getTime())) {
+    console.error("Invalid date format:", dateTime);
+    return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
+  }
+
+  // Prepare data for database insertion
+  const assistData = {
+    userId,
+    name,
+    patience, // Keep as 'patience'
+    dateTime: assistDate, // Store as a Date object
+    gcash,
+    proof,
+    status,
+  };
+
+  try {
+    // Insert the data into the database
+    const tambayayong = await db.assistance.create({
+      data: assistData,
+    });
+    return NextResponse.json(tambayayong, { status: 201 });
+  } catch (error) {
+    console.error("Error creating assistance:", error);
+    return NextResponse.json(
+      { error: "Error creating assistance" },
+      { status: 500 }
+    );
+  }
 }
+// Prepae the data for Prisma

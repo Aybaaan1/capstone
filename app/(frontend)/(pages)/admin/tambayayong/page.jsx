@@ -1,46 +1,82 @@
-"use client";
-import React, { useState } from "react";
-
-const initialUsers = [
-  {
-    id: 1,
-    userID: "001",
-    name: "Elizabeth Lee",
-    patient: "John Doe",
-    date: "2024-09-01",
-    gcashNumber: "09171234567",
-    proof: "https://via.placeholder.com/50",
-    status: "Pending", // Assuming initial status can be "Pending"
-  },
-  {
-    id: 2,
-    userID: "002",
-    name: "Carlos Garcia",
-    patient: "Jane Doe",
-    date: "2024-09-05",
-    gcashNumber: "09181234567",
-    proof: "https://via.placeholder.com/50",
-    status: "Pending",
-  },
-  // more users...
-];
+"use client"; // Ensure this is included at the top of your file
+import React, { useState, useEffect } from "react";
+import Proof from "../../../(components)/_components/Proof";
 
 const Dashboard = () => {
-  const [users, setUsers] = useState(initialUsers); // State for users
+  const [assistances, setAssistances] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleApprove = (id) => {
-    // Change user status to "Approved"
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === id ? { ...user, status: "Approved" } : user
-      )
-    );
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState("");
+
+  useEffect(() => {
+    const fetchAssistances = async () => {
+      try {
+        const response = await fetch("/api/assistance");
+        if (!response.ok) {
+          throw new Error("Failed to fetch assistance records");
+        }
+        const data = await response.json();
+        setAssistances(data); // Assuming the data is an array of assistance records
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchAssistances();
+  }, []);
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      // Update the status of the assistance record locally
+      const updatedAssistances = assistances.map((assistance) =>
+        assistance.id === id ? { ...assistance, status } : assistance
+      );
+      setAssistances(updatedAssistances);
+
+      // Send an update request to the backend
+      const response = await fetch(`/api/assistance/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update status: ${response.statusText}`);
+      }
+
+      // Optionally refresh the data or handle a successful response
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status. Please try again.");
+    }
   };
 
-  const handleDecline = (id) => {
-    // Remove user from the list
-    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+  // Open the modal with the selected image
+  const openModal = (imageSrc) => {
+    setCurrentImage(imageSrc);
+    setIsModalOpen(true);
   };
+
+  // Close the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentImage("");
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -104,28 +140,31 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="flex-1 bg-white p-10">
         <h2 className="text-3xl font-semibold text-black mb-8">
-          Admin Dashboard
+          Assistance Dashboard
         </h2>
 
-        {/* Users Table */}
+        {/* Assistance Table */}
         <section>
           <table className="min-w-full bg-white rounded-lg shadow-md">
             <thead className="bg-[rgb(255,211,70)] text-black">
               <tr>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  UserID
+                  ID
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  User ID
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Name
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Patient
+                  Patience
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Date
+                  Date & Time
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  GCash Number
+                  GCash
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Proof
@@ -135,94 +174,78 @@ const Dashboard = () => {
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Actions
-                </th>{" "}
-                {/* New Actions Column */}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {assistances.map((assistance) => (
                 <tr
-                  key={user.id}
+                  key={assistance.id}
                   className="bg-white border-b hover:bg-gray-50"
                 >
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.userID}
+                    {assistance.id}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.name}
+                    {assistance.userId}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.patient}
+                    {assistance.name}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.date}
+                    {assistance.patience}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.gcashNumber}
+                    {new Date(assistance.dateTime).toLocaleString()}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    <img
-                      src={user.proof}
-                      alt="proof"
-                      className="h-8 w-8 rounded"
-                    />
+                    {assistance.gcash}
                   </td>
-                  <td className="border px-4 py-3 text-sm">
-                    <span
-                      className={`inline-block px-2 py-1 rounded-full text-white ${
-                        user.status === "Approved"
-                          ? "bg-green-500"
-                          : user.status === "Declined"
-                          ? "bg-red-500"
-                          : "bg-orange-500"
-                      }`}
-                    >
-                      {user.status}
-                    </span>
+                  <td className="border px-4 py-3 text-sm text-gray-800">
+                    {assistance.proof ? (
+                      <button
+                        onClick={() => openModal(assistance.proof)}
+                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                      >
+                        View
+                      </button>
+                    ) : (
+                      "No proof available"
+                    )}
                   </td>
-                  <td className="border px-4 py-3 text-sm">
+                  <td className="border px-4 py-3 text-sm text-gray-800">
+                    {assistance.status}
+                  </td>
+                  <td className="border px-4 py-3 text-sm text-gray-800 flex space-x-2">
                     <button
-                      onClick={() => handleApprove(user.id)}
-                      className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600 mr-2"
+                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                      onClick={() =>
+                        handleStatusChange(assistance.id, "accepted")
+                      }
                     >
-                      Approve
+                      Accept
                     </button>
                     <button
-                      onClick={() => handleDecline(user.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                      className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                      onClick={() =>
+                        handleStatusChange(assistance.id, "rejected")
+                      }
                     >
-                      Decline
+                      Reject
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-6">
-            <span className="text-sm text-gray-600">
-              {users.length} results
-            </span>
-            <div className="flex space-x-2">
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                «
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                1
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                2
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                3
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                »
-              </button>
-            </div>
-          </div>
         </section>
+
+        {/* Modal for Image Preview */}
+        <Proof
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          imageSrc={currentImage}
+        />
       </main>
     </div>
   );

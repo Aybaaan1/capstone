@@ -1,176 +1,177 @@
-"use client";
-import React, { useState } from "react";
-import { Calendar } from "@nextui-org/react";
-import { today, getLocalTimeZone } from "@internationalized/date";
+import { useSession } from "next-auth/react"; // Importing useSession
+import { useState } from "react";
+import { uploadImage } from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/imageUpload";
 
-const ReservationForm = ({ formLabel, setClose }) => {
-  const [isCalendarVisible, setCalendarVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(today(getLocalTimeZone()));
+const TambayayongForm = ({ setClose }) => {
+  const { data: session } = useSession(); // Accessing session
+  const userId = session?.user?.id; // Fetching userId from session
 
-  const toggleCalendar = () => {
-    setCalendarVisible((prev) => !prev);
+  const [name, setName] = useState("");
+  const [patience, setPatience] = useState("");
+  const [gcash, setGcash] = useState("");
+  const [dateTime, setDateTime] = useState(
+    new Date().toISOString().slice(0, 16)
+  );
+  const [proofFile, setProofFile] = useState(null); // Store the file
+  const [status] = useState("pending");
+  const [loading, setLoading] = useState(false); // Loading state for submission
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true); // Start loading state
+
+    // Upload the proof image and get the URL
+    let proofUrl = "";
+    if (proofFile) {
+      try {
+        proofUrl = await uploadImage(proofFile);
+      } catch (uploadError) {
+        setError("Failed to upload proof image. Please try again.");
+        setLoading(false);
+        return; // Exit if upload fails
+      }
+    }
+
+    const assistanceData = {
+      userId,
+      name,
+      patience,
+      dateTime,
+      gcash,
+      proof: proofUrl, // Use the uploaded URL
+      status,
+    };
+
+    try {
+      const response = await fetch("/api/assistance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(assistanceData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error submitting the form");
+      }
+
+      const result = await response.json();
+      console.log("Response from server:", result);
+      // Optionally reset the form or show a success message here
+    } catch (error) {
+      console.error("Error submitting the form:", error);
+      setError(
+        "An error occurred while submitting the form. Please try again."
+      );
+    } finally {
+      setLoading(false); // End loading state
+    }
   };
-
   return (
-    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-0">
-      {" "}
-      {/* Black background with reduced opacity */}
-      <form className="w-[50%] bg-white shadow-lg p-6 flex z-50 rounded-lg">
-        {" "}
-        {/* Form with rounded corners */}
-        <div className="p-8 flex-1">
-          <button onClick={setClose} className="absolute top-4 right-4">
-            ❌
-          </button>
-          <h3 className="text-2xl font-bold mb-4">{formLabel}</h3>
-          <p className="text-lg font-semibold text-gray-800 drop-shadow-md">
-            Project Tambayayong Form
-          </p>{" "}
-          {/* Increased visibility with shadow */}
-          {/* Input fields and other content remain unchanged */}
-          <div className="mt-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg shadow-md max-w-md w-full p-4 relative">
+        <button
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+          onClick={setClose}
+        >
+          ✕
+        </button>
+        <h2 className="text-xl font-semibold text-center mb-4">
+          Assistance Request Form
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div>
             <label
               htmlFor="name"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Your Name
+              Name
             </label>
             <input
               type="text"
               id="name"
-              placeholder="Your name"
-              className="p-2 mt-1 w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
             />
           </div>
-          <div className="mt-4">
+          <div>
             <label
-              htmlFor="patient"
-              className="block text-sm font-semibold text-gray-700"
+              htmlFor="patience"
+              className="block text-sm font-medium text-gray-700"
             >
-              Patient's Name
+              Patience
             </label>
             <input
               type="text"
-              id="patient"
-              placeholder="Name of the patient"
-              className="p-2 mt-1 w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+              id="patience"
+              value={patience}
+              onChange={(e) => setPatience(e.target.value)}
+              placeholder="Enter patience level"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
             />
           </div>
-          <div className="mt-4">
+          <div>
             <label
               htmlFor="gcash"
-              className="block text-sm font-semibold text-gray-700"
+              className="block text-sm font-medium text-gray-700"
             >
-              Gcash Number
+              GCash Number
             </label>
             <input
               type="text"
               id="gcash"
-              placeholder="Enter your Gcash Number"
-              className="p-2 mt-1 w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+              value={gcash}
+              onChange={(e) => setGcash(e.target.value)}
+              placeholder="Enter GCash number"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
             />
           </div>
-          <div className="grid grid-cols-2 mt-4 gap-4">
-            <div>
-              <label
-                htmlFor="department"
-                className="block text-sm font-semibold text-gray-700"
-              >
-                Department
-              </label>
-              <select
-                name="department"
-                id="department"
-                className="mt-1.5 w-full p-2 rounded-lg border-gray-300 text-gray-700 sm:text-sm"
-              >
-                <option value="">From what Department?</option>
-                <option value="JM">COED</option>
-                <option value="SRV">COTE</option>
-                <option value="JH">CAS</option>
-                <option value="BBK">COE</option>
-                <option value="AK">COT</option>
-              </select>
-            </div>
-
-            <div className="relative">
-              <label
-                htmlFor="date"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Date
-              </label>
-              <button
-                type="button"
-                onClick={toggleCalendar}
-                className="mt-1.5 p-1 w-full rounded-lg border-gray-300 text-gray-700 sm:text-sm text-xs"
-              >
-                {selectedDate.toString()} {/* Display the selected date */}
-              </button>
-
-              {/* Calendar visibility controlled by state */}
-              {isCalendarVisible && (
-                <div className="absolute z-10 top-[-300%] left-0 mt-1">
-                  <div className="bg-white rounded-lg shadow-lg w-[350px] h-[400px] p-4">
-                    <Calendar
-                      value={selectedDate}
-                      onChange={(date) => {
-                        setSelectedDate(date);
-                        setCalendarVisible(false); // Hide calendar after selection
-                      }}
-                      aria-label="Select date"
-                      className="!w-full !h-full"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <button className="bg-primary text-white py-2 col-span-2 rounded-3xl mt-4">
-              Report Now
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 h-full">
-          <h3 className="text-xl font-bold mb-4">Proof/Evidence</h3>
-          <div className="relative my-6 w-full h-full">
-            <input
-              id="id-dropzone01"
-              name="file-upload"
-              type="file"
-              className="hidden"
-            />
+          <div>
             <label
-              htmlFor="id-dropzone01"
-              className="relative flex cursor-pointer flex-col items-center gap-4 rounded border border-dashed border-slate-300 px-3 py-24 text-center text-sm font-medium transition-colors"
+              htmlFor="dateTime"
+              className="block text-sm font-medium text-gray-700"
             >
-              <span className="inline-flex h-12 items-center justify-center self-center rounded-full bg-slate-100/70 px-3 text-slate-400">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-label="File input icon"
-                  role="graphics-symbol"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="h-6 w-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
-                  />
-                </svg>
-              </span>
-              <span className="text-slate-500">
-                Drag & drop or
-                <span className="text-primary"> upload a file</span>
-              </span>
+              Date and Time
             </label>
+            <input
+              type="datetime-local"
+              id="dateTime"
+              value={dateTime}
+              onChange={(e) => setDateTime(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
+            />
           </div>
-        </div>
-      </form>
+          <div>
+            <label
+              htmlFor="proof"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Upload Proof
+            </label>
+            <input
+              type="file"
+              onChange={(e) => setProofFile(e.target.files[0])}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-2 bg-primary text-white font-medium rounded-md hover:bg-primary-dark transition duration-150"
+          >
+            Submit Request
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
-export default ReservationForm;
+export default TambayayongForm;
