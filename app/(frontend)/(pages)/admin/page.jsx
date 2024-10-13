@@ -152,6 +152,14 @@ const Dashboard = () => {
           </li>
           <li>
             <a
+              href="/admin/reserveitem"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Reserve Item
+            </a>
+          </li>
+          <li>
+            <a
               href="/admin/item"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
