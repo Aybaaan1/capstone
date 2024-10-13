@@ -70,7 +70,7 @@ const TambayayongForm = ({ setClose }) => {
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-md max-w-md w-full p-4 relative">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full relative">
         <button
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
           onClick={setClose}
@@ -103,7 +103,7 @@ const TambayayongForm = ({ setClose }) => {
               htmlFor="patience"
               className="block text-sm font-medium text-gray-700"
             >
-              Patience
+              Patient
             </label>
             <input
               type="text"

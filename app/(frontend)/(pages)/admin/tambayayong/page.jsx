@@ -167,7 +167,7 @@ const Dashboard = () => {
                   Name
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Patience
+                  Patient
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Date & Time
