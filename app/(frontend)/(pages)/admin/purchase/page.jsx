@@ -3,46 +3,85 @@ import React, { useState, useEffect } from "react";
 
 const Purchase = () => {
   const [purchases, setPurchases] = useState([]);
-  const [selectedPurchase, setSelectedPurchase] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState(null); // For error handling
+  const [error, setError] = useState(null);
 
   // Fetch purchases from the database
   const fetchPurchases = async () => {
     try {
-      const response = await fetch("/api/order"); // Fetch from your API route
+      const response = await fetch("/api/order");
       if (!response.ok) {
-        throw new Error("Failed to fetch orders"); // Handle errors
+        throw new Error("Failed to fetch orders");
       }
       const orders = await response.json();
       setPurchases(orders);
     } catch (error) {
-      setError(error.message); // Set error state
+      setError(error.message);
     }
   };
 
   useEffect(() => {
-    fetchPurchases(); // Fetch data when the component mounts
+    fetchPurchases();
   }, []);
 
-  // Toggle claim/unclaim status (you might want to implement this functionality with the backend)
-  const toggleClaim = (index) => {
-    const updatedPurchases = [...purchases];
-    updatedPurchases[index].status =
-      updatedPurchases[index].status === "claimed" ? "unclaimed" : "claimed";
-    setPurchases(updatedPurchases);
+  // Toggle claim/unclaim status
+  const toggleClaim = async (index, id) => {
+    try {
+      const updatedStatus =
+        purchases[index].status === "claimed" ? "unclaimed" : "claimed";
+
+      const response = await fetch(`/api/order/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: updatedStatus }),
+      });
+
+      if (response.ok) {
+        const updatedPurchases = [...purchases];
+        updatedPurchases[index].status = updatedStatus;
+        setPurchases(updatedPurchases);
+      }
+    } catch (error) {
+      setError("Failed to update claim status.");
+    }
   };
 
-  // Open the details modal
-  const openModal = (index) => {
-    setSelectedPurchase(purchases[index]);
-    setShowModal(true);
+  // Accept the order (updating the status to "accepted")
+  const acceptOrder = async (index, id) => {
+    try {
+      const response = await fetch(`/api/order/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "accepted" }),
+      });
+
+      if (response.ok) {
+        const updatedPurchases = [...purchases];
+        updatedPurchases[index].status = "accepted";
+        setPurchases(updatedPurchases);
+      }
+    } catch (error) {
+      setError("Failed to accept order.");
+    }
   };
 
-  // Close the modal
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedPurchase(null);
+  // Decline the order (deleting it)
+  const declineOrder = async (index, id) => {
+    try {
+      const response = await fetch(`/api/order/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        const updatedPurchases = purchases.filter((purchase, i) => i !== index);
+        setPurchases(updatedPurchases);
+      }
+    } catch (error) {
+      setError("Failed to decline order.");
+    }
   };
 
   return (
@@ -127,9 +166,6 @@ const Purchase = () => {
             <thead>
               <tr className="bg-[rgb(255,211,70)] text-black">
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Select
-                </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Order ID
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
@@ -137,9 +173,6 @@ const Purchase = () => {
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Merch ID
-                </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Order Date
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Payment Mode
@@ -151,19 +184,16 @@ const Purchase = () => {
                   Status
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Details
+                  Claim Status
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Claim/Unclaim
+                  Actions
                 </th>
               </tr>
             </thead>
             <tbody>
               {purchases.map((purchase, index) => (
                 <tr key={purchase.id} className="hover:bg-gray-100">
-                  <td className="border px-4 py-3 text-sm text-center">
-                    <input type="checkbox" />
-                  </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     {purchase.id}
                   </td>
@@ -174,45 +204,46 @@ const Purchase = () => {
                     {purchase.merchId}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
-                    {new Date(purchase.createdAt).toLocaleString()}
-                  </td>
-                  <td className="border px-4 py-3 text-sm text-center">
                     {purchase.paymentMode}
                   </td>
-                  <td className="border px-4 py-3 text-center">
-                    {purchase.proof && (
-                      <img
-                        src={purchase.proof}
-                        alt="Proof"
-                        className="w-16 h-16 object-cover mx-auto"
-                      />
-                    )}
+                  <td className="border px-4 py-3 text-sm text-center">
+                    {purchase.proof}
                   </td>
-                  <td className="border px-4 py-3 text-center">
+                  <td className="border px-4 py-3 text-sm text-center">
                     <span
                       className={`px-3 py-1 rounded-full ${
                         purchase.status === "claimed"
                           ? "bg-green-500"
-                          : "bg-red-500"
+                          : purchase.status === "unclaimed"
+                          ? "bg-red-500"
+                          : purchase.status === "accepted"
+                          ? "bg-blue-500"
+                          : "bg-gray-500"
                       } text-white text-xs`}
                     >
                       {purchase.status}
                     </span>
                   </td>
-                  <td className="border px-4 py-3 text-center">
+                  <td className="border px-4 py-3 text-sm text-center">
                     <button
-                      onClick={() => openModal(index)}
-                      className="bg-[rgb(255,211,70)] text-black px-3 py-1 rounded text-xs"
-                    >
-                      View Details
-                    </button>
-                  </td>
-                  <td className="border px-4 py-3 text-center">
-                    <button
-                      onClick={() => toggleClaim(index)}
+                      onClick={() => toggleClaim(index, purchase.id)}
                       className="bg-[rgb(255,211,70)] text-black px-3 py-1 rounded text-xs"
                     >
                       {purchase.status === "claimed" ? "Unclaim" : "Claim"}
+                    </button>
+                  </td>
+                  <td className="border px-4 py-3 text-sm text-center">
+                    <button
+                      onClick={() => acceptOrder(index, purchase.id)}
+                      className="bg-green-500 text-white px-3 py-1 rounded text-xs mr-2"
+                    >
+                      Accept
+                    </button>
+                    <button
+                      onClick={() => declineOrder(index, purchase.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+                    >
+                      Decline
                     </button>
                   </td>
                 </tr>
@@ -220,61 +251,6 @@ const Purchase = () => {
             </tbody>
           </table>
         </section>
-
-        {/* Modal */}
-        {showModal && selectedPurchase && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-3/4">
-              <h3 className="text-2xl font-semibold mb-4">Order Details</h3>
-              <div className="flex items-center mb-4">
-                <img
-                  src={selectedPurchase.merch.image} // Use the image from the merch object
-                  alt="Product"
-                  className="w-32 h-32 object-cover mr-4 border border-gray-300 rounded"
-                />
-                <div className="flex-grow">
-                  <p className="text-lg">
-                    <span className="font-semibold">Product Name:</span>{" "}
-                    {selectedPurchase.merch.name}
-                  </p>
-                  <p className="text-lg">
-                    <span className="font-semibold">Size:</span>{" "}
-                    {selectedPurchase.merch.size} {/* If applicable */}
-                  </p>
-                  <p className="text-lg">
-                    <span className="font-semibold">Quantity:</span>{" "}
-                    {selectedPurchase.quantity}{" "}
-                    {/* Adjust if you track quantity */}
-                  </p>
-                  <p className="text-lg">
-                    <span className="font-semibold">Unit Price:</span>{" "}
-                    {selectedPurchase.merch.price}
-                  </p>
-                </div>
-              </div>
-              <div className="border-t border-gray-300 mt-4 pt-4">
-                <p className="text-lg">
-                  <span className="font-semibold">Status:</span>{" "}
-                  {selectedPurchase.status}
-                </p>
-                <p className="text-lg">
-                  <span className="font-semibold">Payment Mode:</span>{" "}
-                  {selectedPurchase.paymentMode}
-                </p>
-                <p className="text-lg">
-                  <span className="font-semibold">Order Date:</span>{" "}
-                  {new Date(selectedPurchase.createdAt).toLocaleString()}
-                </p>
-              </div>
-              <button
-                onClick={closeModal}
-                className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );

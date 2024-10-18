@@ -17,9 +17,15 @@ export async function PUT(request, { params }) {
 export async function DELETE(request, { params }) {
   const { id } = params;
 
-  await db.assistance.delete({
-    where: { id: Number(id) },
-  });
-
-  return NextResponse.json({ message: "Assistance deleted" });
+  try {
+    await db.assistance.delete({
+      where: { id: Number(id) }, // Ensure the ID is treated as a number
+    });
+    return NextResponse.json({
+      message: "Assistance record deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting assistance record:", error);
+    return NextResponse.error(); // Return an error response
+  }
 }

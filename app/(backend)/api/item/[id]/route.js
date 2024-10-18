@@ -3,14 +3,14 @@ import db from "@/lib/db";
 
 export async function PUT(request, { params }) {
   const { id } = params;
-  const { name, place, dateTime, image, type, status } = await request.json();
+  const { status } = await request.json();
 
-  const updatedItem = await db.item.update({
+  const updatedItemOrder = await db.item.update({
     where: { id: Number(id) },
-    data: { name, place, dateTime, image, type, status },
+    data: { status },
   });
 
-  return NextResponse.json(updatedItem);
+  return NextResponse.json(updatedOrder);
 }
 
 export async function DELETE(request, { params }) {

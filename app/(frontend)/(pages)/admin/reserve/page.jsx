@@ -173,10 +173,13 @@ const ReservationDashboard = () => {
                   Select
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  User Id
+                  Id
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Item Id
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  User Id
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Reserve Date & Time
@@ -206,6 +209,9 @@ const ReservationDashboard = () => {
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {reservation.itemId}
+                  </td>
+                  <td className="border px-4 py-3 text-sm text-gray-800">
+                    {reservation.userId}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {new Date(reservation.reserveDateTime).toLocaleString()}

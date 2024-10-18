@@ -25,6 +25,69 @@ const LostAndFound = () => {
     fetchLostFoundItems();
   }, []);
 
+  // Accept item and update its status
+  const acceptItem = async (index) => {
+    const updatedItems = [...lostFoundItems];
+    updatedItems[index].status = "Accepted";
+
+    // Update the state first
+    setLostFoundItems(updatedItems);
+
+    // Attempt to update status in the database (API call)
+    try {
+      await updateItemStatus(updatedItems[index].id, "Accepted");
+    } catch (error) {
+      console.error("Failed to update status in the database:", error);
+      // Optionally revert the state update in case of failure
+      updatedItems[index].status = "Pending"; // or whatever the previous state was
+      setLostFoundItems(updatedItems);
+    }
+  };
+
+  // Decline item and delete from the list and database
+  const declineItem = async (index) => {
+    const itemId = lostFoundItems[index].id;
+
+    // Remove item from UI
+    const updatedItems = lostFoundItems.filter((_, i) => i !== index);
+    setLostFoundItems(updatedItems);
+
+    // Delete item in the database
+    await deleteItemFromDatabase(itemId);
+  };
+
+  // Function to send status update to the API
+  const updateItemStatus = async (id, status) => {
+    try {
+      const response = await fetch(`/api/item/status/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update item status");
+      }
+    } catch (error) {
+      console.error("Error updating item status:", error);
+    }
+  };
+
+  // Function to delete the item from the database
+  const deleteItemFromDatabase = async (id) => {
+    try {
+      const response = await fetch(`/api/item/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete item");
+      }
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
+  };
+
   const showDetails = (index) => {
     setSelectedItem(lostFoundItems[index]);
     setModalVisible(true);
@@ -34,7 +97,9 @@ const LostAndFound = () => {
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
-        <h1 className="text-3xl font-bold mb-10 tracking-wide">SSG CONNECT</h1>
+        <div className="logo mb-10">
+          <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
+        </div>
         <ul className="space-y-4">
           <li>
             <a
@@ -96,17 +161,11 @@ const LostAndFound = () => {
       </nav>
 
       {/* Main Content */}
-      {/* Main Content */}
       <main className="flex-1 p-10 bg-white">
         <header className="flex justify-between mb-8">
           <h2 className="text-3xl font-semibold text-black">
             Lost & Found Dashboard
           </h2>
-          <div className="flex space-x-4">
-            <button className="text-2xl">🔔</button>
-            <button className="text-2xl">❓</button>
-            <button className="text-2xl">👤</button>
-          </div>
         </header>
 
         {/* Lost and Found Table */}
@@ -114,7 +173,6 @@ const LostAndFound = () => {
           <table className="w-full text-left bg-white rounded-lg shadow-md border-collapse">
             <thead className="bg-[rgb(255,211,70)] text-black">
               <tr>
-                {/* Table Headers */}
                 {[
                   "ID",
                   "User ID",
@@ -124,6 +182,7 @@ const LostAndFound = () => {
                   "Time",
                   "Place",
                   "Image",
+                  "Status",
                   "Actions",
                 ].map((header, index) => (
                   <th
@@ -161,6 +220,9 @@ const LostAndFound = () => {
                     ) : (
                       <span>No Image</span>
                     )}
+                  </td>
+                  <td className="border px-4 py-3 text-sm">
+                    {item.status || "Pending"}
                   </td>
                   <td className="border px-4 py-3 text-sm">
                     <button

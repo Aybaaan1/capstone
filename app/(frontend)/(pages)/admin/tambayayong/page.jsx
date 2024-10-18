@@ -30,31 +30,50 @@ const Dashboard = () => {
     fetchAssistances();
   }, []);
 
-  const handleStatusChange = async (id, status) => {
+  const handleStatusChange = async (id, action) => {
     try {
-      // Update the status of the assistance record locally
-      const updatedAssistances = assistances.map((assistance) =>
-        assistance.id === id ? { ...assistance, status } : assistance
-      );
-      setAssistances(updatedAssistances);
+      if (action === "rejected") {
+        // Make a DELETE request to remove the assistance record from the database
+        const response = await fetch(`/api/assistance/${id}`, {
+          method: "DELETE",
+        });
 
-      // Send an update request to the backend
-      const response = await fetch(`/api/assistance/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status }),
-      });
+        if (!response.ok) {
+          throw new Error(
+            `Failed to delete assistance record: ${response.statusText}`
+          );
+        }
 
-      if (!response.ok) {
-        throw new Error(`Failed to update status: ${response.statusText}`);
+        // Filter out the deleted assistance record from the state
+        const updatedAssistances = assistances.filter(
+          (assistance) => assistance.id !== id
+        );
+        setAssistances(updatedAssistances);
+      } else {
+        // Update the status of the assistance record locally for "accepted" action
+        const updatedAssistances = assistances.map((assistance) =>
+          assistance.id === id
+            ? { ...assistance, status: "accepted" }
+            : assistance
+        );
+        setAssistances(updatedAssistances);
+
+        // Send an update request to the backend
+        const response = await fetch(`/api/assistance/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: "accepted" }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to update status: ${response.statusText}`);
+        }
       }
-
-      // Optionally refresh the data or handle a successful response
     } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status. Please try again.");
+      console.error("Error handling status change:", error);
+      alert("Failed to process the request. Please try again.");
     }
   };
 
