@@ -110,7 +110,7 @@ const TambayayongForm = ({ setClose }) => {
               id="patience"
               value={patience}
               onChange={(e) => setPatience(e.target.value)}
-              placeholder="Enter patience level"
+              placeholder="Enter patient name"
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
             />

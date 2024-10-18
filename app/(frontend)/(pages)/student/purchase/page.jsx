@@ -1,9 +1,16 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function Purchase() {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    // Load cart from local storage on initial render
+    if (typeof window !== "undefined") {
+      const savedCart = localStorage.getItem("cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    }
+    return [];
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -15,15 +22,35 @@ export default function Purchase() {
     { picture: "/imgs/lanyards.png", item: "Department Lanyards", price: 85.0 },
     { picture: "/imgs/totebag.png", item: "University Tote Bag", price: 160.0 },
     { picture: "/imgs/flask.png", item: "University Tumbler", price: 299.0 },
-    { picture: "/imgs/tshirt.png", item: "University T-Shirt", price: 250.0 },
-    { picture: "/imgs/lanyards.png", item: "Department Lanyards", price: 85.0 },
-    { picture: "/imgs/totebag.png", item: "University Tote Bag", price: 160.0 },
-    { picture: "/imgs/flask.png", item: "University Tumbler", price: 299.0 },
   ];
 
+  useEffect(() => {
+    // Update local storage whenever the cart changes
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    // Calculate the total price
+    const updatedTotal = cart.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+    setTotalPrice(updatedTotal);
+  }, [cart]);
+
   const handleAddToCart = (item) => {
-    setCart([...cart, { ...item, quantity: 1, size: null }]);
-    setTotalPrice((prevPrice) => prevPrice + item.price);
+    const existingItem = cart.find((cartItem) => cartItem.item === item.item);
+    if (existingItem) {
+      // Update quantity if item already in cart
+      setCart(
+        cart.map((cartItem) =>
+          cartItem.item === item.item
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
+        )
+      );
+    } else {
+      // Add new item to cart
+      setCart([...cart, { ...item, quantity: 1 }]);
+    }
   };
 
   const handleToggleCart = () => {
@@ -39,9 +66,10 @@ export default function Purchase() {
     const updatedCart = [...editedCart];
     updatedCart[index][key] = value;
 
-    const updatedTotal = updatedCart.reduce((total, item) => {
-      return total + item.price * item.quantity;
-    }, 0);
+    const updatedTotal = updatedCart.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
 
     setEditedCart(updatedCart);
     setTotalPrice(updatedTotal);
