@@ -1,6 +1,7 @@
 "use client"; // Ensure this is included at the top of your file
 import React, { useState, useEffect } from "react";
 import Proof from "../../../(components)/_components/Proof";
+import RejectionModal from "../../../(components)/_components/RejectionModal";
 
 const Dashboard = () => {
   const [assistances, setAssistances] = useState([]);
@@ -10,6 +11,22 @@ const Dashboard = () => {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState("");
+  const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
+  const [currentAssistanceId, setCurrentAssistanceId] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+
+  const closeRejectionModal = () => {
+    setIsRejectionModalOpen(false);
+    setCurrentAssistanceId(null);
+    setRejectionReason(""); // Reset the rejection reason
+  };
+
+  const handleRejectClick = (id, userId) => {
+    setCurrentAssistanceId(id);
+    setCurrentUserId(userId);
+    setIsRejectionModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchAssistances = async () => {
@@ -19,10 +36,10 @@ const Dashboard = () => {
           throw new Error("Failed to fetch assistance records");
         }
         const data = await response.json();
-        setAssistances(data); // Assuming the data is an array of assistance records
-        setLoading(false);
+        setAssistances(data);
       } catch (error) {
         setError(error.message);
+      } finally {
         setLoading(false);
       }
     };
@@ -30,54 +47,47 @@ const Dashboard = () => {
     fetchAssistances();
   }, []);
 
-  const handleStatusChange = async (id, action) => {
+  const handleStatusChange = async (id, action, reason = "") => {
     try {
-      if (action === "rejected") {
-        // Make a DELETE request to remove the assistance record from the database
-        const response = await fetch(`/api/assistance/${id}`, {
-          method: "DELETE",
-        });
+      const response = await fetch(`/api/assistance/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: action, reason }),
+      });
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to delete assistance record: ${response.statusText}`
-          );
-        }
-
-        // Filter out the deleted assistance record from the state
-        const updatedAssistances = assistances.filter(
-          (assistance) => assistance.id !== id
-        );
-        setAssistances(updatedAssistances);
-      } else {
-        // Update the status of the assistance record locally for "accepted" action
-        const updatedAssistances = assistances.map((assistance) =>
-          assistance.id === id
-            ? { ...assistance, status: "accepted" }
-            : assistance
-        );
-        setAssistances(updatedAssistances);
-
-        // Send an update request to the backend
-        const response = await fetch(`/api/assistance/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: "accepted" }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to update status: ${response.statusText}`);
-        }
+      if (!response.ok) {
+        throw new Error(`Failed to update status: ${response.statusText}`);
       }
+
+      alert(
+        action === "accepted"
+          ? "Request accepted"
+          : `Request rejected: ${reason}`
+      );
+
+      // Update local state after processing
+      setAssistances((prev) =>
+        prev.map((assistance) =>
+          assistance.id === id
+            ? { ...assistance, status: action, reason }
+            : assistance
+        )
+      );
     } catch (error) {
       console.error("Error handling status change:", error);
       alert("Failed to process the request. Please try again.");
     }
   };
 
-  // Open the modal with the selected image
+  const handleRejectionSubmit = (reason) => {
+    if (currentAssistanceId) {
+      handleStatusChange(currentAssistanceId, "rejected", reason);
+      closeRejectionModal();
+    }
+  };
+
   const openModal = (imageSrc) => {
     setCurrentImage(imageSrc);
     setIsModalOpen(true);
@@ -137,7 +147,6 @@ const Dashboard = () => {
               Reservation
             </a>
           </li>
-
           <li>
             <a
               href="/admin/tambayayong"
@@ -256,7 +265,7 @@ const Dashboard = () => {
                     <button
                       className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                       onClick={() =>
-                        handleStatusChange(assistance.id, "rejected")
+                        handleRejectClick(assistance.id, assistance.userId)
                       }
                     >
                       Reject
@@ -266,14 +275,24 @@ const Dashboard = () => {
               ))}
             </tbody>
           </table>
-        </section>
 
-        {/* Modal for Image Preview */}
-        <Proof
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          imageSrc={currentImage}
-        />
+          <Proof
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            imageSrc={currentImage}
+          />
+
+          {/* Rejection Modal */}
+          {isRejectionModalOpen && (
+            <RejectionModal
+              isOpen={isRejectionModalOpen}
+              onClose={closeRejectionModal}
+              onSubmit={handleRejectionSubmit}
+              rejectionReason={rejectionReason}
+              setRejectionReason={setRejectionReason}
+            />
+          )}
+        </section>
       </main>
     </div>
   );

@@ -96,9 +96,10 @@ model Assistance { //form for user to request cash assistance
   gcash     String
   proof     String?
   status    String
-
+  reason    String?
   user      User     @relation(fields: [userId], references: [id])
 }
+
 
 enum Role {
   STUDENT

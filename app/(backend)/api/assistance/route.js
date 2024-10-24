@@ -47,3 +47,24 @@ export async function POST(request) {
   }
 }
 // Prepae the data for Prisma
+export default async function handler(req, res) {
+  const session = await getSession({ req });
+  if (!session) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const userId = req.query.userId;
+
+  try {
+    // Query to fetch assistances for the specific user
+    const assistances = await db.assistance.findMany({
+      where: { userId: userId },
+    });
+
+    return res.status(200).json(assistances);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Failed to fetch assistance records" });
+  }
+}

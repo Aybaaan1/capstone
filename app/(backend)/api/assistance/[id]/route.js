@@ -3,17 +3,22 @@ import db from "@/lib/db";
 
 export async function PUT(request, { params }) {
   const { id } = params;
-  const { name, patience, dateTime, gcash, proof, status } =
-    await request.json();
+  const { status, reason } = await request.json();
 
-  const updatedAssistance = await db.assistance.update({
-    where: { id: Number(id) },
-    data: { name, patience, dateTime, gcash, proof, status },
-  });
+  try {
+    const updatedAssistance = await db.assistance.update({
+      where: { id: Number(id) },
+      data: { status, reason },
+    });
 
-  return NextResponse.json(updatedAssistance);
+    return NextResponse.json(updatedAssistance);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update assistance" },
+      { status: 500 }
+    );
+  }
 }
-
 export async function DELETE(request, { params }) {
   const { id } = params;
 
