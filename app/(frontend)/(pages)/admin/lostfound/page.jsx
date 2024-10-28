@@ -1,13 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Proof from "../../../(components)/_components/Proof";
 
 const LostAndFound = () => {
   const [lostFoundItems, setLostFoundItems] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [searchId, setSearchId] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [proofModalVisible, setProofModalVisible] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState(null);
 
-  // Fetch lost and found items from the database
   useEffect(() => {
     const fetchLostFoundItems = async () => {
       try {
@@ -25,38 +29,28 @@ const LostAndFound = () => {
     fetchLostFoundItems();
   }, []);
 
-  // Accept item and update its status
   const acceptItem = async (index) => {
     const updatedItems = [...lostFoundItems];
     updatedItems[index].status = "Accepted";
-
-    // Update the state first
     setLostFoundItems(updatedItems);
 
-    // Attempt to update status in the database (API call)
     try {
       await updateItemStatus(updatedItems[index].id, "Accepted");
     } catch (error) {
       console.error("Failed to update status in the database:", error);
-      // Optionally revert the state update in case of failure
-      updatedItems[index].status = "Pending"; // or whatever the previous state was
+      updatedItems[index].status = "Pending"; // Rollback to previous status
       setLostFoundItems(updatedItems);
     }
   };
 
-  // Decline item and delete from the list and database
   const declineItem = async (index) => {
     const itemId = lostFoundItems[index].id;
-
-    // Remove item from UI
     const updatedItems = lostFoundItems.filter((_, i) => i !== index);
     setLostFoundItems(updatedItems);
 
-    // Delete item in the database
     await deleteItemFromDatabase(itemId);
   };
 
-  // Function to send status update to the API
   const updateItemStatus = async (id, status) => {
     try {
       const response = await fetch(`/api/item/status/${id}`, {
@@ -74,7 +68,6 @@ const LostAndFound = () => {
     }
   };
 
-  // Function to delete the item from the database
   const deleteItemFromDatabase = async (id) => {
     try {
       const response = await fetch(`/api/item/${id}`, {
@@ -93,9 +86,19 @@ const LostAndFound = () => {
     setModalVisible(true);
   };
 
+  const openProofModal = (imageSrc) => {
+    setSelectedImageSrc(imageSrc);
+    setProofModalVisible(true);
+  };
+
+  const filteredItems = lostFoundItems.filter((item) => {
+    const matchesSearch = item.userId.toString().includes(searchId);
+    const matchesFilter = filter === "all" || item.type === filter;
+    return matchesSearch && matchesFilter;
+  });
+
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
         <div className="logo mb-10">
           <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
@@ -160,7 +163,6 @@ const LostAndFound = () => {
         </ul>
       </nav>
 
-      {/* Main Content */}
       <main className="flex-1 p-10 bg-white">
         <header className="flex justify-between mb-8">
           <h2 className="text-3xl font-semibold text-black">
@@ -168,7 +170,41 @@ const LostAndFound = () => {
           </h2>
         </header>
 
-        {/* Lost and Found Table */}
+        {/* Filter Buttons */}
+        <div className="mb-4 flex items-center space-x-4">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-4 py-2 rounded-md ${
+              filter === "all" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter("lost")}
+            className={`mr-2 px-4 py-2 rounded-md ${
+              filter === "lost" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            Lost
+          </button>
+          <button
+            onClick={() => setFilter("found")}
+            className={`mr-2 px-4 py-2 rounded-md ${
+              filter === "found" ? "bg-blue-600 text-white" : "bg-gray-200"
+            }`}
+          >
+            Found
+          </button>
+          <input
+            type="text"
+            placeholder="Search by User ID" // Updated placeholder
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
+            className="border rounded-md p-2 ml-4"
+          />
+        </div>
+
         <section>
           <table className="w-full text-left bg-white rounded-lg shadow-md border-collapse">
             <thead className="bg-[rgb(255,211,70)] text-black">
@@ -195,7 +231,7 @@ const LostAndFound = () => {
               </tr>
             </thead>
             <tbody>
-              {lostFoundItems.map((item, index) => (
+              {filteredItems.map((item, index) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="border px-4 py-3 text-sm">{item.id}</td>
                   <td className="border px-4 py-3 text-sm">{item.userId}</td>
@@ -208,15 +244,16 @@ const LostAndFound = () => {
                     {new Date(item.dateTime).toLocaleTimeString()}
                   </td>
                   <td className="border px-4 py-3 text-sm">{item.place}</td>
-                  <td className="border px-4 py-3">
+                  <td className="border px-4 py-3 text-sm">
                     {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt="Item"
-                        width={50}
-                        height={50}
-                        className="rounded-full"
-                      />
+                      <>
+                        <button
+                          className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                          onClick={() => openProofModal(item.image)}
+                        >
+                          View
+                        </button>
+                      </>
                     ) : (
                       <span>No Image</span>
                     )}
@@ -243,27 +280,22 @@ const LostAndFound = () => {
             </tbody>
           </table>
         </section>
+        <Proof
+          isOpen={proofModalVisible}
+          onClose={() => setProofModalVisible(false)}
+          imageSrc={selectedImageSrc}
+        />
 
-        {/* Modal */}
+        {/* Modal implementation here */}
         {modalVisible && selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-2/3 relative">
-              <button
-                className="absolute top-3 right-4 text-2xl text-gray-600"
-                onClick={() => setModalVisible(false)}
-              >
-                &times;
-              </button>
-              <h3 className="text-xl mb-4 font-semibold">Lost Item Details</h3>
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white p-6 rounded shadow-lg">
+              <h3 className="text-lg font-bold">{selectedItem.name}</h3>
               <p>
                 <strong>ID:</strong> {selectedItem.id}
               </p>
               <p>
                 <strong>User ID:</strong> {selectedItem.userId}
-              </p>
-              <p>
-                <strong>Username:</strong>{" "}
-                {selectedItem.user?.username || "Unknown User"}
               </p>
               <p>
                 <strong>Type:</strong> {selectedItem.type}
@@ -279,23 +311,23 @@ const LostAndFound = () => {
               <p>
                 <strong>Place:</strong> {selectedItem.place}
               </p>
-              {selectedItem.image ? (
+              {selectedItem.image && (
                 <Image
                   src={selectedItem.image}
                   alt="Item"
-                  width={200}
-                  height={200}
-                  className="rounded-lg mt-4"
+                  width={100}
+                  height={100}
+                  className="rounded-full"
                 />
-              ) : (
-                <p>No Image Available</p>
               )}
-              <button
-                className="mt-6 bg-yellow-400 text-black px-4 py-2 rounded-md hover:bg-yellow-500"
-                onClick={() => setModalVisible(false)}
-              >
-                Close
-              </button>
+              <div className="mt-4">
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={() => setModalVisible(false)}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}

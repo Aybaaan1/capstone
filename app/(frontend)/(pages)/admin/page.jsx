@@ -1,4 +1,4 @@
-"use client"; // Ensure this is included at the top of your file
+"use client";
 import React, { useState, useEffect } from "react";
 
 const Dashboard = () => {
@@ -8,6 +8,8 @@ const Dashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({});
+  const [filterRole, setFilterRole] = useState(""); // New state for role filtering
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -29,16 +31,11 @@ const Dashboard = () => {
   }, []);
 
   const handleDelete = async (userId) => {
-    console.log("Attempting to delete user with ID:", userId);
     if (confirm("Are you sure you want to delete this user?")) {
       try {
         const response = await fetch(`/api/user/${userId}`, {
-          // Use backticks here
           method: "DELETE",
         });
-        console.log("Response status:", response.status);
-        const responseBody = await response.text();
-        console.log("Response body:", responseBody);
 
         if (!response.ok) {
           throw new Error("Failed to delete user");
@@ -67,7 +64,6 @@ const Dashboard = () => {
   const handleSave = async () => {
     try {
       const response = await fetch(`/api/user/${updatedUser.id}`, {
-        // Use backticks here
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -75,16 +71,11 @@ const Dashboard = () => {
         body: JSON.stringify(updatedUser),
       });
 
-      console.log("Response Status:", response.status);
-      const responseText = await response.text();
-      console.log("Response Text:", responseText);
-
       if (!response.ok) {
         throw new Error("Failed to update user");
       }
 
-      const responseData = JSON.parse(responseText);
-      console.log("Updated Data:", responseData);
+      const responseData = await response.json();
       setUsers(
         users.map((user) => (user.id === responseData.id ? responseData : user))
       );
@@ -93,6 +84,12 @@ const Dashboard = () => {
       alert(error.message);
     }
   };
+
+  const filteredUsers = users.filter((user) => {
+    const matchesRole = filterRole ? user.role === filterRole : true;
+    const matchesSearch = user.id.toString().includes(searchQuery);
+    return matchesRole && matchesSearch;
+  });
 
   if (loading) {
     return <div>Loading...</div>;
@@ -110,6 +107,7 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
         </div>
         <ul className="space-y-4">
+          {/* Sidebar Links */}
           <li>
             <a
               href="/admin"
@@ -175,6 +173,48 @@ const Dashboard = () => {
           Admin Dashboard
         </h2>
 
+        {/* Filter and Search */}
+        <div className="mb-4 flex items-center space-x-4">
+          <button
+            onClick={() => setFilterRole("")}
+            className={`px-4 py-2 rounded-md ${
+              filterRole === ""
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-black"
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilterRole("STUDENT")}
+            className={`px-4 py-2 rounded-md ${
+              filterRole === "STUDENT"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-black"
+            }`}
+          >
+            Student
+          </button>
+          <button
+            onClick={() => setFilterRole("ADMIN")}
+            className={`px-4 py-2 rounded-md ${
+              filterRole === "ADMIN"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-black"
+            }`}
+          >
+            Admin
+          </button>
+
+          <input
+            type="text"
+            placeholder="Search by UserId"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border rounded-md p-2 ml-4"
+          />
+        </div>
+
         {/* Users Table */}
         <section>
           <table className="min-w-full bg-white rounded-lg shadow-md">
@@ -207,7 +247,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <tr
                   key={user.id}
                   className="bg-white border-b hover:bg-gray-50"
@@ -251,102 +291,70 @@ const Dashboard = () => {
               ))}
             </tbody>
           </table>
-
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-6">
-            <span className="text-sm text-gray-600">
-              {users.length} results
-            </span>
-            <div className="flex space-x-2">
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                «
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                1
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                2
-              </button>
-              <button className="bg-gray-800 text-white px-3 py-1 rounded-md hover:bg-gray-700">
-                »
-              </button>
-            </div>
-          </div>
         </section>
 
-        {/* Modal for Updating User */}
+        {/* Update Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg p-6 w-96">
-              <h3 className="text-lg font-semibold mb-4">Update User</h3>
-              <form>
-                <div className="mb-4">
-                  <label className="block mb-1">Email:</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={updatedUser.email || ""}
-                    onChange={handleChange}
-                    className="border rounded-md p-2 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">ID Number:</label>
-                  <input
-                    type="text"
-                    name="idnumber"
-                    value={updatedUser.idnumber || ""}
-                    onChange={handleChange}
-                    className="border rounded-md p-2 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">First Name:</label>
-                  <input
-                    type="text"
-                    name="firstname"
-                    value={updatedUser.firstname || ""}
-                    onChange={handleChange}
-                    className="border rounded-md p-2 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Last Name:</label>
-                  <input
-                    type="text"
-                    name="lastname"
-                    value={updatedUser.lastname || ""}
-                    onChange={handleChange}
-                    className="border rounded-md p-2 w-full"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-1">Program:</label>
-                  <input
-                    type="text"
-                    name="program"
-                    value={updatedUser.program || ""}
-                    onChange={handleChange}
-                    className="border rounded-md p-2 w-full"
-                  />
-                </div>
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="bg-gray-300 text-black px-4 py-2 rounded-md ml-2 hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+          <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-md shadow-lg w-96">
+              <h2 className="text-2xl font-semibold mb-4">Update User</h2>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  name="email"
+                  placeholder="Enter Email Address"
+                  value={updatedUser.email || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  name="idnumber"
+                  placeholder="Enter IdNumber"
+                  value={updatedUser.idnumber || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  name="firstname"
+                  placeholder="Enter First Name"
+                  value={updatedUser.firstname || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  name="lastname"
+                  placeholder="Last Name"
+                  value={updatedUser.lastname || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  name="Program"
+                  placeholder="Enter Program"
+                  value={updatedUser.program || ""}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded-md"
+                />
+                {/* Add additional fields as needed */}
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         )}
