@@ -15,6 +15,7 @@ const Dashboard = () => {
   const [currentAssistanceId, setCurrentAssistanceId] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   const closeRejectionModal = () => {
     setIsRejectionModalOpen(false);
@@ -109,7 +110,6 @@ const Dashboard = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
         <div className="logo mb-10">
           <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
@@ -134,18 +134,47 @@ const Dashboard = () => {
           <li>
             <a
               href="/admin/lostfound"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+              className="block py-2 px-4 rounded-md bg-gray-900 text-white"
             >
               Lost & Found
             </a>
           </li>
           <li>
-            <a
-              href="/admin/reserve"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            {/* Reservation Dropdown */}
+            <button
+              onClick={() => setIsReservationOpen(!isReservationOpen)}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Reservation
-            </a>
+            </button>
+            {isReservationOpen && (
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/reserveitem"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Available Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/reserve"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Borrow Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/item"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Item Reservation Form
+                  </a>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <a
@@ -153,22 +182,6 @@ const Dashboard = () => {
               className="block py-2 px-4 rounded-md bg-gray-900 text-white"
             >
               Tambayayong
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/reserveitem"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Reserve Item
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/item"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Item Reservation Form
             </a>
           </li>
         </ul>

@@ -11,6 +11,7 @@ const LostAndFound = () => {
   const [filter, setFilter] = useState("all");
   const [proofModalVisible, setProofModalVisible] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState(null);
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   useEffect(() => {
     const fetchLostFoundItems = async () => {
@@ -129,12 +130,41 @@ const LostAndFound = () => {
             </a>
           </li>
           <li>
-            <a
-              href="/admin/reserve"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            {/* Reservation Dropdown */}
+            <button
+              onClick={() => setIsReservationOpen(!isReservationOpen)}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Reservation
-            </a>
+            </button>
+            {isReservationOpen && (
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/reserveitem"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Available Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/reserve"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Borrow Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/item"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Item Reservation Form
+                  </a>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <a
@@ -142,22 +172,6 @@ const LostAndFound = () => {
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
               Tambayayong
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/reserveitem"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Reserve Item
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/item"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Item Reservation Form
             </a>
           </li>
         </ul>

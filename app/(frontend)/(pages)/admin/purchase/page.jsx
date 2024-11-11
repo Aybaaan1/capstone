@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 const Purchase = () => {
   const [purchases, setPurchases] = useState([]);
   const [error, setError] = useState(null);
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   // Fetch purchases from the database
   const fetchPurchases = async () => {
@@ -86,7 +87,6 @@ const Purchase = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
         <div className="logo mb-10">
           <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
@@ -117,12 +117,41 @@ const Purchase = () => {
             </a>
           </li>
           <li>
-            <a
-              href="/admin/reserve"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            {/* Reservation Dropdown */}
+            <button
+              onClick={() => setIsReservationOpen(!isReservationOpen)}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Reservation
-            </a>
+            </button>
+            {isReservationOpen && (
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/reserveitem"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Available Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/reserve"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Borrow Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/item"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Item Reservation Form
+                  </a>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <a
@@ -130,22 +159,6 @@ const Purchase = () => {
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
               Tambayayong
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/reserveitem"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Reserve Item
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/item"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Item Reservation Form
             </a>
           </li>
         </ul>

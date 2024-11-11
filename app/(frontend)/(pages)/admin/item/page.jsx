@@ -4,65 +4,70 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadImage } from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/imageUpload"; // Adjust the import path as needed
 
-const ItemReservationPage = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+const ReserveItemDashboard = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [itemType, setItemType] = useState("TV");
   const [itemStatus, setItemStatus] = useState("Available");
 
-  // Check session status and redirect accordingly
+  // Fetch all items from the database
   useEffect(() => {
-    if (status === "loading") return; // Wait until the session is loaded
-    if (status === "unauthenticated") {
-      router.push("/signin");
-    } else if (session?.user?.role !== "ADMIN") {
-      router.push("/"); // Ensure only admins can access this page
-    }
-  }, [session, status, router]);
+    const fetchItems = async () => {
+      try {
+        const response = await fetch("/api/reserveitem");
+        if (!response.ok) {
+          throw new Error("Failed to fetch items");
+        }
+        const data = await response.json();
+        setItems(data);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, []);
 
+  // Handle file change for image upload
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  const handleUpload = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+  // Handle form submission to add an item
+  const handleAddItem = async (e) => {
+    e.preventDefault();
     try {
-      if (!file) {
-        throw new Error("Please select a file to upload.");
-      }
-
-      // Upload the image using your custom upload function
+      if (!file) throw new Error("Please select a file to upload.");
       const imageUrl = await uploadImage(file);
-      console.log("Uploaded file available at:", imageUrl); // Log the uploaded image URL
 
-      // Now call the reserve item API with the uploaded image URL
       const reserveResponse = await fetch("/api/reserveitem", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: itemType, // Use item type from form state
-          status: itemStatus, // Use item status from form state
-          image: imageUrl, // Use the uploaded image URL
+          type: itemType,
+          status: itemStatus,
+          image: imageUrl,
         }),
       });
 
-      if (!reserveResponse.ok) {
+      if (!reserveResponse.ok)
         throw new Error("Failed to create item in database");
-      }
 
-      const reserveData = await reserveResponse.json();
-      console.log("Item created:", reserveData);
-
-      // Optionally clear the input fields or provide feedback
+      const newItem = await reserveResponse.json();
+      setItems((prevItems) => [...prevItems, newItem]);
+      setIsAddItemModalOpen(false); // Close the modal after adding
       setFile(null);
       setItemType("TV");
       setItemStatus("Available");
     } catch (error) {
-      console.error("Error uploading image or creating item:", error);
-      alert(error.message); // Alert the user in case of an error
+      console.error(error.message);
     }
   };
 
@@ -74,6 +79,7 @@ const ItemReservationPage = () => {
           <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
         </div>
         <ul className="space-y-4">
+          {/* Sidebar links */}
           <li>
             <a
               href="/admin"
@@ -82,104 +88,138 @@ const ItemReservationPage = () => {
               Users
             </a>
           </li>
+          {/* Add additional sidebar links here */}
           <li>
-            <a
-              href="/admin/purchase"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Purchase
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/lostfound"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Lost & Found
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/reserve"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            <button
+              onClick={() => setIsReservationOpen(!isReservationOpen)}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Reservation
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/tambayayong"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Tambayayong
-            </a>
-          </li>
-          <li>
-            <a
-              href="/admin/item"
-              className="block py-2 px-4 rounded-md bg-gray-900 text-white"
-            >
-              Item Reservation Form
-            </a>
+            </button>
+            {isReservationOpen && (
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/reserveitem"
+                    className="block py-2 px-4 rounded-md bg-gray-900 text-white"
+                  >
+                    Available Items
+                  </a>
+                </li>
+                {/* Other submenu items */}
+              </ul>
+            )}
           </li>
         </ul>
       </nav>
 
-      {/* Form content */}
-      <div className="flex-1 min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div className="max-w-md w-full bg-white p-8 border border-gray-200 rounded-lg shadow-md">
-          <h1 className="text-3xl font-bold mb-6 text-center text-black">
-            Item Reservation Form
-          </h1>
-          <h2 className="text-xl font-semibold mb-4 text-black">
-            Upload Items
-          </h2>
-          <form onSubmit={handleUpload}>
-            <label className="block text-gray-700 font-semibold mb-2">
-              Item Type:
-            </label>
-            <select
-              value={itemType}
-              onChange={(e) => setItemType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)] mb-4"
-            >
-              <option value="TV">TV</option>
-              <option value="Chairs">Chairs</option>
-              <option value="Camera">Camera</option>
-              <option value="Table">Table</option>
-            </select>
+      {/* Main Content */}
+      <main className="flex-1 bg-white p-10">
+        <h2 className="text-3xl font-semibold text-black mb-8">
+          Reserve Item Dashboard
+        </h2>
 
-            <label className="block text-gray-700 font-semibold mb-2">
-              Status:
-            </label>
-            <select
-              value={itemStatus}
-              onChange={(e) => setItemStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)] mb-4"
-            >
-              <option value="Available">Available</option>
-              <option value="Not Available">Not Available</option>
-            </select>
+        {/* Add Item Button */}
+        <button
+          onClick={() => setIsAddItemModalOpen(true)}
+          className="mb-6 px-4 py-2 bg-[rgb(255,211,70)] text-black font-semibold rounded-md hover:bg-[rgb(255,200,60)]"
+        >
+          + Add Item
+        </button>
 
-            <label className="block text-gray-700 font-semibold mb-2 mt-4">
-              Upload Image:
-            </label>
-            <input
-              type="file"
-              onChange={handleFileChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)] mb-4"
-            />
-            <button
-              type="submit"
-              className="w-full bg-gray-900 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)] mt-4"
-            >
-              Upload
-            </button>
-          </form>
-        </div>
-      </div>
+        {/* Table displaying items */}
+        <section>
+          <table className="min-w-full bg-white rounded-lg shadow-md">
+            <thead className="bg-[rgb(255,211,70)] text-black">
+              <tr>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  ID
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Type
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Status
+                </th>
+                {/* Additional columns */}
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="border-gray-200 p-3 text-sm">{item.id}</td>
+                  <td className="border-gray-200 p-3 text-sm">{item.type}</td>
+                  <td className="border-gray-200 p-3 text-sm">{item.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+
+        {/* Add Item Modal */}
+        {isAddItemModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+              <h2 className="text-xl font-semibold mb-4 text-black">
+                Add Item
+              </h2>
+              <form onSubmit={handleAddItem}>
+                <label className="block text-gray-700 font-semibold mb-2">
+                  Item Type:
+                </label>
+                <select
+                  value={itemType}
+                  onChange={(e) => setItemType(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4"
+                >
+                  <option value="TV">TV</option>
+                  <option value="Chairs">Chairs</option>
+                  <option value="Camera">Camera</option>
+                  <option value="Table">Table</option>
+                </select>
+
+                <label className="block text-gray-700 font-semibold mb-2">
+                  Status:
+                </label>
+                <select
+                  value={itemStatus}
+                  onChange={(e) => setItemStatus(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4"
+                >
+                  <option value="Available">Available</option>
+                  <option value="Not Available">Not Available</option>
+                </select>
+
+                <label className="block text-gray-700 font-semibold mb-2">
+                  Upload Image:
+                </label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4"
+                />
+
+                <button
+                  type="submit"
+                  className="w-full bg-gray-900 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-700"
+                >
+                  Submit
+                </button>
+              </form>
+
+              {/* Close Modal Button */}
+              <button
+                onClick={() => setIsAddItemModalOpen(false)}
+                className="mt-4 w-full text-center text-gray-500 hover:underline"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
 
-export default ItemReservationPage;
+export default ReserveItemDashboard;
