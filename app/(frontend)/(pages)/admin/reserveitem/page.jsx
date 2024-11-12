@@ -103,7 +103,7 @@ const ReserveItemDashboard = () => {
               onClick={() => setIsReservationOpen(!isReservationOpen)}
               className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
-              Reservation
+              Item Management
             </button>
             {isReservationOpen && (
               <ul className="ml-4 space-y-2">

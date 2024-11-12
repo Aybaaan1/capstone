@@ -88,7 +88,7 @@ const Dashboard = () => {
 
   const filteredUsers = users.filter((user) => {
     const matchesRole = filterRole ? user.role === filterRole : true;
-    const matchesSearch = user.id.toString().includes(searchQuery);
+    const matchesSearch = user.idnumber.toString().includes(searchQuery);
     return matchesRole && matchesSearch;
   });
 
@@ -137,7 +137,7 @@ const Dashboard = () => {
               onClick={() => setIsReservationOpen(!isReservationOpen)}
               className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
-              Reservation
+              Item Management
             </button>
             {isReservationOpen && (
               <ul className="ml-4 space-y-2">
@@ -159,10 +159,10 @@ const Dashboard = () => {
                 </li>
                 <li>
                   <a
-                    href="/admin/item"
+                    href="/admin/return"
                     className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
                   >
-                    Item Reservation Form
+                    Return Items
                   </a>
                 </li>
               </ul>

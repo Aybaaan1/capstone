@@ -20,37 +20,48 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
-  const { itemId, userId, reserveDateTime, returnDateTime, purpose } =
-    await request.json();
-
-  // Convert to Date objects to ensure valid ISO-8601 format
-  const reserveDate = new Date(reserveDateTime);
-  const returnDate = new Date(returnDateTime);
-
-  // Validate dates
-  if (isNaN(reserveDate) || isNaN(returnDate)) {
-    return NextResponse.json({ error: "Invalid date format" }, { status: 400 });
-  }
-
-  // Prepare the data for Prisma
-  const reservationData = {
-    itemId,
-    userId,
-    reserveDateTime: reserveDate, // Use the Date object
-    returnDateTime: returnDate, // Use the Date object
-    purpose,
-  };
-
+export async function POST(req) {
   try {
+    const { itemId, userId, reserveDateTime, returnDateTime, purpose, status } =
+      await req.json(); // Parse incoming request body
+
+    // Validate if all required fields are provided
+    if (!itemId || !userId || !reserveDateTime || !returnDateTime || !purpose) {
+      return new Response(
+        JSON.stringify({ error: "All fields are required" }),
+        { status: 400 }
+      );
+    }
+
+    // Parse the date fields
+    const reserveDate = new Date(reserveDateTime);
+    const returnDate = new Date(returnDateTime);
+
+    // Optional: Log the date values to verify
+    console.log("Reserve Date:", reserveDate);
+    console.log("Return Date:", returnDate);
+
+    // Use the status from the request body or set a default value (e.g., 'pending')
+    const reservationStatus = status || "pending"; // Default to "pending" if no status is provided
+
+    // Create reservation using Prisma
     const reservation = await prisma.reserve.create({
-      data: reservationData,
+      data: {
+        itemId,
+        userId,
+        reserveDateTime: reserveDate,
+        returnDateTime: returnDate,
+        purpose,
+        status: reservationStatus, // Add the status field
+      },
     });
-    return NextResponse.json(reservation, { status: 201 });
+
+    // Return success response with reservation data
+    return new Response(JSON.stringify(reservation), { status: 201 });
   } catch (error) {
     console.error("Error creating reservation:", error);
-    return NextResponse.json(
-      { error: "Error creating reservation" },
+    return new Response(
+      JSON.stringify({ error: error.message || "Error creating reservation" }),
       { status: 500 }
     );
   }

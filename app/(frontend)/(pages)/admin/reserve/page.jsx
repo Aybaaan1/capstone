@@ -28,22 +28,27 @@ const ReservationDashboard = () => {
 
   const handleAccept = async (reservationId) => {
     try {
-      const response = await fetch(`/api/reserve/${reservationId}`, {
+      const response = await fetch(`/api/returned`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: "accepted" }), // Ensure the body is properly formatted
+        body: JSON.stringify({ id: reservationId, status: "returned" }), // Modify status as per your requirement
       });
 
       if (!response.ok) {
-        throw new Error("Failed to accept reservation");
+        throw new Error("Failed to update reservation status");
       }
 
       const updatedReservation = await response.json();
-      // Handle the successful response (e.g., update state)
+      // Optionally update the state to reflect the updated reservation
+      setReservations((prevReservations) =>
+        prevReservations.map((res) =>
+          res.id === updatedReservation.id ? updatedReservation : res
+        )
+      );
     } catch (error) {
-      console.error(error.message);
+      console.error("Error updating reservation status:", error.message);
     }
   };
 
@@ -64,26 +69,71 @@ const ReservationDashboard = () => {
         <ul className="space-y-4">
           <li>
             <a
-              href="/admin/reserveitem"
+              href="/admin"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
-              Available Items
+              Users
             </a>
           </li>
           <li>
             <a
-              href="/admin/reserve"
-              className="block py-2 px-4 rounded-md bg-gray-900 text-white"
+              href="/admin/purchase"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
-              Borrowed Items
+              Purchase
             </a>
           </li>
           <li>
             <a
-              href="/admin/return"
+              href="/admin/lostfound"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
-              Returned Items
+              Lost & Found
+            </a>
+          </li>
+          <li>
+            {/* Reservation Dropdown */}
+            <button
+              onClick={() => setIsReservationOpen(!isReservationOpen)}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
+            >
+              Item Management
+            </button>
+            {isReservationOpen && (
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/reserveitem"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Available Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/reserve"
+                    className="block py-2 px-4 rounded-md bg-gray-900 text-white"
+                  >
+                    Borrow Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/return"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Return Items
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+          <li>
+            <a
+              href="/admin/tambayayong"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Tambayayong
             </a>
           </li>
         </ul>
@@ -151,6 +201,9 @@ const ReservationDashboard = () => {
                       className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
                     >
                       Accept
+                    </button>
+                    <button className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600">
+                      Reject
                     </button>
                   </td>
                 </tr>
