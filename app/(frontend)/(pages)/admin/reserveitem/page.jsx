@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { uploadImage } from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/imageUpload";
+import { uploadImage } from "@/lib/imageUpload";
 
 const ReserveItemDashboard = () => {
   const [items, setItems] = useState([]);
@@ -65,7 +65,48 @@ const ReserveItemDashboard = () => {
       alert(error.message);
     }
   };
-
+  const handleDelete = async (itemId) => {
+    if (confirm("Are you sure you want to delete this item?")) {
+      try {
+        const response = await fetch(`/api/reserveitem?id=${itemId}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to delete item");
+        }
+        // Filter out the deleted item from the state
+        setItems(items.filter((item) => item.id !== itemId));
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+  };
+  // Handle update action to toggle status
+  const handleUpdateStatus = async (item) => {
+    const newStatus =
+      item.status === "Available" ? "Not Available" : "Available";
+    try {
+      const response = await fetch(`/api/reserveitem?id=${item.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }), // Send the new status
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update status");
+      }
+      const updatedItem = await response.json();
+      // Update the UI with the new item status
+      setItems(
+        items.map((currentItem) =>
+          currentItem.id === updatedItem.id ? updatedItem : currentItem
+        )
+      );
+    } catch (error) {
+      alert(error.message);
+    }
+  };
   return (
     <div className="flex h-screen bg-gray-50">
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
@@ -125,10 +166,10 @@ const ReserveItemDashboard = () => {
                 </li>
                 <li>
                   <a
-                    href="/admin/item"
+                    href="/admin/return"
                     className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
                   >
-                    Item Reservation Form
+                    Return Items
                   </a>
                 </li>
               </ul>

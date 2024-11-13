@@ -26,6 +26,51 @@ const ReturnedItems = () => {
     fetchReturnedItems();
   }, []);
 
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch("/api/reserve"); // Correct endpoint
+        if (!response.ok) {
+          throw new Error("Failed to fetch returned items");
+        }
+        const data = await response.json();
+        const filteredData = data.filter((item) => item.status === "borrowed");
+        setReturnedItems(filteredData);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
+  const handleReturnClick = async (itemId) => {
+    try {
+      const response = await fetch(`/api/returned/${itemId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "Returned" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update item status");
+      }
+
+      // Update local state to reflect the change
+      setReturnedItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === itemId ? { ...item, status: "returned" } : item
+        )
+      );
+    } catch (error) {
+      console.error("Error updating item status:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -113,9 +158,7 @@ const ReturnedItems = () => {
         </ul>
       </nav>
       <main className="flex-1 bg-white p-10">
-        <h2 className="text-3xl font-semibold text-black mb-8">
-          Returned Items
-        </h2>
+        <h2 className="text-3xl font-semibold text-black mb-8">Return Items</h2>
         <table className="min-w-full bg-white rounded-lg shadow-md">
           <thead className="bg-[rgb(255,211,70)] text-black">
             <tr>
@@ -123,7 +166,7 @@ const ReturnedItems = () => {
                 Id
               </th>
               <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                Item Id
+                Item
               </th>
               <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                 User Id
@@ -146,7 +189,7 @@ const ReturnedItems = () => {
                   {item.id}
                 </td>
                 <td className="border px-4 py-3 text-sm text-gray-800">
-                  {item.itemId}
+                  {item.item?.type}
                 </td>
                 <td className="border px-4 py-3 text-sm text-gray-800">
                   {item.userId}
@@ -157,12 +200,17 @@ const ReturnedItems = () => {
                 <td className="border px-4 py-3 text-sm text-gray-800">
                   {item.status}
                 </td>
-                <button className="bg-green-600 text-white px-2 py-1 rounded-md hover:bg-green-700">
-                  Returned
-                </button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600">
-                  Alert
-                </button>
+                <td className="border px-4 py-3 text-sm text-gray-800">
+                  <button
+                    onClick={() => handleReturnClick(item.id)}
+                    className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700"
+                  >
+                    Returned
+                  </button>
+                  <button className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600">
+                    Alert
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

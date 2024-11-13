@@ -2,8 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { uploadImage } from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/imageUpload"; // Adjust the import path as needed
-
+import { uploadImage } from "@/lib/imageUpload";
 const ItemReservationPage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();

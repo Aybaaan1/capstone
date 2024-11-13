@@ -10,12 +10,14 @@ const ReservationDashboard = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       try {
-        const response = await fetch("/api/reserve");
+        const response = await fetch("/api/reserve"); // Adjust the endpoint if needed
         if (!response.ok) {
           throw new Error("Failed to fetch reservations");
         }
         const data = await response.json();
-        setReservations(data);
+        // Filter out reservations that are not "borrowed"
+        const filteredData = data.filter((item) => item.status === "pending");
+        setReservations(filteredData);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -33,19 +35,18 @@ const ReservationDashboard = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: reservationId, status: "returned" }), // Modify status as per your requirement
+        body: JSON.stringify({ id: reservationId, status: "borrowed" }), // Changing status to "accepted"
       });
 
       if (!response.ok) {
         throw new Error("Failed to update reservation status");
       }
 
-      const updatedReservation = await response.json();
-      // Optionally update the state to reflect the updated reservation
+      await response.json();
+
+      // Remove the reservation from local state
       setReservations((prevReservations) =>
-        prevReservations.map((res) =>
-          res.id === updatedReservation.id ? updatedReservation : res
-        )
+        prevReservations.filter((res) => res.id !== reservationId)
       );
     } catch (error) {
       console.error("Error updating reservation status:", error.message);
@@ -141,7 +142,7 @@ const ReservationDashboard = () => {
 
       <main className="flex-1 bg-white p-10">
         <h2 className="text-3xl font-semibold text-black mb-8">
-          Borrowed Items
+          Borrow Items Request
         </h2>
 
         <section>
@@ -151,8 +152,9 @@ const ReservationDashboard = () => {
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Id
                 </th>
+
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Item Id
+                  Item
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   User Id
@@ -167,6 +169,10 @@ const ReservationDashboard = () => {
                   Purpose
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Status
+                </th>
+
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Actions
                 </th>
               </tr>
@@ -180,8 +186,9 @@ const ReservationDashboard = () => {
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {reservation.id}
                   </td>
+
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {reservation.itemId}
+                    {reservation.item?.type}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {reservation.userId}
@@ -195,6 +202,10 @@ const ReservationDashboard = () => {
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {reservation.purpose}
                   </td>
+                  <td className="border px-4 py-3 text-sm text-gray-800">
+                    {reservation.status}
+                  </td>
+
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     <button
                       onClick={() => handleAccept(reservation.id)}

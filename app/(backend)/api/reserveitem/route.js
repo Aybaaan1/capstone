@@ -52,14 +52,11 @@ export async function PUT(request) {
   try {
     const { searchParams } = new URL(request.url);
     const itemId = searchParams.get("id"); // Get the item ID from query params
-
     if (!itemId) {
       return NextResponse.json({ error: "Missing item ID" }, { status: 400 });
     }
-
     const body = await request.json();
     const { status } = body;
-
     // Validate that status is provided
     if (!status) {
       return NextResponse.json(
@@ -67,13 +64,11 @@ export async function PUT(request) {
         { status: 400 }
       );
     }
-
     // Update the item's status in the database
     const updatedItem = await db.itemReservation.update({
       where: { id: parseInt(itemId) }, // Convert the ID to an integer
       data: { status },
     });
-
     return NextResponse.json(
       {
         id: updatedItem.id,
