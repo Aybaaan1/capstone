@@ -1,33 +1,44 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LostFoundForm from "../../../(components)/_components/LostFoundForm";
 
-export default function page() {
+export default function LostFoundPage() {
   const [isLostFormClicked, setIsLostFormClicked] = useState(false);
   const [isFoundFormClicked, setIsFoundFormClicked] = useState(false);
+  const [foundItems, setFoundItems] = useState([]);
+  const [lostItems, setLostItems] = useState([]);
 
-  const items = [
-    { path: "/imgs/tshirt.png" },
-    { path: "/imgs/lanyards.png" },
-    { path: "/imgs/totebag.png" },
-    { path: "/imgs/flask.png" },
-    { path: "/imgs/tshirt.png" },
-    { path: "/imgs/lanyards.png" },
-    { path: "/imgs/totebag.png" },
-    { path: "/imgs/flask.png" },
-    { path: "/imgs/tshirt.png" },
-    { path: "/imgs/lanyards.png" },
-    { path: "/imgs/totebag.png" },
-    { path: "/imgs/flask.png" },
-  ];
-
-  const sociallinks = [
+  const socialLinks = [
     { image: "/imgs/fb-icon.png", href: "/" },
     { image: "/imgs/twitter-icon.png", href: "/" },
     { image: "/imgs/instagram-icon.png", href: "/" },
     { image: "/imgs/youtube-icon.png", href: "/" },
   ];
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch("/api/item");
+        const data = await response.json();
+
+        // Filter the items into 'lost' and 'found' categories based on their status
+        const foundItemsList = data.filter(
+          (item) => item.type === "found" && item.status === "Accepted"
+        );
+        const lostItemsList = data.filter(
+          (item) => item.type === "lost" && item.status === "Accepted"
+        );
+
+        setFoundItems(foundItemsList);
+        setLostItems(lostItemsList);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchItems();
+  }, []);
 
   return (
     <div className="mt-10">
@@ -47,22 +58,35 @@ export default function page() {
             >
               Report Found/Lost Item
             </button>
-            <span></span>
           </div>
-          <span></span>
-          <span></span>
         </div>
-        {isFoundFormClicked ? (
+
+        {isFoundFormClicked && (
           <LostFoundForm
             formLabel="Report Found Item"
             setClose={() => setIsFoundFormClicked(false)}
           />
-        ) : null}
+        )}
+
         <div className="grid grid-cols-4 place-items-center gap-14">
-          {items.map((item) => (
-            <Image key={item.path} src={item.path} height={200} width={200} />
-          ))}
+          {foundItems.length > 0 ? (
+            foundItems.map((item) => (
+              <div key={item.id}>
+                <Image
+                  src={item.image || "/imgs/placeholder.png"}
+                  height={200}
+                  width={200}
+                  alt={item.name}
+                />
+                <h3>Item: {item.name}</h3>
+                <p>Place: {item.place}</p>
+              </div>
+            ))
+          ) : (
+            <p>No accepted found items available.</p>
+          )}
         </div>
+
         <div className="w-full flex justify-center px-6">
           <button className="border-black border px-10 py-3 rounded-full">
             See All
@@ -76,10 +100,24 @@ export default function page() {
           <h1 className="font-bold text-5xl text-center">Lost Items</h1>
         </div>
         <div className="grid grid-cols-4 place-items-center gap-14">
-          {items.map((item) => (
-            <Image key={item.path} src={item.path} height={200} width={200} />
-          ))}
+          {lostItems.length > 0 ? (
+            lostItems.map((item) => (
+              <div key={item.id}>
+                <Image
+                  src={item.image || "/imgs/placeholder.png"}
+                  height={200}
+                  width={200}
+                  alt={item.name}
+                />
+                <h3>Item: {item.name}</h3>
+                <p>Place: {item.place}</p>
+              </div>
+            ))
+          ) : (
+            <p>No accepted lost items available.</p>
+          )}
         </div>
+
         <div className="w-full flex justify-center px-6">
           <button className="border-black border px-10 py-3 rounded-full">
             See All
@@ -96,27 +134,25 @@ export default function page() {
               @https://www.facebook.com/SSGCTUArgao
             </p>
             <p className="text-slate-600">
-              To stay updated with the latest news, promotions, and offerings
-              from the poke, make sure to follow us on social media accounts.
-              Don't miss out on any updates.
+              Stay updated with the latest news and promotions. Follow us on our
+              social media accounts.
             </p>
           </div>
           <div className="flex pr-48 items-center justify-between">
-            {sociallinks.map((links) => (
-              <Image
-                key={links.href}
-                src={links.image}
-                href={links.href}
-                height={40}
-                width={40}
-              />
+            {socialLinks.map((links) => (
+              <a key={links.href} href={links.href}>
+                <Image
+                  src={links.image}
+                  alt="Social Icon"
+                  height={40}
+                  width={40}
+                />
+              </a>
             ))}
           </div>
         </div>
         <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
       </section>
-
-      <form action=""></form>
     </div>
   );
 }

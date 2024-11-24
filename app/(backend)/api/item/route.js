@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
-import { uploadImage } from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/imageUpload";
+import { uploadImage } from "@/lib/imageUpload";
 
 export async function GET() {
   const items = await db.item.findMany({

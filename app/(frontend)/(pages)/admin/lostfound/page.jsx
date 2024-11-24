@@ -54,12 +54,13 @@ const LostAndFound = () => {
 
   const updateItemStatus = async (id, status) => {
     try {
-      const response = await fetch(`/api/item/status/${id}`, {
+      const response = await fetch(`/api/item/${id}`, {
+        // Correct URL structure
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status }), // Send status in the body
       });
       if (!response.ok) {
         throw new Error("Failed to update item status");
@@ -283,10 +284,10 @@ const LostAndFound = () => {
                       Accept
                     </button>
                     <button
-                      className="bg-red-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
+                      className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
                       onClick={() => declineItem(index)}
                     >
-                      Decline
+                      Claimed
                     </button>
                   </td>
                 </tr>

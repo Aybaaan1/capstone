@@ -84,6 +84,7 @@ model Reserve { //form for user to reserve items
   purpose         String
   status          String    @default("pending")
 
+  
   item            ItemReservation @relation(fields: [itemId], references: [id])
   user            User            @relation(fields: [userId], references: [id])
 }

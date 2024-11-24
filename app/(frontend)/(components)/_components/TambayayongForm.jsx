@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react"; // Importing useSession
 import { useState } from "react";
-import { uploadImage } from "/Users/Bernadeth Caballero/Desktop/JOSWA/ssg/lib/imageUpload";
+import { uploadImage } from "@/lib/imageUpload";
 
 const TambayayongForm = ({ setClose }) => {
   const { data: session } = useSession(); // Accessing session
