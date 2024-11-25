@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
 
-export async function PUT(request, { params }) {
-  const { id } = params;
-  const { name, price, stocks, type, image } = await request.json();
+export const DELETE = async (req, res) => {
+  const { id } = req.query;
 
-  const updatedMerch = await db.merch.update({
-    where: { id: Number(id) },
-    data: { name, price, stocks, type, image },
-  });
-
-  return NextResponse.json(updatedMerch);
-}
-
-export async function DELETE(request, { params }) {
-  const { id } = params;
-
-  await db.merch.delete({
-    where: { id: Number(id) },
-  });
-
-  return NextResponse.json({ message: "Merchandise deleted" });
-}
+  try {
+    const deletedItem = await db.merch.delete({
+      where: { id: parseInt(id) },
+    });
+    return res.status(200).json(deletedItem);
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to delete item" });
+  }
+};

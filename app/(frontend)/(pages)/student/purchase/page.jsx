@@ -2,9 +2,24 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 
+// Fetch merchandise items from the API
+const fetchMerchItems = async () => {
+  try {
+    const response = await fetch("/api/merch");
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("Failed to fetch merch items");
+    }
+  } catch (error) {
+    console.error("Error fetching merch items:", error);
+    return [];
+  }
+};
+
 export default function Purchase() {
   const [cart, setCart] = useState(() => {
-    // Load cart from local storage on initial render
+    // Initialize cart from localStorage or empty array
     if (typeof window !== "undefined") {
       const savedCart = localStorage.getItem("cart");
       return savedCart ? JSON.parse(savedCart) : [];
@@ -15,44 +30,51 @@ export default function Purchase() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [editedCart, setEditedCart] = useState([]);
-  const [isConfirmed, setIsConfirmed] = useState(false); // Confirmation state
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [merchItems, setMerchItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const merchandise = [
-    { picture: "/imgs/tshirt.png", item: "University T-Shirt", price: 250.0 },
-    { picture: "/imgs/lanyards.png", item: "Department Lanyards", price: 85.0 },
-    { picture: "/imgs/totebag.png", item: "University Tote Bag", price: 160.0 },
-    { picture: "/imgs/flask.png", item: "University Tumbler", price: 299.0 },
-  ];
+  // Fetch merchandise items on component mount
+  useEffect(() => {
+    const loadMerchItems = async () => {
+      const items = await fetchMerchItems();
+      setMerchItems(items);
+      setLoading(false);
+    };
+    loadMerchItems();
+  }, []);
 
   useEffect(() => {
-    // Update local storage whenever the cart changes
+    // Update local storage and total price when cart changes
     localStorage.setItem("cart", JSON.stringify(cart));
 
-    // Calculate the total price
     const updatedTotal = cart.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (total, item) => total + item.price * item.quantity, // Using item.quantity
       0
     );
     setTotalPrice(updatedTotal);
   }, [cart]);
 
   const handleAddToCart = (item) => {
-    const existingItem = cart.find((cartItem) => cartItem.item === item.item);
-    if (existingItem) {
-      // Update quantity if item already in cart
-      setCart(
-        cart.map((cartItem) =>
-          cartItem.item === item.item
+    setCart((prevCart) => {
+      // Check if an item with the same name and type exists
+      const existingItem = prevCart.find(
+        (cartItem) => cartItem.name === item.name && cartItem.type === item.type
+      );
+
+      if (existingItem) {
+        // Update the quantity if the item already exists
+        return prevCart.map((cartItem) =>
+          cartItem.name === item.name && cartItem.type === item.type
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
             : cartItem
-        )
-      );
-    } else {
-      // Add new item to cart
-      setCart([...cart, { ...item, quantity: 1 }]);
-    }
+        );
+      } else {
+        // Add a new entry if the item is "new"
+        return [...prevCart, { ...item, quantity: 1 }];
+      }
+    });
   };
-
   const handleToggleCart = () => {
     setIsCartOpen(!isCartOpen);
   };
@@ -67,7 +89,7 @@ export default function Purchase() {
     updatedCart[index][key] = value;
 
     const updatedTotal = updatedCart.reduce(
-      (total, item) => total + item.price * item.quantity,
+      (total, item) => total + item.price * item.quantity, // Update total with quantity
       0
     );
 
@@ -90,29 +112,19 @@ export default function Purchase() {
     setTotalPrice(updatedTotal);
   };
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log("Uploaded file: ", file.name);
-      // Handle the uploaded file as needed
-    }
-  };
-
   return (
     <div>
       <header className="relative mt-10">
         <section
-          // , backgroundSize: "cover", backgroundRepeat: "no-repeat", backgroundPosition: "center center"
           style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
-          className="w-full h-56 bg-cover bg-no-repeat bg-center "
+          className="w-full h-56 bg-cover bg-no-repeat bg-center"
         ></section>
       </header>
       <section>
-        <div>
-          <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
-            University Merchandise
-          </h1>
-        </div>
+        <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
+          University Merchandise
+        </h1>
+
         <div>
           <div className="flex flex-wrap justify-center">
             <button
@@ -131,6 +143,7 @@ export default function Purchase() {
                 </span>
               )}
             </button>
+
             {isCartOpen && (
               <div className="absolute top-16 right-4 bg-white p-4 shadow-lg rounded-lg">
                 <h2 className="font-bold">Cart</h2>
@@ -138,16 +151,16 @@ export default function Purchase() {
                   cart.map((item, index) => (
                     <div key={index} className="flex items-center gap-2">
                       <Image
-                        src={item.picture}
+                        src={item.image}
                         height={50}
                         width={50}
-                        alt={item.item}
+                        alt={item.name}
                       />
                       <div>
-                        <p>{item.item}</p>
+                        <p>{item.name}</p>
                         <p>Price: P{item.price}</p>
                         <p>Quantity: {item.quantity}</p>
-                        {item.size && <p>Size: {item.size}</p>}{" "}
+                        {item.size && <p>Size: {item.size}</p>}
                       </div>
                       <button
                         onClick={() => handleRemoveItem(index)}
@@ -178,33 +191,40 @@ export default function Purchase() {
             )}
           </div>
         </div>
+
         <div className="grid grid-cols-4 place-items-center px-20">
-          {merchandise.map((merch, index) => (
-            <div
-              key={index}
-              className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl"
-            >
-              <Image
-                src={merch.picture}
-                height={200}
-                width={200}
-                alt="Item picture"
-              />
-              <p>{merch.item}</p>
-              <p>Price: P{merch.price}</p>
-              <div>
-                <button
-                  onClick={() => handleAddToCart(merch)}
-                  className="bg-primary text-white px-3 py-1 rounded-lg text-m"
-                >
-                  Add to cart
-                </button>
+          {loading ? (
+            <p>Loading items...</p>
+          ) : (
+            merchItems.map((merch, index) => (
+              <div
+                key={index}
+                className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl"
+              >
+                <Image
+                  src={merch.image}
+                  height={200}
+                  width={200}
+                  alt={merch.name}
+                />
+                <p>{merch.name}</p>
+                <p>Price: P{merch.price}</p>
+                <p>Stocks: {merch.stocks}</p>
+                <div>
+                  <button
+                    onClick={() => handleAddToCart(merch)}
+                    className="bg-primary text-white px-3 py-1 rounded-lg text-m"
+                  >
+                    Add to cart
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
 
+      {/* Modal for editing cart */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg shadow-lg">
@@ -213,13 +233,13 @@ export default function Purchase() {
               <div key={index} className="mb-4">
                 <div className="flex items-center gap-4">
                   <Image
-                    src={item.picture}
+                    src={item.image}
                     height={50}
                     width={50}
-                    alt={item.item}
+                    alt={item.name}
                   />
                   <div>
-                    <p>{item.item}</p>
+                    <p>{item.name}</p>
                     <p>Price: P{item.price}</p>
                     <div className="mt-2">
                       <label>Size: </label>
@@ -276,14 +296,14 @@ export default function Purchase() {
           </div>
         </div>
       )}
+
+      {/* Payment Confirmation Modal */}
       {isConfirmed && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-10 rounded-lg shadow-lg relative">
-            {" "}
-            {/* Add relative positioning here */}
             <button
               onClick={() => setIsConfirmed(false)} // Close modal
-              className="absolute top-4 right-4 bg-red-500 text-white hover:bg-red-600 px-2 py-1 rounded-full" // Updated classes for positioning
+              className="absolute top-4 right-4 bg-red-500 text-white hover:bg-red-600 px-2 py-1 rounded-full"
             >
               &times; {/* Close icon */}
             </button>
@@ -310,8 +330,6 @@ export default function Purchase() {
               />
             </div>
             <div className="flex justify-center mt-4">
-              {" "}
-              {/* Centering the button */}
               <button
                 onClick={() => {
                   // Handle the confirmation logic here

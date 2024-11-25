@@ -115,12 +115,40 @@ const LostAndFound = () => {
             </a>
           </li>
           <li>
-            <a
-              href="/admin/purchase"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            <button
+              onClick={() => setIsPurchaseOpen(!isPurchaseOpen)} // Toggle the dropdown
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Purchase
-            </a>
+            </button>
+            {isPurchaseOpen && ( // Show the dropdown if "isPurchaseOpen" is true
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/purchase"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Merchs List
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/orderrequests"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Order Requests
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/orderslist"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Orders List
+                  </a>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <a
