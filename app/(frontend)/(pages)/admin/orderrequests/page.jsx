@@ -42,9 +42,11 @@ const Purchase = () => {
         const updatedPurchases = [...purchases];
         updatedPurchases[index].status = updatedStatus;
         setPurchases(updatedPurchases);
+      } else {
+        throw new Error("Failed to update claim status.");
       }
     } catch (error) {
-      setError("Failed to update claim status.");
+      setError(error.message);
     }
   };
 
@@ -63,9 +65,11 @@ const Purchase = () => {
         const updatedPurchases = [...purchases];
         updatedPurchases[index].status = "accepted";
         setPurchases(updatedPurchases);
+      } else {
+        throw new Error("Failed to accept order.");
       }
     } catch (error) {
-      setError("Failed to accept order.");
+      setError(error.message);
     }
   };
 
@@ -79,9 +83,11 @@ const Purchase = () => {
       if (response.ok) {
         const updatedPurchases = purchases.filter((purchase, i) => i !== index);
         setPurchases(updatedPurchases);
+      } else {
+        throw new Error("Failed to decline order.");
       }
     } catch (error) {
-      setError("Failed to decline order.");
+      setError(error.message);
     }
   };
 
@@ -187,9 +193,7 @@ const Purchase = () => {
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Merch ID
                 </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Payment Mode
-                </th>
+
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Proof
                 </th>
@@ -216,9 +220,7 @@ const Purchase = () => {
                   <td className="border px-4 py-3 text-sm text-center">
                     {purchase.merchId}
                   </td>
-                  <td className="border px-4 py-3 text-sm text-center">
-                    {purchase.paymentMode}
-                  </td>
+
                   <td className="border px-4 py-3 text-sm text-center">
                     {purchase.proof}
                   </td>

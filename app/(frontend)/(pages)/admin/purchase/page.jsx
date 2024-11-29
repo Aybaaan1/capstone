@@ -317,6 +317,7 @@ const MerchandiseDashboard = () => {
                 Add Merchandise
               </h2>
               <form onSubmit={handleUpload}>
+                {/* Name Field */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-600" htmlFor="name">
                     Name
@@ -329,6 +330,7 @@ const MerchandiseDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Price Field */}
                 <div className="mb-4">
                   <label
                     className="block text-sm text-gray-600"
@@ -344,6 +346,7 @@ const MerchandiseDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Stocks Field */}
                 <div className="mb-4">
                   <label
                     className="block text-sm text-gray-600"
@@ -359,41 +362,44 @@ const MerchandiseDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Type Field (Dropdown) */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-600" htmlFor="type">
                     Type
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="type"
                     value={itemType}
                     onChange={(e) => setItemType(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
-                  />
+                  >
+                    <option value="">Select a type</option>
+                    <option value="T-shirt">T-shirt</option>
+                    <option value="Lanyards">Lanyards</option>
+                    <option value="Pins">Pins</option>
+                    <option value="Stickers">Stickers</option>
+                  </select>
                 </div>
+                {/* File Upload */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-600" htmlFor="file">
-                    Upload Image
+                    Image
                   </label>
                   <input
+                    id="file"
                     type="file"
                     onChange={handleFileChange}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-gray-900 text-white px-3 py-1 rounded-md mb-6 hover:bg-gray-700"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                 >
-                  Add Item
+                  Save Item
                 </button>
               </form>
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-gray-600"
-              >
-                Close
-              </button>
             </div>
           </div>
         )}
@@ -406,6 +412,7 @@ const MerchandiseDashboard = () => {
                 Update Merchandise
               </h2>
               <form onSubmit={handleUpload}>
+                {/* Name Field */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-600" htmlFor="name">
                     Name
@@ -418,6 +425,7 @@ const MerchandiseDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Price Field */}
                 <div className="mb-4">
                   <label
                     className="block text-sm text-gray-600"
@@ -433,6 +441,7 @@ const MerchandiseDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Stocks Field */}
                 <div className="mb-4">
                   <label
                     className="block text-sm text-gray-600"
@@ -448,41 +457,44 @@ const MerchandiseDashboard = () => {
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Type Field (Dropdown) */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-600" htmlFor="type">
                     Type
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="type"
                     value={itemType}
                     onChange={(e) => setItemType(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md"
-                  />
+                  >
+                    <option value="">Select a type</option>
+                    <option value="T-shirt">T-shirt</option>
+                    <option value="Lanyards">Lanyards</option>
+                    <option value="Pins">Pins</option>
+                    <option value="Stickers">Stickers</option>
+                  </select>
                 </div>
+                {/* File Upload */}
                 <div className="mb-4">
                   <label className="block text-sm text-gray-600" htmlFor="file">
-                    Upload Image
+                    Image
                   </label>
                   <input
+                    id="file"
                     type="file"
                     onChange={handleFileChange}
                     className="w-full p-2 border border-gray-300 rounded-md"
                   />
                 </div>
+                {/* Submit Button */}
                 <button
                   type="submit"
-                  className="bg-gray-900 text-white px-3 py-1 rounded-md mb-6 hover:bg-gray-700"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                 >
-                  Update Item
+                  Save Changes
                 </button>
               </form>
-              <button
-                onClick={() => setIsUpdateModalOpen(false)}
-                className="text-gray-600"
-              >
-                Close
-              </button>
             </div>
           </div>
         )}

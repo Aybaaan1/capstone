@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { uploadImage } from "@/lib/imageUpload";
 
 // Fetch merchandise items from the API
 const fetchMerchItems = async () => {
@@ -22,10 +24,14 @@ export default function Purchase() {
     // Initialize cart from localStorage or empty array
     if (typeof window !== "undefined") {
       const savedCart = localStorage.getItem("cart");
+
       return savedCart ? JSON.parse(savedCart) : [];
     }
     return [];
   });
+
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -33,6 +39,15 @@ export default function Purchase() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [merchItems, setMerchItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterType, setFilterType] = useState("");
+  const [proofFile, setProofFile] = useState(null);
+  const [error, setError] = useState("");
+
+  const [merchId, setMerchId] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [size, setSize] = useState("");
+  const [status] = useState("pending");
+  const [cartItems, setCartItems] = useState([]);
 
   // Fetch merchandise items on component mount
   useEffect(() => {
@@ -56,6 +71,7 @@ export default function Purchase() {
   }, [cart]);
 
   const handleAddToCart = (item) => {
+    console.log("Item added to cart:", item);
     setCart((prevCart) => {
       // Check if an item with the same name and type exists
       const existingItem = prevCart.find(
@@ -84,12 +100,22 @@ export default function Purchase() {
     setIsModalOpen(true);
   };
 
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0]; // Get the uploaded file
+    if (file) {
+      // Handle file upload, e.g., upload to a server
+      setProofFile(file); // Store the file in state to include it in the order
+      console.log("File selected:", file.name);
+    } else {
+      console.error("No file selected");
+    }
+  };
   const handleUpdateItem = (index, key, value) => {
     const updatedCart = [...editedCart];
     updatedCart[index][key] = value;
 
     const updatedTotal = updatedCart.reduce(
-      (total, item) => total + item.price * item.quantity, // Update total with quantity
+      (total, item) => total + item.price * item.quantity,
       0
     );
 
@@ -97,10 +123,53 @@ export default function Purchase() {
     setTotalPrice(updatedTotal);
   };
 
-  const handleConfirmEdit = () => {
-    setCart(editedCart);
-    setIsModalOpen(false);
-    setIsConfirmed(true); // Set confirmed state to true
+  const handleConfirmEdit = async () => {
+    if (!proofFile) {
+      setError("Please upload a proof of payment.");
+      return;
+    }
+
+    const preparedCartItems = editedCart.map((item) => ({
+      merchId: item.id,
+      quantity: item.quantity,
+      size: item.size,
+    }));
+
+    console.log("Prepared Cart Items:", preparedCartItems);
+
+    if (!preparedCartItems || preparedCartItems.length === 0) {
+      setError("Your cart is empty.");
+      return;
+    }
+
+    const fileUrl = await uploadImage(proofFile);
+
+    const orderData = {
+      userId,
+      cartItems: preparedCartItems, // Pass the prepared cart items
+      proof: fileUrl,
+      status: "Pending",
+    };
+
+    try {
+      const response = await fetch("/api/order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Order placed successfully:", data);
+      } else {
+        setError("Error placing the order.");
+      }
+    } catch (error) {
+      console.error("Error submitting the order:", error);
+      setError("An error occurred while placing the order.");
+    }
   };
 
   const handleRemoveItem = (index) => {
@@ -111,7 +180,50 @@ export default function Purchase() {
     setCart(updatedCart);
     setTotalPrice(updatedTotal);
   };
+  const filteredMerchItems = filterType
+    ? merchItems.filter((item) => item.type === filterType)
+    : merchItems;
 
+  const renderSizeField = (item, index) => {
+    if (item.type === "T-shirt") {
+      return (
+        <div className="flex items-center gap-2">
+          <label htmlFor={`size-${index}`} className="text-sm font-semibold">
+            Size:
+          </label>
+          <select
+            id={`size-${index}`}
+            value={item.size || ""}
+            onChange={(e) => handleUpdateItem(index, "size", e.target.value)}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="">Select</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+          </select>
+        </div>
+      );
+    } else if (item.type === "Lanyards") {
+      return (
+        <div className="flex items-center gap-2">
+          <label htmlFor={`program-${index}`} className="text-sm font-semibold">
+            Program:
+          </label>
+          <input
+            type="text"
+            id={`program-${index}`}
+            value={item.size || ""}
+            onChange={(e) => handleUpdateItem(index, "size", e.target.value)}
+            className="border rounded px-2 py-1 text-sm"
+            placeholder="Enter Program"
+          />
+        </div>
+      );
+    } else if (item.type === "Pins" || item.type === "Stickers") {
+      return null; // No size field for PINS and STICKERS
+    }
+  };
   return (
     <div>
       <header className="relative mt-10">
@@ -124,79 +236,108 @@ export default function Purchase() {
         <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
           University Merchandise
         </h1>
-
-        <div>
-          <div className="flex flex-wrap justify-center">
-            <button
-              onClick={handleToggleCart}
-              className="absolute top-4 right-10 bg-transparent p-2 rounded-full"
-            >
-              <Image
-                src="/imgs/cart-icon.png"
-                height={35}
-                width={35}
-                alt="Cart Icon"
-              />
-              {cart.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
-                  {cart.length}
-                </span>
-              )}
-            </button>
-
-            {isCartOpen && (
-              <div className="absolute top-16 right-4 bg-white p-4 shadow-lg rounded-lg">
-                <h2 className="font-bold">Cart</h2>
-                {cart.length > 0 ? (
-                  cart.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Image
-                        src={item.image}
-                        height={50}
-                        width={50}
-                        alt={item.name}
-                      />
-                      <div>
-                        <p>{item.name}</p>
-                        <p>Price: P{item.price}</p>
-                        <p>Quantity: {item.quantity}</p>
-                        {item.size && <p>Size: {item.size}</p>}
-                      </div>
-                      <button
-                        onClick={() => handleRemoveItem(index)}
-                        className="ml-auto"
-                      >
-                        <Image
-                          src="/imgs/remove.png"
-                          height={20}
-                          width={20}
-                          alt="Remove Icon"
-                          className="hover:opacity-75"
-                        />
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p>Your cart is empty.</p>
-                )}
-                {cart.length > 0 && (
-                  <button
-                    onClick={handleCheckout}
-                    className="mt-2 bg-primary text-white px-4 py-2 rounded-full"
-                  >
-                    Checkout
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
+        <div className="flex justify-center gap-4 mt-4">
+          {/* Filter Buttons */}
+          <button
+            onClick={() => setFilterType("T-shirt")}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+          >
+            T-shirt
+          </button>
+          <button
+            onClick={() => setFilterType("Lanyards")}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg"
+          >
+            Lanyards
+          </button>
+          <button
+            onClick={() => setFilterType("Pins")}
+            className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
+          >
+            Pins
+          </button>
+          <button
+            onClick={() => setFilterType("Stickers")}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg"
+          >
+            Stickers
+          </button>
+          <button
+            onClick={() => setFilterType("")}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+          >
+            All
+          </button>
         </div>
 
-        <div className="grid grid-cols-4 place-items-center px-20">
+        <div className="flex flex-wrap justify-center">
+          <button
+            onClick={handleToggleCart}
+            className="absolute top-4 right-10 bg-transparent p-2 rounded-full"
+          >
+            <Image
+              src="/imgs/cart-icon.png"
+              height={35}
+              width={35}
+              alt="Cart Icon"
+            />
+            {cart.length > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+                {cart.length}
+              </span>
+            )}
+          </button>
+
+          {isCartOpen && (
+            <div className="absolute top-16 right-4 bg-white p-4 shadow-lg rounded-lg">
+              <h2 className="font-bold">Cart</h2>
+              {cart.length > 0 ? (
+                cart.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Image
+                      src={item.image}
+                      height={50}
+                      width={50}
+                      alt={item.name}
+                    />
+                    <div>
+                      <p>{item.name}</p>
+                      <p>Price: P{item.price}</p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveItem(index)}
+                      className="ml-auto"
+                    >
+                      <Image
+                        src="/imgs/remove.png"
+                        height={20}
+                        width={20}
+                        alt="Remove Icon"
+                        className="hover:opacity-75"
+                      />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p>Your cart is empty.</p>
+              )}
+              {cart.length > 0 && (
+                <button
+                  onClick={handleCheckout}
+                  className="mt-2 bg-primary text-white px-4 py-2 rounded-full"
+                >
+                  Checkout
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-4 place-items-center px-20 mt-6">
           {loading ? (
             <p>Loading items...</p>
           ) : (
-            merchItems.map((merch, index) => (
+            filteredMerchItems.map((merch, index) => (
               <div
                 key={index}
                 className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl"
@@ -223,121 +364,108 @@ export default function Purchase() {
           )}
         </div>
       </section>
-
       {/* Modal for editing cart */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Edit Cart Items</h2>
-            {editedCart.map((item, index) => (
-              <div key={index} className="mb-4">
-                <div className="flex items-center gap-4">
-                  <Image
-                    src={item.image}
-                    height={50}
-                    width={50}
-                    alt={item.name}
-                  />
-                  <div>
-                    <p>{item.name}</p>
-                    <p>Price: P{item.price}</p>
-                    <div className="mt-2">
-                      <label>Size: </label>
-                      <select
-                        value={item.size || ""}
-                        onChange={(e) =>
-                          handleUpdateItem(index, "size", e.target.value)
-                        }
-                        className="border rounded px-2 py-1"
-                      >
-                        <option value="">Select Size</option>
-                        <option value="S">Small</option>
-                        <option value="M">Medium</option>
-                        <option value="L">Large</option>
-                      </select>
-                    </div>
-                    <div className="mt-2">
-                      <label>Quantity: </label>
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) =>
-                          handleUpdateItem(
-                            index,
-                            "quantity",
-                            parseInt(e.target.value)
-                          )
-                        }
-                        className="border rounded px-2 py-1"
-                        min="1"
-                      />
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-[800px]">
+            {/* Modal Header */}
+            <h2 className="text-lg font-bold text-center mb-4">
+              Edit Cart & Payment
+            </h2>
+
+            <div className="grid grid-cols-2 gap-6">
+              {/* Left: Cart Section */}
+              <div className="border-r pr-4">
+                <h3 className="text-md font-semibold mb-3">Cart Items</h3>
+                {editedCart.map((item, index) => (
+                  <div
+                    key={index}
+                    className="border-b pb-3 mb-3 flex justify-between items-start"
+                  >
+                    <Image
+                      src={item.image}
+                      height={40}
+                      width={40}
+                      alt={item.name}
+                      className="rounded"
+                    />
+                    <div className="flex-1 ml-4">
+                      <p className="text-sm font-medium">{item.name}</p>
+                      <p className="text-sm text-gray-600">
+                        Price: P{item.price}
+                      </p>
+                      <div className="mt-2 flex flex-col gap-2">
+                        {/* Quantity Field */}
+                        <div className="flex items-center gap-2">
+                          <label
+                            htmlFor={`quantity-${index}`}
+                            className="text-sm font-semibold"
+                          >
+                            Quantity:
+                          </label>
+                          <input
+                            type="number"
+                            id={`quantity-${index}`}
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleUpdateItem(
+                                index,
+                                "quantity",
+                                parseInt(e.target.value)
+                              )
+                            }
+                            className="border rounded px-2 py-1 w-16 text-sm"
+                            min="1"
+                          />
+                        </div>
+
+                        {/* Size/Program Field */}
+                        {renderSizeField(item, index)}
+                      </div>
                     </div>
                   </div>
+                ))}
+                <div className="text-right text-sm font-semibold">
+                  Total: P{totalPrice.toFixed(2)}
                 </div>
               </div>
-            ))}
-            <div className="mt-4">
-              <h3>Total Price: P{totalPrice.toFixed(2)}</h3>
+
+              {/* Right: Payment Section */}
+              <div className="pl-4">
+                <h3 className="text-md font-semibold mb-3">Payment</h3>
+                <div className="flex flex-col items-center gap-3">
+                  <Image
+                    src="/imgs/qrcode.png"
+                    height={100}
+                    width={200}
+                    alt="QR Code"
+                    className="rounded"
+                  />
+                  <p className="text-center text-sm">
+                    Scan this QR code to complete the payment.
+                  </p>
+                  <input
+                    type="file"
+                    onChange={handleFileUpload}
+                    className="border rounded px-2 py-1 text-sm"
+                  />
+                </div>
+              </div>
             </div>
-            <div className="flex justify-end mt-4">
+
+            {/* Buttons */}
+            <div className="flex justify-center gap-4 mt-6">
               <button
                 onClick={handleConfirmEdit}
-                className="bg-primary text-white px-4 py-2 rounded-full"
+                className="bg-primary text-white px-6 py-2 rounded-full text-sm"
               >
                 Confirm
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="bg-red-500 text-white px-4 py-2 rounded-full ml-2"
+                className="bg-red-500 text-white px-6 py-2 rounded-full text-sm"
               >
                 Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Payment Confirmation Modal */}
-      {isConfirmed && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-10 rounded-lg shadow-lg relative">
-            <button
-              onClick={() => setIsConfirmed(false)} // Close modal
-              className="absolute top-4 right-4 bg-red-500 text-white hover:bg-red-600 px-2 py-1 rounded-full"
-            >
-              &times; {/* Close icon */}
-            </button>
-            <h2 className="text-xl font-bold text-center mb-4">Payment</h2>
-            <div className="flex flex-col items-center">
-              <Image
-                src="/imgs/qrcode.png"
-                height={100}
-                width={200}
-                alt="QR Code"
-              />
-              <p className="text-center mt-2">
-                Scan this QR code to complete the payment
-              </p>
-            </div>
-            <div className="mt-4">
-              <label className="block text-center mb-2 font-semibold">
-                Upload Payment Proof:
-              </label>
-              <input
-                type="file"
-                onChange={handleFileUpload}
-                className="block mx-auto text-center"
-              />
-            </div>
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={() => {
-                  // Handle the confirmation logic here
-                  console.log("Payment confirmed!");
-                }}
-                className="bg-primary text-white px-4 py-2 rounded-full"
-              >
-                Confirm
               </button>
             </div>
           </div>

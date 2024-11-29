@@ -38,6 +38,7 @@ model Merch { //form for admin to add merch items
   image  String?
   stocks Int
   type   String
+  size   String?
   orders Order[]
 }
 
@@ -45,10 +46,10 @@ model Order { //form for user in purchase
   id          Int      @id @default(autoincrement())
   userId      Int
   merchId     Int
-  paymentMode String
+  quantity    Int      @default(1)  // Add this field if tracking quantity
   proof       String?
-  status      String
-
+  status      String?  // Make status nullable
+  size        String
   user        User     @relation(fields: [userId], references: [id])
   merch       Merch    @relation(fields: [merchId], references: [id])
 }
