@@ -1,11 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Proof from "../../../(components)/_components/Proof";
 
 const Purchase = () => {
   const [purchases, setPurchases] = useState([]);
   const [error, setError] = useState(null);
   const [isReservationOpen, setIsReservationOpen] = useState(false);
-
+  const [isProofModalOpen, setIsProofModalOpen] = useState(false); // Separate state for proof modal
+  const [isOrderDetailsModalOpen, setIsOrderDetailsModalOpen] = useState(false); // Separate state for order details modal
+  const [currentImage, setCurrentImage] = useState(null);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   // Fetch purchases from the database
   const fetchPurchases = async () => {
     try {
@@ -24,30 +30,24 @@ const Purchase = () => {
     fetchPurchases();
   }, []);
 
-  // Toggle claim/unclaim status
-  const toggleClaim = async (index, id) => {
-    try {
-      const updatedStatus =
-        purchases[index].status === "claimed" ? "unclaimed" : "claimed";
+  // Open Order Details Modal
+  const openOrderDetailsModal = (orderDetails) => {
+    setSelectedOrderDetails(orderDetails);
+    setIsOrderDetailsModalOpen(true);
+  };
 
-      const response = await fetch(`/api/order/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: updatedStatus }),
-      });
+  // Open Proof Modal
+  const openProofModal = (imageSrc) => {
+    setCurrentImage(imageSrc);
+    setIsProofModalOpen(true);
+  };
 
-      if (response.ok) {
-        const updatedPurchases = [...purchases];
-        updatedPurchases[index].status = updatedStatus;
-        setPurchases(updatedPurchases);
-      } else {
-        throw new Error("Failed to update claim status.");
-      }
-    } catch (error) {
-      setError(error.message);
-    }
+  // Close Modals
+  const closeModals = () => {
+    setIsOrderDetailsModalOpen(false);
+    setIsProofModalOpen(false);
+    setSelectedOrderDetails(null);
+    setCurrentImage(null);
   };
 
   // Accept the order (updating the status to "accepted")
@@ -193,15 +193,11 @@ const Purchase = () => {
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Merch ID
                 </th>
-
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Proof
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Status
-                </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Claim Status
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Actions
@@ -218,45 +214,46 @@ const Purchase = () => {
                     {purchase.userId}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
-                    {purchase.merchId}
+                    <button
+                      onClick={() => openOrderDetailsModal(purchase)}
+                      className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                    >
+                      View Orders
+                    </button>
                   </td>
-
                   <td className="border px-4 py-3 text-sm text-center">
-                    {purchase.proof}
+                    {purchase.proof ? (
+                      <button
+                        onClick={() => openProofModal(purchase.proof)}
+                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                      >
+                        View
+                      </button>
+                    ) : (
+                      "No proof available"
+                    )}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     <span
                       className={`px-3 py-1 rounded-full ${
-                        purchase.status === "claimed"
+                        purchase.status === "accepted"
                           ? "bg-green-500"
-                          : purchase.status === "unclaimed"
-                          ? "bg-red-500"
-                          : purchase.status === "accepted"
-                          ? "bg-blue-500"
-                          : "bg-gray-500"
-                      } text-white text-xs`}
+                          : "bg-yellow-500"
+                      } text-white`}
                     >
                       {purchase.status}
                     </span>
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     <button
-                      onClick={() => toggleClaim(index, purchase.id)}
-                      className="bg-[rgb(255,211,70)] text-black px-3 py-1 rounded text-xs"
-                    >
-                      {purchase.status === "claimed" ? "Unclaim" : "Claim"}
-                    </button>
-                  </td>
-                  <td className="border px-4 py-3 text-sm text-center">
-                    <button
                       onClick={() => acceptOrder(index, purchase.id)}
-                      className="bg-green-500 text-white px-3 py-1 rounded text-xs mr-2"
+                      className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                     >
                       Accept
                     </button>
                     <button
                       onClick={() => declineOrder(index, purchase.id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-xs"
+                      className="ml-2 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
                     >
                       Decline
                     </button>
@@ -266,6 +263,86 @@ const Purchase = () => {
             </tbody>
           </table>
         </section>
+
+        {/* Proof Modal */}
+        {isProofModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-md">
+              <button
+                onClick={closeModals}
+                className="absolute top-2 right-2 text-black"
+              >
+                X
+              </button>
+              <h2 className="text-lg mb-4">Proof of Purchase</h2>
+              <Image
+                src={currentImage}
+                alt="Proof"
+                width={400}
+                height={300}
+                className="rounded"
+              />
+            </div>
+          </div>
+        )}
+
+        {isOrderDetailsModalOpen && selectedOrderDetails && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-md">
+              <button
+                onClick={closeModals}
+                className="absolute top-2 right-2 text-black"
+              >
+                X
+              </button>
+              <h2 className="text-lg mb-4">Order Details</h2>
+              <div>
+                {/* If selectedOrderDetails is an array, map through it */}
+                {Array.isArray(selectedOrderDetails) ? (
+                  selectedOrderDetails.map((item, index) => (
+                    <div key={index} className="mb-4">
+                      <p>Item: {item.merch?.name || "N/A"}</p>
+                      <p>Price: {item.merch?.price * item.quantity || "N/A"}</p>
+                      <p>Quantity: {item.quantity || "N/A"}</p>
+                      <p>Size: {item.size || "N/A"}</p>
+                      {item.merch?.image && (
+                        <Image
+                          src={item.merch.image}
+                          alt="Merchandise"
+                          width={200}
+                          height={150}
+                          className="rounded"
+                        />
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  // If it's a single object, render its details
+                  <div>
+                    <p>Item: {selectedOrderDetails.merch?.name || "N/A"}</p>
+
+                    <p>
+                      Price:{" "}
+                      {selectedOrderDetails.merch?.price *
+                        selectedOrderDetails.quantity || "N/A"}
+                    </p>
+                    <p>Quantity: {selectedOrderDetails.quantity || "N/A"}</p>
+                    <p>Size: {selectedOrderDetails.size || "N/A"}</p>
+                    {selectedOrderDetails.merch?.image && (
+                      <Image
+                        src={selectedOrderDetails.merch.image}
+                        alt="Merchandise"
+                        width={200}
+                        height={150}
+                        className="rounded"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

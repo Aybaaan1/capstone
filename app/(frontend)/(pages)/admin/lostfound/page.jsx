@@ -12,7 +12,7 @@ const LostAndFound = () => {
   const [proofModalVisible, setProofModalVisible] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState(null);
   const [isReservationOpen, setIsReservationOpen] = useState(false);
-
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   useEffect(() => {
     const fetchLostFoundItems = async () => {
       try {

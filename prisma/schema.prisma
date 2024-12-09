@@ -42,17 +42,17 @@ model Merch { //form for admin to add merch items
   orders Order[]
 }
 
-model Order { //form for user in purchase
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  merchId     Int
-  quantity    Int      @default(1)  // Add this field if tracking quantity
-  proof       String?
-  status      String?  // Make status nullable
-  size        String
-  user        User     @relation(fields: [userId], references: [id])
-  merch       Merch    @relation(fields: [merchId], references: [id])
-}
+  model Order { //form for user in purchase
+    id          Int      @id @default(autoincrement())
+    userId      Int
+    merchId     Int
+    quantity    Int      @default(1)  // Add this field if tracking quantity
+    proof       String?
+    status      String?  // Make status nullable
+    size        String?
+    user        User     @relation(fields: [userId], references: [id])
+    merch       Merch    @relation(fields: [merchId], references: [id])
+  }
 
 model Item { //form for user for lost&found
   id        Int      @id @default(autoincrement())

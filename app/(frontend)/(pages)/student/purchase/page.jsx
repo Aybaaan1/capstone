@@ -129,10 +129,11 @@ export default function Purchase() {
       return;
     }
 
+    // Prepare cart items
     const preparedCartItems = editedCart.map((item) => ({
       merchId: item.id,
-      quantity: item.quantity,
-      size: item.size,
+      quantity: item.quantity || 1, // Default quantity to 1 if not provided
+      size: item.size || null, // Default size to null if not provided
     }));
 
     console.log("Prepared Cart Items:", preparedCartItems);
@@ -142,14 +143,18 @@ export default function Purchase() {
       return;
     }
 
+    // Upload proof image
     const fileUrl = await uploadImage(proofFile);
 
+    // Prepare order data
     const orderData = {
       userId,
-      cartItems: preparedCartItems, // Pass the prepared cart items
+      cartItems: preparedCartItems,
       proof: fileUrl,
       status: "Pending",
     };
+
+    console.log("DATA:", orderData);
 
     try {
       const response = await fetch("/api/order", {
@@ -160,11 +165,13 @@ export default function Purchase() {
         body: JSON.stringify(orderData),
       });
 
-      const data = await response.json();
       if (response.ok) {
+        const data = await response.json();
         console.log("Order placed successfully:", data);
       } else {
-        setError("Error placing the order.");
+        const errorData = await response.json();
+        console.error("API Error:", errorData.error);
+        setError(errorData.error || "Error placing the order.");
       }
     } catch (error) {
       console.error("Error submitting the order:", error);
@@ -221,7 +228,24 @@ export default function Purchase() {
         </div>
       );
     } else if (item.type === "Pins" || item.type === "Stickers") {
-      return null; // No size field for PINS and STICKERS
+      return (
+        <div className="flex items-center gap-2">
+          <label htmlFor={`design-${index}`} className="text-sm font-semibold">
+            Design:
+          </label>
+          <select
+            id={`design-${index}`}
+            value={item.size || ""}
+            onChange={(e) => handleUpdateItem(index, "size", e.target.value)}
+            className="border rounded px-2 py-1 text-sm"
+          >
+            <option value="">Select Design</option>
+            <option value="Design1">Design1</option>
+            <option value="Design2">Design2</option>
+            <option value="Design3">Design3</option>
+          </select>
+        </div>
+      );
     }
   };
   return (
