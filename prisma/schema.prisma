@@ -27,7 +27,8 @@ model User {
   items          Item[]
   reserves       Reserve[]
   assistances    Assistance[]
-
+  resetPasswordToken   String?  // Optional field for the reset token
+  resetPasswordExpires DateTime? // Expiration time for the token
   
 }
 

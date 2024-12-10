@@ -98,6 +98,12 @@ const SignIn = ({ switchToRegister }) => {
           Register here
         </button>
       </p>
+      <p className="text-sm mt-2 text-center">
+        Forgot your password?{" "}
+        <a href="/forgot-password" className="text-blue-500">
+          Reset it here
+        </a>
+      </p>
     </div>
   );
 };
