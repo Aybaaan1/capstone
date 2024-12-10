@@ -10,14 +10,17 @@ export default function RootLayout({ children }) {
   const pathname = usePathname(); // Use the hook to get current route
 
   const isAdminRoute = pathname.startsWith("/admin");
+  const isSuperAdminRoute = pathname.startsWith("/superadmin");
 
   return (
     <html lang="en">
       <body>
         <Provider>
-          {!isAdminRoute && <Navbar />}
+          {!isAdminRoute && !isSuperAdminRoute && <Navbar />}
+
           {children}
-          {!isAdminRoute && <Footer />}
+
+          {!isAdminRoute && !isSuperAdminRoute && <Footer />}
         </Provider>
       </body>
     </html>

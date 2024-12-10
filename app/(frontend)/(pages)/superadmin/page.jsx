@@ -1,17 +1,17 @@
 "use client";
 import React, { useState, useEffect } from "react";
 
-const Dashboard = () => {
+const SuperAdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({});
-  const [filterRole, setFilterRole] = useState(""); // New state for role filtering
-  const [searchQuery, setSearchQuery] = useState(""); // New state for search query
-  const [isReservationOpen, setIsReservationOpen] = useState(false);
-  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const [filterRole, setFilterRole] = useState(""); // Role filtering state
+  const [searchQuery, setSearchQuery] = useState(""); // Search query state
+  const [isAddAdminModalOpen, setIsAddAdminModalOpen] = useState(false);
+  const [newAdmin, setNewAdmin] = useState({});
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -99,6 +99,51 @@ const Dashboard = () => {
     }
   };
 
+  const handleAddAdmin = async () => {
+    try {
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newAdmin),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add new admin");
+      }
+
+      const responseData = await response.json();
+      setUsers([...users, responseData]);
+      setIsAddAdminModalOpen(false);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      const response = await fetch(`/api/user/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ role: newRole }), // Send only the role to update
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user role");
+      }
+
+      const updatedUser = await response.json();
+      setUsers(
+        users.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+      );
+      alert("Role updated successfully!");
+    } catch (error) {
+      alert(`Error: ${error.message}`);
+    }
+  };
   const filteredUsers = users.filter((user) => {
     const matchesRole = filterRole ? user.role === filterRole : true;
     const matchesSearch = user.idnumber.toString().includes(searchQuery);
@@ -122,111 +167,28 @@ const Dashboard = () => {
         <ul className="space-y-4">
           <li>
             <a
-              href="/admin"
+              href="/superadmin"
               className="block py-2 px-4 rounded-md bg-gray-900 text-white"
             >
-              Users
+              User Management
             </a>
           </li>
           <li>
-            <button
-              onClick={() => setIsPurchaseOpen(!isPurchaseOpen)} // Toggle the dropdown
-              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
-            >
-              Purchase
-            </button>
-            {isPurchaseOpen && ( // Show the dropdown if "isPurchaseOpen" is true
-              <ul className="ml-4 space-y-2">
-                <li>
-                  <a
-                    href="/admin/purchase"
-                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-                  >
-                    Merchs List
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/admin/orderrequests"
-                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-                  >
-                    Order Requests
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/admin/orderslist"
-                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-                  >
-                    Orders List
-                  </a>
-                </li>
-              </ul>
-            )}
-          </li>
-          <li>
             <a
-              href="/admin/lostfound"
+              href="/superadmin/addadmin"
               className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
             >
-              Lost & Found
-            </a>
-          </li>
-          <li>
-            {/* Reservation Dropdown */}
-            <button
-              onClick={() => setIsReservationOpen(!isReservationOpen)}
-              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
-            >
-              Item Management
-            </button>
-            {isReservationOpen && (
-              <ul className="ml-4 space-y-2">
-                <li>
-                  <a
-                    href="/admin/reserveitem"
-                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-                  >
-                    Available Items
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/admin/reserve"
-                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-                  >
-                    Borrow Items
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="/admin/return"
-                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-                  >
-                    Return Items
-                  </a>
-                </li>
-              </ul>
-            )}
-          </li>
-          <li>
-            <a
-              href="/admin/tambayayong"
-              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
-            >
-              Tambayayong
+              Add Admin
             </a>
           </li>
         </ul>
       </nav>
 
-      {/* Main Content */}
       <main className="flex-1 bg-white p-10">
         <h2 className="text-3xl font-semibold text-black mb-8">
-          Admin Dashboard
+          Super Admin Dashboard
         </h2>
 
-        {/* Filter and Search */}
         <div className="mb-4 flex items-center space-x-4">
           <button
             onClick={() => setFilterRole("")}
@@ -268,14 +230,10 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Users Table */}
         <section>
           <table className="min-w-full bg-white rounded-lg shadow-md">
             <thead className="bg-[rgb(255,211,70)] text-black">
               <tr>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Select
-                </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   UserId
                 </th>
@@ -283,16 +241,7 @@ const Dashboard = () => {
                   Email
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  ID Number
-                </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  First Name
-                </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Last Name
-                </th>
-                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Program
+                  Role
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Actions
@@ -305,9 +254,6 @@ const Dashboard = () => {
                   key={user.id}
                   className="bg-white border-b hover:bg-gray-50"
                 >
-                  <td className="border px-4 py-3">
-                    <input type="checkbox" />
-                  </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     {user.id}
                   </td>
@@ -315,23 +261,19 @@ const Dashboard = () => {
                     {user.email}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.idnumber}
-                  </td>
-                  <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.firstname}
-                  </td>
-                  <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.lastname}
-                  </td>
-                  <td className="border px-4 py-3 text-sm text-gray-800">
-                    {user.program}
+                    {user.role}
                   </td>
                   <td className="border px-4 py-3 text-sm text-gray-800">
                     <button
-                      onClick={() => handleUpdate(user)}
-                      className="bg-blue-600 text-white text-xs px-2 py-1 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onClick={() =>
+                        handleRoleChange(
+                          user.id,
+                          user.role === "ADMIN" ? "STUDENT" : "ADMIN"
+                        )
+                      }
+                      className="bg-yellow-500 text-white text-xs px-2 py-1 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                     >
-                      Update
+                      Toggle Role
                     </button>
                     <button
                       onClick={() => handleDelete(user.id)}
@@ -346,68 +288,50 @@ const Dashboard = () => {
           </table>
         </section>
 
-        {/* Update Modal */}
-        {isModalOpen && (
+        {/* Add Admin Modal */}
+        {isAddAdminModalOpen && (
           <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-md shadow-lg w-96">
-              <h2 className="text-2xl font-semibold mb-4">Update User</h2>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  name="email"
-                  placeholder="Enter Email Address"
-                  value={updatedUser.email || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="idnumber"
-                  placeholder="Enter IdNumber"
-                  value={updatedUser.idnumber || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="firstname"
-                  placeholder="Enter First Name"
-                  value={updatedUser.firstname || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="lastname"
-                  placeholder="Last Name"
-                  value={updatedUser.lastname || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="Program"
-                  placeholder="Enter Program"
-                  value={updatedUser.program || ""}
-                  onChange={handleChange}
-                  className="w-full p-2 border rounded-md"
-                />
-                {/* Add additional fields as needed */}
-              </div>
-              <div className="flex justify-end space-x-2 mt-4">
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  Save
-                </button>
-              </div>
+              <h2 className="text-2xl font-semibold mb-4">Add New Admin</h2>
+              <input
+                type="text"
+                name="idnumber"
+                placeholder="ID Number"
+                className="w-full border rounded-md p-2 mb-2"
+                onChange={(e) =>
+                  setNewAdmin({ ...newAdmin, idnumber: e.target.value })
+                }
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                className="w-full border rounded-md p-2 mb-2"
+                onChange={(e) =>
+                  setNewAdmin({ ...newAdmin, email: e.target.value })
+                }
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                className="w-full border rounded-md p-2 mb-2"
+                onChange={(e) =>
+                  setNewAdmin({ ...newAdmin, password: e.target.value })
+                }
+              />
+              <button
+                onClick={handleAddAdmin}
+                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+              >
+                Add Admin
+              </button>
+              <button
+                onClick={() => setIsAddAdminModalOpen(false)}
+                className="w-full mt-2 bg-gray-300 text-black py-2 rounded-md hover:bg-gray-400"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         )}
@@ -416,4 +340,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default SuperAdminDashboard;
