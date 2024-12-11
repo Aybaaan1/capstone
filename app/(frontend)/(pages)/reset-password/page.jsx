@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +11,35 @@ const ResetPassword = () => {
   const [error, setError] = useState("");
 
   const router = useRouter();
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordForm
+        password={password}
+        setPassword={setPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        message={message}
+        setMessage={setMessage}
+        error={error}
+        setError={setError}
+        router={router}
+      />
+    </Suspense>
+  );
+};
+
+const ResetPasswordForm = ({
+  password,
+  setPassword,
+  confirmPassword,
+  setConfirmPassword,
+  message,
+  setMessage,
+  error,
+  setError,
+  router,
+}) => {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
