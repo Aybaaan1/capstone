@@ -85,10 +85,28 @@ const LostAndFoundForm = ({ formLabel, setClose }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
+              htmlFor="type"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Type (Lost/Found)
+            </label>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
+            >
+              <option value="">Select</option>
+              <option value="lost">Lost</option>
+              <option value="found">Found</option>
+            </select>
+          </div>
+          <div>
+            <label
               htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              Your Name
+              Item Name
             </label>
             <input
               type="text"
@@ -113,25 +131,6 @@ const LostAndFoundForm = ({ formLabel, setClose }) => {
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
             />
-          </div>
-
-          <div>
-            <label
-              htmlFor="type"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Type (Lost/Found)
-            </label>
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-primary focus:outline-none"
-            >
-              <option value="">Select</option>
-              <option value="lost">Lost</option>
-              <option value="found">Found</option>
-            </select>
           </div>
 
           <div>

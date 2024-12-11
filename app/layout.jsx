@@ -14,12 +14,10 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body>
+      <body className="min-h-screen flex flex-col">
         <Provider>
           {!isAdminRoute && !isSuperAdminRoute && <Navbar />}
-
-          {children}
-
+          <main className="flex-grow">{children}</main>
           {!isAdminRoute && !isSuperAdminRoute && <Footer />}
         </Provider>
       </body>

@@ -2,24 +2,35 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import LostFoundForm from "../../../(components)/_components/LostFoundForm";
+import { FaBell } from "react-icons/fa";
+import { useSession } from "next-auth/react";
+
+const socialLinks = [
+  { href: "https://www.facebook.com/SSGCTUArgao", image: "/imgs/facebook.png" },
+  // Add more social links here if needed
+];
 
 export default function LostFoundPage() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id; // Get the user ID from the session
+
   const [isLostFormClicked, setIsLostFormClicked] = useState(false);
   const [isFoundFormClicked, setIsFoundFormClicked] = useState(false);
   const [foundItems, setFoundItems] = useState([]);
   const [lostItems, setLostItems] = useState([]);
-
-  const socialLinks = [
-    { image: "/imgs/fb-icon.png", href: "/" },
-    { image: "/imgs/twitter-icon.png", href: "/" },
-    { image: "/imgs/instagram-icon.png", href: "/" },
-    { image: "/imgs/youtube-icon.png", href: "/" },
-  ];
+  const [notifications, setNotifications] = useState([]); // Stores notifications for the user
+  const [showNotifications, setShowNotifications] = useState(false); // Controls notification dropdown visibility
 
   useEffect(() => {
     const fetchItems = async () => {
+      if (!userId) return; // Exit if userId is not available
+
       try {
-        const response = await fetch("/api/item");
+        const response = await fetch("/api/item?userId=${userId}");
+        if (!response.ok) {
+          throw new Error("Error fetching items: ${response.status}");
+        }
+
         const data = await response.json();
 
         // Filter the items into 'lost' and 'found' categories based on their status
@@ -32,13 +43,27 @@ export default function LostFoundPage() {
 
         setFoundItems(foundItemsList);
         setLostItems(lostItemsList);
+
+        // Set notifications for accepted items for the current user
+        const newNotifications = data
+          .filter(
+            (item) => item.status === "Accepted" && item.userId === userId
+          )
+          .map(
+            '(item) => Your request for item "${item.name}" has been accepted.'
+          );
+        setNotifications(newNotifications);
       } catch (error) {
-        console.error("Error fetching items:", error);
+        console.error("Error fetching items:", error.message);
       }
     };
 
     fetchItems();
-  }, []);
+  }, [userId]);
+
+  const handleNotificationClick = () => {
+    setShowNotifications(!showNotifications); // Toggle notification visibility
+  };
 
   return (
     <div className="mt-10">
@@ -46,6 +71,29 @@ export default function LostFoundPage() {
         style={{ backgroundImage: "url('/imgs/ctulogo.png')" }}
         className="w-full h-56 bg-cover bg-no-repeat bg-center"
       ></section>
+
+      {/* Notification Icon */}
+      <div className="fixed top-6 right-8">
+        <button onClick={handleNotificationClick} className="relative">
+          <FaBell className="text-3xl text-primary" />
+          {notifications.length > 0 && (
+            <span className="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              {notifications.length}
+            </span>
+          )}
+        </button>
+        {showNotifications && (
+          <div className="absolute right-0 bg-white border border-gray-300 rounded-lg shadow-lg p-3">
+            {notifications.length === 0 ? (
+              <p>No notifications</p>
+            ) : (
+              notifications.map((notification, index) => (
+                <p key={index}>{notification}</p>
+              ))
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Found Items Section */}
       <section className="mt-10 bg-slate-50 flex flex-col items-center justify-center py-10 gap-10 relative">
@@ -63,7 +111,7 @@ export default function LostFoundPage() {
 
         {isFoundFormClicked && (
           <LostFoundForm
-            formLabel="Report Found Item"
+            formLabel="Report Lost/Found Item"
             setClose={() => setIsFoundFormClicked(false)}
           />
         )}
@@ -83,7 +131,7 @@ export default function LostFoundPage() {
               </div>
             ))
           ) : (
-            <p>No accepted found items available.</p>
+            <p>No found items.</p>
           )}
         </div>
 
@@ -114,7 +162,7 @@ export default function LostFoundPage() {
               </div>
             ))
           ) : (
-            <p>No accepted lost items available.</p>
+            <p>No lost items.</p>
           )}
         </div>
 
@@ -129,7 +177,7 @@ export default function LostFoundPage() {
       <section className="flex items-center justify-between px-24 overflow-hidden py-10">
         <div className="text-black w-[450px] flex flex-col gap-7">
           <h1 className="font-medium text-4xl">Follow us</h1>
-          <div className="flex flex-col ">
+          <div className="flex flex-col">
             <p className="text-slate-600">
               @https://www.facebook.com/SSGCTUArgao
             </p>
@@ -139,10 +187,10 @@ export default function LostFoundPage() {
             </p>
           </div>
           <div className="flex pr-48 items-center justify-between">
-            {socialLinks.map((links) => (
-              <a key={links.href} href={links.href}>
+            {socialLinks.map((link) => (
+              <a key={link.href} href={link.href}>
                 <Image
-                  src={links.image}
+                  src={link.image}
                   alt="Social Icon"
                   height={40}
                   width={40}
