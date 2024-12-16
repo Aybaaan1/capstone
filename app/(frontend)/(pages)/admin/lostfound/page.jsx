@@ -11,8 +11,9 @@ const LostAndFound = () => {
   const [filter, setFilter] = useState("all");
   const [proofModalVisible, setProofModalVisible] = useState(false);
   const [selectedImageSrc, setSelectedImageSrc] = useState(null);
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false); // Correctly defined
   const [isReservationOpen, setIsReservationOpen] = useState(false);
-  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+
   useEffect(() => {
     const fetchLostFoundItems = async () => {
       try {
@@ -54,13 +55,12 @@ const LostAndFound = () => {
 
   const updateItemStatus = async (id, status) => {
     try {
-      const response = await fetch(`/api/item/${id}`, {
-        // Correct URL structure
+      const response = await fetch(/api/item/${id}, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status }), // Send status in the body
+        body: JSON.stringify({ status }),
       });
       if (!response.ok) {
         throw new Error("Failed to update item status");
@@ -72,7 +72,7 @@ const LostAndFound = () => {
 
   const deleteItemFromDatabase = async (id) => {
     try {
-      const response = await fetch(`/api/item/${id}`, {
+      const response = await fetch(/api/item/${id}, {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -116,12 +116,12 @@ const LostAndFound = () => {
           </li>
           <li>
             <button
-              onClick={() => setIsPurchaseOpen(!isPurchaseOpen)} // Toggle the dropdown
+              onClick={() => setIsPurchaseOpen(!isPurchaseOpen)}
               className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Purchase
             </button>
-            {isPurchaseOpen && ( // Show the dropdown if "isPurchaseOpen" is true
+            {isPurchaseOpen && (
               <ul className="ml-4 space-y-2">
                 <li>
                   <a
@@ -159,7 +159,6 @@ const LostAndFound = () => {
             </a>
           </li>
           <li>
-            {/* Reservation Dropdown */}
             <button
               onClick={() => setIsReservationOpen(!isReservationOpen)}
               className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
@@ -213,7 +212,6 @@ const LostAndFound = () => {
           </h2>
         </header>
 
-        {/* Filter Buttons */}
         <div className="mb-4 flex items-center space-x-4">
           <button
             onClick={() => setFilter("all")}
@@ -241,7 +239,7 @@ const LostAndFound = () => {
           </button>
           <input
             type="text"
-            placeholder="Search by User ID" // Updated placeholder
+            placeholder="Search by User ID"
             value={searchId}
             onChange={(e) => setSearchId(e.target.value)}
             className="border rounded-md p-2 ml-4"
@@ -280,42 +278,30 @@ const LostAndFound = () => {
                   <td className="border px-4 py-3 text-sm">{item.userId}</td>
                   <td className="border px-4 py-3 text-sm">{item.name}</td>
                   <td className="border px-4 py-3 text-sm">{item.type}</td>
-                  <td className="border px-4 py-3 text-sm">
-                    {new Date(item.dateTime).toLocaleDateString()}
-                  </td>
-                  <td className="border px-4 py-3 text-sm">
-                    {new Date(item.dateTime).toLocaleTimeString()}
-                  </td>
+                  <td className="border px-4 py-3 text-sm">{item.date}</td>
+                  <td className="border px-4 py-3 text-sm">{item.time}</td>
                   <td className="border px-4 py-3 text-sm">{item.place}</td>
                   <td className="border px-4 py-3 text-sm">
-                    {item.image ? (
-                      <>
-                        <button
-                          className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                          onClick={() => openProofModal(item.image)}
-                        >
-                          View
-                        </button>
-                      </>
-                    ) : (
-                      <span>No Image</span>
-                    )}
-                  </td>
-                  <td className="border px-4 py-3 text-sm">
-                    {item.status || "Pending"}
-                  </td>
-                  <td className="border px-4 py-3 text-sm">
                     <button
-                      className="bg-green-600 text-white px-2 py-1 rounded-md hover:bg-green-700 mr-2"
+                      onClick={() => openProofModal(item.image)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Image
+                    </button>
+                  </td>
+                  <td className="border px-4 py-3 text-sm">{item.status}</td>
+                  <td className="border px-4 py-3 text-sm space-x-2">
+                    <button
                       onClick={() => acceptItem(index)}
+                      className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
                     >
                       Accept
                     </button>
                     <button
-                      className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
                       onClick={() => declineItem(index)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
                     >
-                      Claimed
+                      Decline
                     </button>
                   </td>
                 </tr>
@@ -323,60 +309,9 @@ const LostAndFound = () => {
             </tbody>
           </table>
         </section>
-        <Proof
-          isOpen={proofModalVisible}
-          onClose={() => setProofModalVisible(false)}
-          imageSrc={selectedImageSrc}
-        />
-
-        {/* Modal implementation here */}
-        {modalVisible && selectedItem && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white p-6 rounded shadow-lg">
-              <h3 className="text-lg font-bold">{selectedItem.name}</h3>
-              <p>
-                <strong>ID:</strong> {selectedItem.id}
-              </p>
-              <p>
-                <strong>User ID:</strong> {selectedItem.userId}
-              </p>
-              <p>
-                <strong>Type:</strong> {selectedItem.type}
-              </p>
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(selectedItem.dateTime).toLocaleDateString()}
-              </p>
-              <p>
-                <strong>Time:</strong>{" "}
-                {new Date(selectedItem.dateTime).toLocaleTimeString()}
-              </p>
-              <p>
-                <strong>Place:</strong> {selectedItem.place}
-              </p>
-              {selectedItem.image && (
-                <Image
-                  src={selectedItem.image}
-                  alt="Item"
-                  width={100}
-                  height={100}
-                  className="rounded-full"
-                />
-              )}
-              <div className="mt-4">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                  onClick={() => setModalVisible(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
     </div>
   );
 };
 
-export default LostAndFound;
+export default LostAndFound
