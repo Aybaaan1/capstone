@@ -73,7 +73,7 @@ export default function LostFoundPage() {
       ></section>
 
       {/* Notification Icon */}
-      <div className="fixed top-6 right-8">
+      <div className="absolute top-6 right-10">
         <button onClick={handleNotificationClick} className="relative">
           <FaBell className="text-3xl text-primary" />
           {notifications.length > 0 && (
@@ -116,18 +116,22 @@ export default function LostFoundPage() {
           />
         )}
 
-        <div className="grid grid-cols-4 place-items-center gap-14">
+        <div className="grid grid-cols-4 place-items-center gap-10">
           {foundItems.length > 0 ? (
             foundItems.map((item) => (
-              <div key={item.id}>
+              <div
+                key={item.id}
+                className="border border-gray-300 shadow-md rounded-lg p-4 w-50 text-center bg-white"
+              >
                 <Image
                   src={item.image || "/imgs/placeholder.png"}
                   height={200}
-                  width={200}
+                  width={150}
                   alt={item.name}
+                  className="rounded-lg mx-auto"
                 />
-                <h3>Item: {item.name}</h3>
-                <p>Place: {item.place}</p>
+                <h3 className="font-semibold text-lg mt-2">{item.name}</h3>
+                <p className="text-sm text-gray-600">Place: {item.place}</p>
               </div>
             ))
           ) : (
@@ -147,18 +151,22 @@ export default function LostFoundPage() {
         <div className="w-full flex justify-center px-6">
           <h1 className="font-bold text-5xl text-center">Lost Items</h1>
         </div>
-        <div className="grid grid-cols-4 place-items-center gap-14">
+        <div className="grid grid-cols-4 place-items-center gap-10">
           {lostItems.length > 0 ? (
             lostItems.map((item) => (
-              <div key={item.id}>
+              <div
+                key={item.id}
+                className="border border-gray-300 shadow-md rounded-lg p-4 w-50 text-center bg-white"
+              >
                 <Image
                   src={item.image || "/imgs/placeholder.png"}
                   height={200}
-                  width={200}
+                  width={150}
                   alt={item.name}
+                  className="rounded-lg mx-auto"
                 />
-                <h3>Item: {item.name}</h3>
-                <p>Place: {item.place}</p>
+                <h3 className="font-semibold text-lg mt-2">{item.name}</h3>
+                <p className="text-sm text-gray-600">Place: {item.place}</p>
               </div>
             ))
           ) : (

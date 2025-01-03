@@ -89,7 +89,7 @@ export default function Tambayayong() {
       </section>
 
       {/* Notification Icon */}
-      <div className="fixed top-6 right-8">
+      <div className="absolute top-6 right-10">
         <button onClick={handleNotificationClick} className="relative">
           <FaBell className="text-3xl text-primary" />
           {notifications.length > 0 && (

@@ -315,7 +315,7 @@ const LostAndFound = () => {
                       className="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-red-700"
                       onClick={() => declineItem(index)}
                     >
-                      Claimed
+                      Claim
                     </button>
                   </td>
                 </tr>

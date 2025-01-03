@@ -51,7 +51,7 @@ const AboutUs = () => {
   // console.log(session?.user);
 
   return (
-    <div className="w-full">
+    <div className="mt-10">
       <section className="w-full h-screen mx-auto ">
         {/* {session.user.email} */}
         <div

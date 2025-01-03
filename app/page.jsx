@@ -79,9 +79,15 @@ export default function Home() {
             Digital Platforms Services.
           </p>
           <div>
-            <button className="bg-primary px-10 py-2 text-white rounded-2xl text-sm">
-              Chat Us
-            </button>
+            <a
+              href="https://www.facebook.com/SSGCTUArgao"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <button className="bg-primary px-10 py-2 text-white rounded-2xl text-sm">
+                Chat Us
+              </button>
+            </a>
           </div>
         </div>
         <Image

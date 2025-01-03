@@ -170,7 +170,7 @@ const ReturnedItems = () => {
                     href="/admin/item"
                     className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
                   >
-                    Item Reservation Form
+                    Return Items
                   </a>
                 </li>
               </ul>
