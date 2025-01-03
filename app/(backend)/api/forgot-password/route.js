@@ -34,7 +34,7 @@ export async function POST(req) {
       },
     });
 
-    const resetLink = `https://capstone-tmon.vercel.app/reset-password?token=${resetToken}`;
+    const resetLink = `https://ssgconnect.vercel.app/reset-password?token=${resetToken}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
