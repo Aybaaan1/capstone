@@ -52,7 +52,6 @@ const AboutUs = () => {
 
   return (
     <div className="w-full">
-      <button onClick={() => signOut()}>signOut</button>
       <section className="w-full h-screen mx-auto ">
         {/* {session.user.email} */}
         <div

@@ -9,15 +9,15 @@ import "./globals.css";
 export default function RootLayout({ children }) {
   const pathname = usePathname(); // Use the hook to get current route
 
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isSuperAdminRoute = pathname.startsWith("/superadmin");
+  const isAdminRoute = pathname?.startsWith("/admin");
+  const isSuperAdminRoute = pathname?.startsWith("/superadmin");
 
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col">
+      <body>
         <Provider>
           {!isAdminRoute && !isSuperAdminRoute && <Navbar />}
-          <main className="flex-grow">{children}</main>
+          {children}
           {!isAdminRoute && !isSuperAdminRoute && <Footer />}
         </Provider>
       </body>

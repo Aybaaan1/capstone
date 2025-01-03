@@ -101,7 +101,7 @@ export default function Home() {
           convenient access to essential resources and support systems
         </p>
       </section>
-      <section className=" text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10">
+      <section className=" text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10  ">
         <h1 className="font-bold text-4xl text-black">
           University Merchandise
         </h1>
