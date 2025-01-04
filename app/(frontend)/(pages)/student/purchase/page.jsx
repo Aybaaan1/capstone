@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { uploadImage } from "@/lib/imageUpload";
-
+import { FaBell } from "react-icons/fa";
 // Fetch merchandise items from the API
 const fetchMerchItems = async () => {
   try {
@@ -42,7 +42,8 @@ export default function Purchase() {
   const [filterType, setFilterType] = useState("");
   const [proofFile, setProofFile] = useState(null);
   const [error, setError] = useState("");
-
+  const [notifications, setNotifications] = useState([]); // Stores notifications for the user
+  const [showNotifications, setShowNotifications] = useState(false);
   const [merchId, setMerchId] = useState("");
   const [quantity, setQuantity] = useState("");
   const [size, setSize] = useState("");
@@ -93,6 +94,9 @@ export default function Purchase() {
   };
   const handleToggleCart = () => {
     setIsCartOpen(!isCartOpen);
+  };
+  const handleNotificationClick = () => {
+    setShowNotifications(!showNotifications); // Toggle notification visibility
   };
 
   const handleCheckout = () => {
@@ -256,6 +260,48 @@ export default function Purchase() {
           className="w-full h-56 bg-cover bg-no-repeat bg-center"
         ></section>
       </header>
+      <div className="absolute top-6 right-10">
+        <button onClick={handleNotificationClick} className="relative">
+          <FaBell className="text-3xl text-primary" />
+          {notifications.length > 0 && (
+            <span className="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              {notifications.length}
+            </span>
+          )}
+        </button>
+        {showNotifications && (
+          <div className="absolute right-0 bg-white border border-gray-300 rounded-lg shadow-lg p-3 w-72">
+            <h4 className="font-bold text-lg mb-2">Notifications</h4>
+            {notifications.length === 0 ? (
+              <p className="text-gray-500">No notifications</p>
+            ) : (
+              <ul className="list-disc list-inside">
+                {notifications.map((notification, index) => (
+                  <li
+                    key={index}
+                    className="text-sm mb-1 flex justify-between items-center"
+                  >
+                    <span>{notification}</span>
+                    <button
+                      onClick={() => {
+                        const updatedNotifications = notifications.filter(
+                          (_, i) => i !== index
+                        );
+                        setNotifications(updatedNotifications);
+                      }}
+                      className="text-red-500 text-sm ml-2"
+                      aria-label="Remove notification"
+                    >
+                      <span className="font-bold">&times;</span>{" "}
+                      {/* Red close icon */}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
       <section>
         <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
           University Merchandise
@@ -297,12 +343,12 @@ export default function Purchase() {
         <div className="flex flex-wrap justify-center">
           <button
             onClick={handleToggleCart}
-            className="absolute top-4 right-10 bg-transparent p-2 rounded-full"
+            className="absolute top-4 right-24 bg-transparent p-2 rounded-full"
           >
             <Image
               src="/imgs/cart-icon.png"
-              height={35}
-              width={35}
+              height={33}
+              width={33}
               alt="Cart Icon"
             />
             {cart.length > 0 && (

@@ -5,15 +5,18 @@ import Proof from "../../../(components)/_components/Proof";
 
 const Purchase = () => {
   const [purchases, setPurchases] = useState([]);
+  const [merchTypes, setMerchTypes] = useState([]); // State to store merch types
+  const [selectedMerchType, setSelectedMerchType] = useState(""); // State to store selected merch type
+  const [filteredPurchases, setFilteredPurchases] = useState([]); // State to store filtered purchases
   const [error, setError] = useState(null);
   const [isReservationOpen, setIsReservationOpen] = useState(false);
-  const [isProofModalOpen, setIsProofModalOpen] = useState(false); // Separate state for proof modal
-  const [isOrderDetailsModalOpen, setIsOrderDetailsModalOpen] = useState(false); // Separate state for order details modal
+  const [isProofModalOpen, setIsProofModalOpen] = useState(false);
+  const [isOrderDetailsModalOpen, setIsOrderDetailsModalOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   const [acceptanceSuccess, setAcceptanceSuccess] = useState(false);
-
+  const [searchId, setSearchId] = useState("");
   // Fetch purchases from the database
   const fetchPurchases = async () => {
     try {
@@ -28,6 +31,7 @@ const Purchase = () => {
         (order) => order.status !== "accepted" && order.status !== "claimed"
       );
       setPurchases(pendingOrders);
+      setFilteredPurchases(pendingOrders); // Initially set filtered purchases to all purchases
     } catch (error) {
       setError(error.message);
     }
@@ -36,6 +40,52 @@ const Purchase = () => {
   useEffect(() => {
     fetchPurchases();
   }, []);
+
+  const fetchMerchTypes = async () => {
+    try {
+      const response = await fetch("/api/merch");
+      if (!response.ok) {
+        throw new Error("Failed to fetch merch data");
+      }
+      const merchData = await response.json();
+      setMerchTypes(merchData);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchPurchases();
+    fetchMerchTypes(); // Fetch merch types when component mounts
+  }, []);
+
+  // Function to get merch type based on merchId
+  const getMerchType = (merchId) => {
+    const merch = merchTypes.find((item) => item.id === merchId);
+    return merch ? merch.type : "N/A";
+  };
+
+  // Handle merch type selection change
+  const handleMerchTypeChange = (selectedType) => {
+    setSelectedMerchType(selectedType);
+
+    // Filter purchases based on the selected merch type
+    const filtered = selectedType
+      ? purchases.filter(
+          (purchase) => getMerchType(purchase.merchId) === selectedType
+        )
+      : purchases;
+
+    setFilteredPurchases(filtered);
+  };
+
+  const filteredItems = filteredPurchases.filter((item) => {
+    const matchesSearch = item.userId.toString().includes(searchId);
+    const matchesFilter =
+      selectedMerchType === "" ||
+      getMerchType(item.merchId) === selectedMerchType;
+    return matchesSearch && matchesFilter;
+  });
 
   // Open Order Details Modal
   const openOrderDetailsModal = (orderDetails) => {
@@ -69,22 +119,19 @@ const Purchase = () => {
       });
 
       if (response.ok) {
-        // Forward the accepted order to the order list
-        const acceptedOrder = purchases[index]; // Get the order that was accepted
+        const acceptedOrder = purchases[index];
         await fetch("/api/order", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(acceptedOrder), // Send the order data to the order list API
+          body: JSON.stringify(acceptedOrder),
         });
 
-        // Remove the accepted order from the local state
         const updatedPurchases = purchases.filter((_, i) => i !== index);
         setPurchases(updatedPurchases);
-
-        setAcceptanceSuccess(true); // Update success state
-        setTimeout(() => setAcceptanceSuccess(false), 3000); // Reset after 3 seconds
+        setAcceptanceSuccess(true);
+        setTimeout(() => setAcceptanceSuccess(false), 3000);
       } else {
         throw new Error("Failed to accept order.");
       }
@@ -153,7 +200,7 @@ const Purchase = () => {
                 </li>
                 <li>
                   <a
-                    href="/admin/orderlist"
+                    href="/admin/orderslist"
                     className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
                   >
                     Orders List
@@ -226,6 +273,70 @@ const Purchase = () => {
 
         {/* Error Message */}
         {error && <p className="text-red-500">{error}</p>}
+        {/* Merch Type Filter Buttons */}
+        <div className="mb-4">
+          <div className="space-x-2">
+            {/* Buttons for each merch type */}
+            <button
+              onClick={() => handleMerchTypeChange("")}
+              className={`px-4 py-2 border rounded-md ${
+                selectedMerchType === ""
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => handleMerchTypeChange("T-shirt")}
+              className={`px-4 py-2 border rounded-md ${
+                selectedMerchType === "Tshirt"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Tshirt
+            </button>
+            <button
+              onClick={() => handleMerchTypeChange("Lanyards")}
+              className={`px-4 py-2 border rounded-md ${
+                selectedMerchType === "Lanyard"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Lanyards
+            </button>
+            <button
+              onClick={() => handleMerchTypeChange("Pins")}
+              className={`px-4 py-2 border rounded-md ${
+                selectedMerchType === "Pins"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Pins
+            </button>
+            <button
+              onClick={() => handleMerchTypeChange("Stickers")}
+              className={`px-4 py-2 border rounded-md ${
+                selectedMerchType === "Sticker"
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+            >
+              Sticker
+            </button>
+            <input
+              type="text"
+              placeholder="Search by User ID"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+              className="border rounded-md p-2 ml-4"
+            />
+            {/* Button to clear the filter */}
+          </div>
+        </div>
 
         {/* Purchase Table */}
         <section>
@@ -239,7 +350,10 @@ const Purchase = () => {
                   User ID
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
-                  Merch ID
+                  Merch Type {/* Added this column for merch type */}
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Order Details
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Proof
@@ -253,13 +367,17 @@ const Purchase = () => {
               </tr>
             </thead>
             <tbody>
-              {purchases.map((purchase, index) => (
+              {filteredItems.map((purchase, index) => (
                 <tr key={purchase.id} className="hover:bg-gray-100">
                   <td className="border px-4 py-3 text-sm text-center">
                     {purchase.id}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     {purchase.userId}
+                  </td>
+                  <td className="border px-4 py-3 text-sm text-center">
+                    {getMerchType(purchase.merchId)}{" "}
+                    {/* Display the merch type */}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     <button
