@@ -45,31 +45,32 @@ export default function Reservation() {
         className="w-full h-56 bg-cover bg-no-repeat bg-center"
       ></section>
 
-      <section>
+      <section className="py-10 flex flex-col items-center justify-center">
         <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
           SSG Reservation Items
         </h1>
-
-        <div className="grid grid-cols-4 place-items-center px-20 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 px-20 mt-8">
           {items.length === 0 ? (
             <p>No items available for reservation.</p>
           ) : (
             items.map((item) => (
               <div
                 key={item.id}
-                className="text-black flex flex-col gap-2 bg-white py-12 rounded-xl items-center justify-center relative"
+                className="text-black flex flex-col gap-2 px-8 py-4 rounded-xl items-center justify-center relative"
                 style={{ zIndex: 0 }}
               >
                 {item.image ? (
-                  <Image
-                    src={item.image}
-                    height={200}
-                    width={200}
-                    alt={`Picture of ${item.type}`}
-                    style={{ zIndex: 1 }}
-                  />
+                  <div className="w-48 h-48 flex items-center justify-center overflow-hidden">
+                    <Image
+                      src={item.image}
+                      alt={`Picture of ${item.type}`}
+                      width={192} // Fixed width
+                      height={192} // Fixed height
+                      className="object-contain" // Maintains aspect ratio
+                    />
+                  </div>
                 ) : (
-                  <div className="bg-gray-200 h-48 w-48 flex items-center justify-center">
+                  <div className="w-48 h-48 bg-gray-200 flex items-center justify-center">
                     <p>No image available</p>
                   </div>
                 )}

@@ -73,7 +73,7 @@ export default function LostFoundPage() {
       ></section>
 
       {/* Notification Bell */}
-      <div className="absolute top-6 right-10">
+      <div className="absolute top-6 right-[18%] md:right-[10%] lg:right-[2%] ">
         <button onClick={handleNotificationClick} className="relative">
           <FaBell className="text-3xl text-primary" />
           {notifications.length > 0 && (
@@ -118,9 +118,12 @@ export default function LostFoundPage() {
 
       {/* Found Items Section */}
       <section className="mt-10 bg-slate-50 flex flex-col items-center justify-center py-10 gap-10 relative">
-        <div className="w-full flex flex-col items-center px-6 gap-4">
-          <h1 className="font-bold text-5xl text-center">Found Items</h1>
-          <div className="w-full flex justify-end px-40 absolute left-6 top-12">
+        <div className="w-full grid grid-cols-3 px-6 gap-4 place-items-center">
+          <h1 className="font-bold text-5xl text-center col-span-2 md:col-span-1 md:col-start-2">
+            Found Items
+          </h1>
+
+          <div className="justify-self-end col-start-3">
             <button
               onClick={() => setIsFoundFormClicked(true)}
               className="bg-primary text-white px-4 py-2 rounded-lg text-sm"
@@ -137,7 +140,7 @@ export default function LostFoundPage() {
           />
         )}
 
-        <div className="grid grid-cols-4 place-items-center gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 place-items-center gap-10">
           {foundItems.length > 0 ? (
             foundItems.map((item) => (
               <div
@@ -172,7 +175,7 @@ export default function LostFoundPage() {
         <div className="w-full flex justify-center px-6">
           <h1 className="font-bold text-5xl text-center">Lost Items</h1>
         </div>
-        <div className="grid grid-cols-4 place-items-center gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  place-items-center gap-10">
           {lostItems.length > 0 ? (
             lostItems.map((item) => (
               <div
@@ -203,7 +206,7 @@ export default function LostFoundPage() {
       </section>
 
       {/* Follow Us Section */}
-      <section className="flex items-center justify-between px-24 overflow-hidden py-10">
+      {/* <section className="flex items-center justify-between px-24 overflow-hidden py-10">
         <div className="text-black w-[450px] flex flex-col gap-7">
           <h1 className="font-medium text-4xl">Follow us</h1>
           <div className="flex flex-col">
@@ -229,7 +232,7 @@ export default function LostFoundPage() {
           </div>
         </div>
         <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
-      </section>
+      </section> */}
     </div>
   );
 }

@@ -127,6 +127,11 @@ export default function Purchase() {
     setTotalPrice(updatedTotal);
   };
 
+  const handleLogoutClick = async () => {
+    await signOut();
+    router.push("/signin");
+  };
+
   const handleConfirmEdit = async () => {
     if (!proofFile) {
       setError("Please upload a proof of payment.");
@@ -260,7 +265,15 @@ export default function Purchase() {
           className="w-full h-56 bg-cover bg-no-repeat bg-center"
         ></section>
       </header>
-      <div className="absolute top-6 right-10">
+      {session && (
+        <button
+          onClick={handleLogoutClick}
+          className="bg-black px-3 py-2 rounded-2xl text-sm text-white hidden lg:block absolute top-6 right-40"
+        >
+          Log out
+        </button>
+      )}
+      <div className="absolute top-6 right-[18%] md:right-[10%] lg:right-10">
         <button onClick={handleNotificationClick} className="relative">
           <FaBell className="text-3xl text-primary" />
           {notifications.length > 0 && (
@@ -306,35 +319,35 @@ export default function Purchase() {
         <h1 className="text-center text-4xl font-bold mt-12 tracking-wide">
           University Merchandise
         </h1>
-        <div className="flex justify-center gap-4 mt-4">
+        <div className="flex justify-center gap-4 mt-4 flex-wrap">
           {/* Filter Buttons */}
           <button
             onClick={() => setFilterType("T-shirt")}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            className="px-8 md:px-4 py-1 md:py-2 bg-blue-500 text-white rounded-lg"
           >
             T-shirt
           </button>
           <button
             onClick={() => setFilterType("Lanyards")}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg"
+            className="px-8 md:px-4 py-1 md:py-2 bg-green-500 text-white rounded-lg"
           >
             Lanyards
           </button>
           <button
             onClick={() => setFilterType("Pins")}
-            className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
+            className="px-8 md:px-4 py-1 md:py-2 bg-yellow-500 text-white rounded-lg"
           >
             Pins
           </button>
           <button
             onClick={() => setFilterType("Stickers")}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg"
+            className="px-8 md:px-4 py-1 md:py-2 bg-purple-500 text-white rounded-lg"
           >
             Stickers
           </button>
           <button
             onClick={() => setFilterType("")}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg"
+            className="px-8 md:px-4 py-1 md:py-2 bg-gray-500 text-white rounded-lg"
           >
             All
           </button>
@@ -343,7 +356,7 @@ export default function Purchase() {
         <div className="flex flex-wrap justify-center">
           <button
             onClick={handleToggleCart}
-            className="absolute top-4 right-24 bg-transparent p-2 rounded-full"
+            className="absolute top-4 right-[26%] md:right-[15%] lg:right-24 bg-transparent p-2 rounded-full"
           >
             <Image
               src="/imgs/cart-icon.png"
@@ -403,7 +416,7 @@ export default function Purchase() {
           )}
         </div>
 
-        <div className="grid grid-cols-4 place-items-center px-20 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 place-items-center px-20 mt-6">
           {loading ? (
             <p>Loading items...</p>
           ) : (
@@ -437,13 +450,13 @@ export default function Purchase() {
       {/* Modal for editing cart */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-[800px]">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-[800px] max-h-[90%] overflow-y-auto">
             {/* Modal Header */}
             <h2 className="text-lg font-bold text-center mb-4">
               Edit Cart & Payment
             </h2>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left: Cart Section */}
               <div className="border-r pr-4">
                 <h3 className="text-md font-semibold mb-3">Cart Items</h3>

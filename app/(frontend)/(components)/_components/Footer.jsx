@@ -12,11 +12,16 @@ export default function Footer() {
 
   return (
     <section>
-      <div className="w-full bg-[#171A1FFF] flex items-center justify-around gap-11 py-10 ">
-        <div className="text-white text-sm flex flex-col gap-16">
-          <div className="flex items-center justify-between">
-            <Image src="/imgs/isda.png" height={70} width={70} />
-            <h1 className="font-bold text-slate-500 text-4xl mt-3">
+      <div className="w-full bg-[#171A1FFF] flex flex-col-reverse md:flex-row items-center justify-around py-10 ">
+        <div className="text-white text-sm flex flex-col gap-4 md:gap-16">
+          <div className="flex items-center justify-center gap-4">
+            <Image
+              src="/imgs/isda.png"
+              height={70}
+              width={70}
+              className="w-1/6 md:w-1/3"
+            />
+            <h1 className="font-bold text-slate-500 text-3xl md:text-4xl mt-2">
               SSGConnect
             </h1>
           </div>
@@ -25,7 +30,7 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex flex-col text-end gap-7 text-sm">
-          <div className="flex justify-end gap-5">
+          <div className="flex justify-center md:justify-end gap-5">
             <button className="bg-transparent border border-primary text-primary px-4 py-2 rounded-full text-sm">
               Order Merchandise
             </button>
@@ -33,11 +38,11 @@ export default function Footer() {
               Reserve an item
             </button>
           </div>
-          <p className="text-slate-500">
+          <p className="text-slate-500 text-center md:text-right">
             Lorem ipsum dolor sit amet, <br /> consectetur adipiscing elit, set
             do eiusmod tempor incidunt
           </p>
-          <div className="flex items-center justify-end gap-5">
+          <div className="flex items-center justify-center md:justify-end gap-5">
             {sociallinks.map((links) => (
               <Image
                 src={links.image}

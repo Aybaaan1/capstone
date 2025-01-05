@@ -52,13 +52,13 @@ const AboutUs = () => {
 
   return (
     <div className="mt-10">
-      <section className="w-full h-screen mx-auto ">
+      <section className="w-full h-[75vh] md:h-screen mx-auto ">
         {/* {session.user.email} */}
         <div
           className="w-full h-1/2 bg-cover bg-center bg-no-repeat flex items-end justify-center "
           style={{ backgroundImage: "url('/imgs/aboutus_hero.png')" }}
         >
-          <div className="flex flex-col items-center w-1/3 p-6 shadow-md bg-white translate-y-60 rounded-lg">
+          <div className="flex flex-col items-center w-2/3 min-w-96 md:w-1/3 p-6 shadow-md bg-white translate-y-60 rounded-lg">
             <div>
               <h2 className="font-bold text-4xl text-center mb-3">About Us</h2>
               <p>
@@ -79,7 +79,7 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
-      <section className="relative w-full flex bg-slate-50 px-16 py-10 gap-10 ">
+      <section className="relative w-full flex flex-col md:flex-row px-10 lg:px-16 py-10 gap-10 ">
         <div className="text-center px-2 flex-1">
           <h1 className="font-bold text-4xl mb-8">SSG Achievements</h1>
           <p className="font-bold font-serif">
@@ -116,8 +116,8 @@ const AboutUs = () => {
           )}
         </div>
       </section>
-      <section className="w-full p-20 bg-white">
-        <div className="flex bg-black p-10 rounded-md overflow-hidden">
+      <section className="w-full p-10 md:p-20 bg-white">
+        <div className="flex bg-black p-6 md:p-10 rounded-md overflow-hidden">
           <div className="flex-1 flex flex-col">
             <h1 className="font-bold text-4xl text-slate-400 mb-10">
               Find our locations
@@ -132,7 +132,7 @@ const AboutUs = () => {
               </button>
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-center relative">
+          <div className="flex-1 hidden md:flex items-center justify-center relative">
             <Image
               src={"/imgs/cta-img.png"}
               width={500}
@@ -142,8 +142,8 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
-      <section className="flex items-center justify-between px-24 overflow-hidden py-10">
-        <div className="text-black w-[450px] flex flex-col gap-7">
+      <section className="bg-slate-50 flex flex-col gap-10 md:flex-row items-center px-5 justify-around overflow-hidden py-10">
+        <div className="flex-1 text-black p-10 flex flex-col gap-7">
           <h1 className="font-medium text-4xl">Follow us</h1>
           <div className="flex flex-col ">
             <p className="text-slate-600">
@@ -155,7 +155,7 @@ const AboutUs = () => {
               Don't miss out on any updates
             </p>
           </div>
-          <div className="flex pr-48 items-center justify-between">
+          <div className="flex pr-48 items-center gap-6">
             {sociallinks.map((links) => (
               <Image
                 src={links.image}
@@ -166,7 +166,12 @@ const AboutUs = () => {
             ))}
           </div>
         </div>
-        <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
+        <Image
+          src="/imgs/followus_group_pic.png"
+          height={450}
+          width={450}
+          className="flex-1"
+        />
       </section>
       {/* <SignInModal /> */}
     </div>

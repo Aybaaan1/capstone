@@ -64,7 +64,7 @@ export default function Tambayayong() {
         </div>
       </section>
       <section>
-        <div className="bg-yellow-200 w-1/2 mx-auto px-10 py-6 mt-12 mb-32 rounded-lg shadow-lg relative">
+        <div className="bg-yellow-200 w-4/5 md:w-1/2 mx-auto px-10 py-6 mt-12 flex flex-col mb-32 rounded-lg shadow-lg relative">
           <h1 className="text-center mb-2 font-bold">Qualifications:</h1>
           <h3>1. Bonifide student of CTU Argao.</h3>
           <h3>2. Currently enrolled this Academic Year.</h3>
@@ -77,7 +77,7 @@ export default function Tambayayong() {
           <h3>7. Qualification 7</h3>
           <h3>8. Qualification 8</h3>
           <button
-            className="bg-primary py-1 px-4 mt-2 rounded-lg absolute right-4 bottom-3 text-[12px] text-white"
+            className="bg-primary py-1 px-4 mt-6 self-end rounded-lg text-[12px] text-white"
             onClick={() => setIsFormOpen(true)}
           >
             Request now
@@ -89,7 +89,7 @@ export default function Tambayayong() {
       </section>
 
       {/* Notification Icon */}
-      <div className="absolute top-6 right-10">
+      <div className="absolute top-6 right-[18%] md:right-[10%] lg:right-[2%]">
         <button onClick={handleNotificationClick} className="relative">
           <FaBell className="text-3xl text-primary" />
           {notifications.length > 0 && (

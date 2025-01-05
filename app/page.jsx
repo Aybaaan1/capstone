@@ -69,9 +69,9 @@ export default function Home() {
 
   return (
     <div className=" w-full bg-white">
-      <section className="flex items-center justify-center border-b-2 border-gray-100 h-[513px] gap-20">
-        <div className="text-black flex flex-col gap-5 h-[300px]">
-          <h1 className="font-bold text-7xl">
+      <section className="flex flex-col md:flex-row px-10 md:px-0 items-start md:items-center justify-center border-b-2 border-gray-100 py-10 md:py-32 gap-10 md:gap-20 ">
+        <div className="text-black flex flex-col gap-5">
+          <h1 className="font-bold text-6xl lg:text-7xl">
             SSG <br /> Connect
           </h1>
           <p className="text-slate-600">
@@ -92,12 +92,13 @@ export default function Home() {
         </div>
         <Image
           src="/imgs/ssg-group-pic.png"
-          height={550}
+          height={500}
           width={550}
+          className="w-full md:w-1/2"
           alt="ssg group pic"
         />
       </section>
-      <section className="text-black flex flex-col items-center justify-center py-16 px-40 gap-10">
+      <section className="text-black flex flex-col items-center justify-center py-16 px-10 md:px-40 gap-10">
         <h1 className="font-bold text-4xl">About Us</h1>
         <p>
           The SSG Connect is a comprehensive digital platform meticulously
@@ -111,7 +112,7 @@ export default function Home() {
         <h1 className="font-bold text-4xl text-black">
           University Merchandise
         </h1>
-        <div className="flex items-center justify-between w-4/5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-4/5">
           {Merchandise.map((merchs) => (
             <div className="text-black flex flex-col gap-3 shadow-md py-9 px-5 rounded-xl">
               <Image
@@ -119,6 +120,7 @@ export default function Home() {
                 height={200}
                 width={200}
                 alt="Item picture"
+                className="w-full"
               />
               <p>{merchs.item}</p>
               <p>Price: P{merchs.price}</p>
@@ -134,7 +136,7 @@ export default function Home() {
           Explore more
         </button>
       </section>
-      <section className="relative w-full flex px-16 py-10 gap-10 ">
+      <section className="relative w-full flex flex-col md:flex-row px-10 lg:px-16 py-10 gap-10 ">
         <div className="text-center px-2 flex-1">
           <h1 className="font-bold text-4xl mb-8">SSG Achievements</h1>
           <p className="font-bold font-serif">
@@ -171,8 +173,8 @@ export default function Home() {
           )}
         </div>
       </section>
-      <section className="w-full p-20 bg-white">
-        <div className="flex bg-black p-10 rounded-md overflow-hidden">
+      <section className="w-full p-10 md:p-20 bg-white">
+        <div className="flex bg-black p-6 md:p-10 rounded-md overflow-hidden">
           <div className="flex-1 flex flex-col">
             <h1 className="font-bold text-4xl text-slate-400 mb-10">
               Find our locations
@@ -187,7 +189,7 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-center relative">
+          <div className="flex-1 hidden md:flex items-center justify-center relative">
             <Image
               src={"/imgs/cta-img.png"}
               width={500}
@@ -197,8 +199,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="bg-slate-50 flex items-center justify-between px-24 overflow-hidden py-10">
-        <div className="text-black w-[450px] flex flex-col gap-7">
+      <section className="bg-slate-50 flex flex-col gap-10 md:flex-row items-center px-5 justify-around  py-10">
+        <div className="flex-1 text-black p-10 flex flex-col gap-7">
           <h1 className="font-medium text-4xl">Follow us</h1>
           <div className="flex flex-col ">
             <p className="text-slate-600">
@@ -210,7 +212,7 @@ export default function Home() {
               Don't miss out on any updates
             </p>
           </div>
-          <div className="flex pr-48 items-center justify-between">
+          <div className="flex pr-48 items-center gap-6">
             {sociallinks.map((links) => (
               <Image
                 src={links.image}
@@ -221,7 +223,12 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <Image src="/imgs/followus_group_pic.png" height={450} width={450} />
+        <Image
+          src="/imgs/followus_group_pic.png"
+          height={450}
+          width={450}
+          className="flex-1"
+        />
       </section>
     </div>
   );

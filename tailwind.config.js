@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -14,6 +15,15 @@ module.exports = {
       },
       colors: {
         primary: "#6D31EDFF",
+      },
+      screens: {
+        xxs: "375px",
+        xs: "475px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        xxl: "1536px",
       },
     },
   },
