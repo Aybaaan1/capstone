@@ -55,27 +55,20 @@ export async function PUT(request) {
       return NextResponse.json({ error: "Missing item ID" }, { status: 400 });
     }
     const body = await request.json();
-    const { quantity } = body; // Get the quantity from the request body
+    const { name, price, stocks, type, image } = body;
 
-    // Fetch the merchandise item to check the current stock and sales
-    const merch = await db.merch.findUnique({
-      where: { id: parseInt(itemId) },
-    });
-
-    if (!merch) {
+    // Validate the required fields
+    if (!name || !price || !stocks || !type || !image) {
       return NextResponse.json(
-        { error: "Merchandise item not found" },
-        { status: 404 }
+        { error: "Missing required fields" },
+        { status: 400 }
       );
     }
 
-    // Update the sales and stock
+    // Update the merch item
     const updatedItem = await db.merch.update({
       where: { id: parseInt(itemId) },
-      data: {
-        sales: (merch.sales || 0) + quantity, // Increment sales by the order quantity
-        stocks: merch.stocks - quantity, // Deduct stock by the order quantity
-      },
+      data: { name, price, stocks, type, image },
     });
 
     return NextResponse.json(updatedItem, { status: 200 });
