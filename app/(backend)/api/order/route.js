@@ -21,6 +21,7 @@ export async function POST(request) {
     }
 
     const createdOrders = [];
+    const updatedStocks = [];
 
     // Begin a transaction for consistency
     const transaction = await db.$transaction(async (prisma) => {
@@ -57,6 +58,14 @@ export async function POST(request) {
           );
         }
 
+        // Deduct stocks
+        const updatedMerch = await prisma.merch.update({
+          where: { id: merchId },
+          data: {
+            stocks: merch.stocks - quantity,
+          },
+        });
+
         // Create order
         const order = await prisma.order.create({
           data: {
@@ -65,20 +74,22 @@ export async function POST(request) {
             size,
             userId,
             proof,
-            status, // status will be "pending" when the order is created
+            status,
           },
         });
 
         createdOrders.push(order);
+        updatedStocks.push({ merchId, remainingStock: updatedMerch.stocks });
       }
 
-      return { createdOrders };
+      return { createdOrders, updatedStocks };
     });
 
     return NextResponse.json(
       {
         message: "Orders created successfully.",
         orders: transaction.createdOrders,
+        stockUpdates: transaction.updatedStocks,
       },
       { status: 200 }
     );
