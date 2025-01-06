@@ -110,19 +110,17 @@ const Purchase = () => {
   // Accept the order (updating the status to "accepted")
   const acceptOrder = async (index, id) => {
     try {
-      // Step 1: Update the order status to 'accepted'
       const response = await fetch(`/api/order/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: "accepted" }), // Set status to 'accepted'
+        body: JSON.stringify({ status: "accepted" }),
       });
 
       if (response.ok) {
-        // Step 2: If the order status is successfully updated, deduct stock only if status is accepted
         const acceptedOrder = purchases[index];
-        const updatedMerch = await fetch("/api/order", {
+        await fetch("/api/order", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -130,15 +128,10 @@ const Purchase = () => {
           body: JSON.stringify(acceptedOrder),
         });
 
-        if (updatedMerch.ok) {
-          // Step 3: If stock update is successful, remove the order from the list
-          const updatedPurchases = purchases.filter((_, i) => i !== index);
-          setPurchases(updatedPurchases);
-          setAcceptanceSuccess(true);
-          setTimeout(() => setAcceptanceSuccess(false), 3000);
-        } else {
-          throw new Error("Failed to update stock.");
-        }
+        const updatedPurchases = purchases.filter((_, i) => i !== index);
+        setPurchases(updatedPurchases);
+        setAcceptanceSuccess(true);
+        setTimeout(() => setAcceptanceSuccess(false), 3000);
       } else {
         throw new Error("Failed to accept order.");
       }

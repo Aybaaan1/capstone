@@ -33,6 +33,7 @@ model Merch {
   stocks Int
   type   String
   size   String?
+  sales  Int?
   orders Order[]
 }
 
