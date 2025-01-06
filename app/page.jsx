@@ -18,13 +18,13 @@ export default function Home() {
     {
       title: "PROJECT PANULAT 3.0:",
       description:
-        "TESTING TESTING TESSTING orchestrated an inspiring symphony of education with Project Panulat 2.0. The joy radiating from the genuine smiles of children in three schools echoes the success of our mission. In the heart of this activity lies a transformative experience for both givers and receivers. The genuine smiles on every child's face illuminate the profound impact of this initiative. It's not just about handing out pens and papers; it's about instilling a love for learning, igniting curiosity, and creating a positive atmosphere where education becomes an enchanting journey.",
-      image: "/imgs/ssgachievement_1.png",
+        "The Supreme Student Government brought education to life with Project Panulat 3.0, creating an inspiring harmony of learning. The heartfelt smiles of children across three schools are a testament to the success of this initiative. At its core, this activity offered a transformative experience for both the participants and the beneficiaries. These genuine smiles reflect the profound impact of the project, which goes beyond simply distributing pens and paper. It’s about fostering a love for learning, sparking curiosity, and cultivating a positive environment where education becomes a magical journey..",
+      image: "/imgs/ssgachievements.jfif",
     },
     {
-      title: "PROJECT PANULAT 123.0:",
+      title: "PROJECT PANULAT 4.0:",
       description:
-        "BILAT SA BAKAAAAA orchestrated an inspiring symphony of education with Project Panulat 2.0. The joy radiating from the genuine smiles of children in three schools echoes the success of our mission. In the heart of this activity lies a transformative experience for both givers and receivers. The genuine smiles on every child's face illuminate the profound impact of this initiative. It's not just about handing out pens and papers; it's about instilling a love for learning, igniting curiosity, and creating a positive atmosphere where education becomes an enchanting journey.",
+        "The Supreme Student Government orchestrated an inspiring symphony of education with Project Panulat 2.0. The joy radiating from the genuine smiles of children in three schools echoes the success of our mission. In the heart of this activity lies a transformative experience for both givers and receivers. The genuine smiles on every child's face illuminate the profound impact of this initiative. It's not just about handing out pens and papers; it's about instilling a love for learning, igniting curiosity, and creating a positive atmosphere where education becomes an enchanting journey.",
       image: "/imgs/ssgachievement_1.png",
     },
   ];
@@ -98,14 +98,20 @@ export default function Home() {
           alt="ssg group pic"
         />
       </section>
-      <section className="text-black flex flex-col items-center justify-center py-16 px-10 md:px-40 gap-10">
+      <section className="text-black flex flex-col items-center justify-center py-16 px-15 md:px-40 gap-10">
         <h1 className="font-bold text-4xl">About Us</h1>
         <p>
           The SSG Connect is a comprehensive digital platform meticulously
           designed to streamline student services and enhance engagement within
           CTU Argao (CTU-AC). Through its innovative features and user-friendly
           interface, this system aims to empower students by providing
-          convenient access to essential resources and support systems
+          convenient access to essential resources and support systems. Beyond
+          simplifying administrative tasks, it fosters a sense of community by
+          enabling seamless communication, promoting transparency, and
+          encouraging active participation in university activities. By
+          integrating tools for academic assistance, event coordination, and
+          feedback mechanisms, SSG Connect transforms the student experience,
+          making it more dynamic, efficient, and inclusive.
         </p>
       </section>
       <section className=" text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10  ">

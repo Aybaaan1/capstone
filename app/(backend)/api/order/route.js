@@ -20,45 +20,77 @@ export async function POST(request) {
       );
     }
 
-    // Create orders for each item in cartItems
     const createdOrders = [];
-    for (const item of cartItems) {
-      const { merchId, quantity, size } = item;
 
-      // Validate each item's fields
-      if (!merchId || !quantity || size === null) {
-        return NextResponse.json(
-          { error: "Each cart item must have merchId, quantity, and size." },
-          { status: 400 }
-        );
+    // Begin a transaction for consistency
+    const transaction = await db.$transaction(async (prisma) => {
+      for (const item of cartItems) {
+        const { merchId, quantity, size } = item;
+
+        // Validate each item's fields
+        if (!merchId || !quantity || size === null) {
+          throw new Error(
+            "Each cart item must have merchId, quantity, and size."
+          );
+        }
+
+        // Fetch merchandise to check stock availability
+        const merch = await prisma.merch.findUnique({
+          where: { id: merchId },
+        });
+
+        if (!merch) {
+          throw new Error(`Merch item with ID ${merchId} not found.`);
+        }
+
+        // Check if stock is 0
+        if (merch.stocks === 0) {
+          throw new Error(
+            `The item "${merch.name}" is out of stock and cannot be ordered.`
+          );
+        }
+
+        // Check if there is sufficient stock
+        if (merch.stocks < quantity) {
+          throw new Error(
+            `Insufficient stock for item "${merch.name}". Available: ${merch.stocks}, Requested: ${quantity}.`
+          );
+        }
+
+        // Create order
+        const order = await prisma.order.create({
+          data: {
+            merchId,
+            quantity,
+            size,
+            userId,
+            proof,
+            status, // status will be "pending" when the order is created
+          },
+        });
+
+        createdOrders.push(order);
       }
 
-      const order = await db.order.create({
-        data: {
-          merchId,
-          quantity,
-          size,
-          userId,
-          proof,
-          status,
-        },
-      });
-
-      createdOrders.push(order);
-    }
+      return { createdOrders };
+    });
 
     return NextResponse.json(
-      { message: "Orders created successfully.", createdOrders },
+      {
+        message: "Orders created successfully.",
+        orders: transaction.createdOrders,
+      },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error processing order:", error);
+    console.error("Error processing order:", error.message);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }
 }
+
 export async function GET(request) {
   try {
     const orders = await db.order.findMany({
