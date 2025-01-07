@@ -50,77 +50,81 @@ const Registration = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center ">
-      {" "}
-      {/* Outer div, use bg-transparent to see the background */}
-      <h1 className="text-2xl font-bold mb-6 text-center">Registration</h1>
-      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-      {success && <p className="text-green-500 text-center mb-4">{success}</p>}
+    <div className="container">
+      <h1 className="text-3xl font-semibold mb-8 text-center">
+        Student Registration
+      </h1>
+      {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+      {success && <p className="text-green-600 text-center mb-4">{success}</p>}
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 w-full max-w-3xl bg-white p-8 rounded-lg shadow-md border border-gray-300"
+        className="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg border border-gray-200"
       >
-        {" "}
-        {/* Form has white background */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">
-              Email:
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        <div className="space-y-6">
+          <div className="flex justify-between">
+            <div className="w-full mr-3">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Email:
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+              />
+            </div>
+            <div className="w-full ml-3">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Student ID Number:
+              </label>
+              <input
+                type="text"
+                name="idnumber"
+                value={formData.idnumber}
+                onChange={handleChange}
+                placeholder="Enter your student ID"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">
-              Student ID Number:
-            </label>
-            <input
-              type="text"
-              name="idnumber"
-              value={formData.idnumber}
-              onChange={handleChange}
-              placeholder="Enter your student ID number"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+
+          <div className="flex justify-between">
+            <div className="w-full mr-3">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Firstname:
+              </label>
+              <input
+                type="text"
+                name="firstname"
+                value={formData.firstname}
+                onChange={handleChange}
+                placeholder="Enter your first name"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+              />
+            </div>
+            <div className="w-full ml-3">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Lastname:
+              </label>
+              <input
+                type="text"
+                name="lastname"
+                value={formData.lastname}
+                onChange={handleChange}
+                placeholder="Enter your last name"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">
-              Firstname:
-            </label>
-            <input
-              type="text"
-              name="firstname"
-              value={formData.firstname}
-              onChange={handleChange}
-              placeholder="Enter your first name"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">
-              Lastname:
-            </label>
-            <input
-              type="text"
-              name="lastname"
-              value={formData.lastname}
-              onChange={handleChange}
-              placeholder="Enter your last name"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-gray-700 font-semibold mb-1">
+
+          <div className="w-full">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
               Program:
             </label>
             <select
@@ -128,9 +132,9 @@ const Registration = () => {
               value={formData.program}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
             >
-              <option value="">Select a program</option>
+              <option value="">Select your program</option>
               <option value="BEED">BEED</option>
               <option value="BTLED">BTLED</option>
               <option value="BSED-MATH">BSED-MATH</option>
@@ -147,41 +151,47 @@ const Registration = () => {
               <option value="BSTM">BSTM</option>
             </select>
           </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">
-              Password:
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-semibold mb-1">
-              Confirm Password:
-            </label>
-            <input
-              type="password"
-              name="confirm_password"
-              value={formData.confirm_password}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+
+          <div className="flex justify-between">
+            <div className="w-full mr-3">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Password:
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+              />
+            </div>
+            <div className="w-full ml-3">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Confirm Password:
+              </label>
+              <input
+                type="password"
+                name="confirm_password"
+                value={formData.confirm_password}
+                onChange={handleChange}
+                placeholder="Confirm your password"
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+              />
+            </div>
           </div>
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Sign Up
-        </button>
+
+        <div className="mt-6">
+          <button
+            type="submit"
+            className="w-full bg-[rgb(255,211,70)] text-gray-900 py-2 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-[rgb(255,211,70)]"
+          >
+            Register
+          </button>
+        </div>
       </form>
     </div>
   );
