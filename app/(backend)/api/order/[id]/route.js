@@ -3,67 +3,64 @@ import db from "@/lib/db";
 
 export async function PUT(request, { params }) {
   const { id } = params;
-  const { status } = await request.json();
+  const { status, proof } = await request.json();
 
-  if (status !== "accepted") {
+  console.log("Order ID:", id); // Debugging log
+
+  try {
+    // Fetch the order
+    const order = await db.order.findUnique({ where: { id: Number(id) } });
+    if (!order) {
+      return NextResponse.json({ error: "Order not found." }, { status: 404 });
+    }
+
+    console.log("Order:", order); // Debugging log
+
+    // Check if order status is being set to 'accepted'
+    if (status === "accepted") {
+      const merch = await db.merch.findUnique({
+        where: { id: order.merchId },
+      });
+
+      if (!merch) {
+        return NextResponse.json(
+          { error: "Merchandise not found." },
+          { status: 404 }
+        );
+      }
+      if (merch.stocks < order.quantity) {
+        return NextResponse.json(
+          { error: "Insufficient stock." },
+          { status: 400 }
+        );
+      }
+
+      console.log("Merch:", merch); // Debugging log
+
+      // Deduct stock
+      await db.merch.update({
+        where: { id: order.merchId },
+        data: {
+          stocks: merch.stocks - order.quantity,
+        },
+      });
+    }
+
+    // Update the order's status and proof
+    const updatedOrder = await db.order.update({
+      where: { id: Number(id) },
+      data: { status, proof },
+    });
+
+    return NextResponse.json(updatedOrder);
+  } catch (error) {
+    console.error("Error in updating order:", error);
     return NextResponse.json(
-      { error: "Order can only be accepted to deduct stock." },
-      { status: 400 }
+      { error: "An error occurred while processing the request." },
+      { status: 500 }
     );
   }
-
-  // Update order status to "accepted"
-  const updatedOrder = await db.order.update({
-    where: { id: Number(id) },
-    data: { status },
-  });
-
-  // Deduct stock only when the order is accepted
-  if (status === "accepted") {
-    const orderItems = await db.order.findMany({
-      where: { id: Number(id) },
-      include: {
-        merch: true, // Include merchandise details to update stock
-      },
-    });
-
-    const transaction = await db.$transaction(async (prisma) => {
-      for (const orderItem of orderItems) {
-        const merchId = orderItem.merchId;
-        const quantity = orderItem.quantity;
-
-        const merch = await prisma.merch.findUnique({
-          where: { id: merchId },
-        });
-
-        if (!merch) {
-          throw new Error(`Merchandise not found for order ID ${id}.`);
-        }
-
-        // Check if there is enough stock
-        if (merch.stocks < quantity) {
-          throw new Error(`Not enough stock for item: ${merch.name}.`);
-        }
-
-        // Deduct stock
-        await prisma.merch.update({
-          where: { id: merchId },
-          data: {
-            stocks: merch.stocks - quantity,
-          },
-        });
-      }
-    });
-
-    return NextResponse.json(updatedOrder, { status: 200 });
-  }
-
-  return NextResponse.json(
-    { error: "Failed to accept order." },
-    { status: 500 }
-  );
 }
-
 export async function DELETE(request, { params }) {
   const { id } = params;
 

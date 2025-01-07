@@ -5,8 +5,8 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  LineElement, // Add this import for line rendering
-  PointElement, // Add this import for point rendering
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend,
@@ -15,8 +15,8 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  LineElement, // Register the Line element
-  PointElement, // Register the Point element
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend
@@ -43,7 +43,6 @@ const SalesPage = () => {
     fetchSalesData();
   }, []);
 
-  // Check that salesData is an array and has data before using .map()
   const labels = salesData.length > 0 ? salesData.map((item) => item.name) : [];
   const sales = salesData.length > 0 ? salesData.map((item) => item.sales) : [];
   const stocks =
@@ -79,40 +78,84 @@ const SalesPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Sales Report</h1>
+    <div className="flex h-screen bg-gray-50">
+      <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
+        <div className="logo mb-10">
+          <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
+        </div>
+        <ul className="space-y-4">
+          <li>
+            <a
+              href="/admin"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Users
+            </a>
+          </li>
+          <li>
+            <button
+              onClick={() => {}}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Purchase
+            </button>
+          </li>
+          <li>
+            <a
+              href="/admin/lostfound"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Lost & Found
+            </a>
+          </li>
+          <li>
+            <a
+              href="/admin/sales"
+              className="block py-2 px-4 rounded-md bg-gray-900 text-white"
+            >
+              Sales
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-      <div className="chart-container">
-        {salesData.length > 0 ? (
-          <Line data={chartData} />
-        ) : (
-          <p>Loading sales data...</p>
-        )}
-      </div>
+      <main className="flex-1 p-10 bg-white">
+        <header className="flex justify-between mb-8">
+          <h2 className="text-3xl font-semibold text-black">Sales Report</h2>
+        </header>
 
-      <div className="mt-8">
-        <h2 className="text-xl">Sales and Income Details</h2>
-        <table className="table-auto w-full mt-4">
-          <thead>
-            <tr>
-              <th className="px-4 py-2">Item</th>
-              <th className="px-4 py-2">Sales Quantity</th>
-              <th className="px-4 py-2">Stock Quantity</th>
-              <th className="px-4 py-2">Income</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salesData.map((item) => (
-              <tr key={item.id}>
-                <td className="px-4 py-2">{item.name}</td>
-                <td className="px-4 py-2">{item.sales}</td>
-                <td className="px-4 py-2">{item.stocks}</td>
-                <td className="px-4 py-2">${item.income}</td>
+        <div className="chart-container">
+          {salesData.length > 0 ? (
+            <Line data={chartData} />
+          ) : (
+            <p>Loading sales data...</p>
+          )}
+        </div>
+
+        <div className="mt-8">
+          <h2 className="text-xl">Sales and Income Details</h2>
+          <table className="table-auto w-full mt-4">
+            <thead>
+              <tr>
+                <th className="px-4 py-2">Item</th>
+                <th className="px-4 py-2">Sales Quantity</th>
+                <th className="px-4 py-2">Stock Quantity</th>
+                <th className="px-4 py-2">Income</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {salesData.map((item) => (
+                <tr key={item.id}>
+                  <td className="px-4 py-2">{item.name}</td>
+                  <td className="px-4 py-2">{item.sales}</td>
+                  <td className="px-4 py-2">{item.stocks}</td>
+                  <td className="px-4 py-2">${item.income}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
   );
 };
