@@ -158,6 +158,14 @@ const ReserveItemDashboard = () => {
                     Orders List
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="/admin/sales"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Sales Report
+                  </a>
+                </li>
               </ul>
             )}
           </li>

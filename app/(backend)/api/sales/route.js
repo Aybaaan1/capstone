@@ -3,7 +3,7 @@ import db from "@/lib/db";
 
 export async function GET() {
   try {
-    // Fetch the merchandise items, including the sales field
+    // Fetch the merchandise items, including sales field
     const merchData = await db.merch.findMany({
       where: { type: { in: ["T-shirt", "Lanyards", "Pins", "Stickers"] } },
       select: {
@@ -16,25 +16,37 @@ export async function GET() {
       },
     });
 
+    // Calculate sales data and total income
     const salesData = merchData.map((item) => ({
       name: item.name,
       type: item.type,
       price: item.price,
       stocks: item.stocks,
-      sales: item.sales,
-      income: item.price * item.sales, // Calculate total income based on sales
+      sales: item.sales || 0,
+      income: item.sales ? item.price * item.sales : 0, // Calculate total income based on sales
     }));
 
-    return new Response(JSON.stringify(salesData), {
+    // Calculate total sales and total income
+    const totalIncome = salesData.reduce((sum, item) => sum + item.income, 0);
+    const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
+
+    const report = {
+      items: salesData,
+      totalIncome,
+      totalSales,
+    };
+
+    return new Response(JSON.stringify(report), {
       status: 200,
     });
   } catch (error) {
-    console.error("Error fetching sales data:", error); // Log error
+    console.error("Error fetching sales data:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
     });
   }
 }
+
 export async function POST(request) {
   try {
     const { saleStatus, itemId, quantity, ...orderDetails } =

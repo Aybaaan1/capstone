@@ -3,64 +3,71 @@ import db from "@/lib/db";
 
 export async function PUT(request, { params }) {
   const { id } = params;
-  const { status, proof } = await request.json();
+  const { status } = await request.json();
 
-  console.log("Order ID:", id); // Debugging log
+  if (status !== "accepted") {
+    return NextResponse.json(
+      { error: "Order can only be accepted to deduct stock." },
+      { status: 400 }
+    );
+  }
 
   try {
-    // Fetch the order
-    const order = await db.order.findUnique({ where: { id: Number(id) } });
-    if (!order) {
-      return NextResponse.json({ error: "Order not found." }, { status: 404 });
-    }
+    // Update order status to "accepted"
+    const updatedOrder = await db.order.update({
+      where: { id: Number(id) },
+      data: { status },
+    });
 
-    console.log("Order:", order); // Debugging log
-
-    // Check if order status is being set to 'accepted'
+    // Deduct stock and update sales
     if (status === "accepted") {
+      const order = await db.order.findUnique({
+        where: { id: Number(id) },
+        include: {
+          merch: true, // Include merchandise details
+        },
+      });
+
+      if (!order) {
+        throw new Error(`Order not found for ID ${id}.`);
+      }
+
+      const merchId = order.merchId;
+      const quantity = order.quantity;
+
       const merch = await db.merch.findUnique({
-        where: { id: order.merchId },
+        where: { id: merchId },
       });
 
       if (!merch) {
-        return NextResponse.json(
-          { error: "Merchandise not found." },
-          { status: 404 }
-        );
-      }
-      if (merch.stocks < order.quantity) {
-        return NextResponse.json(
-          { error: "Insufficient stock." },
-          { status: 400 }
-        );
+        throw new Error(`Merchandise not found for ID ${merchId}.`);
       }
 
-      console.log("Merch:", merch); // Debugging log
+      // Check if there is enough stock
+      if (merch.stocks < quantity) {
+        throw new Error(`Not enough stock for item: ${merch.name}.`);
+      }
 
-      // Deduct stock
+      // Update stock and sales
       await db.merch.update({
-        where: { id: order.merchId },
+        where: { id: merchId },
         data: {
-          stocks: merch.stocks - order.quantity,
+          stocks: merch.stocks - quantity,
+          sales: (merch.sales || 0) + quantity, // Increment sales by the order quantity
         },
       });
     }
 
-    // Update the order's status and proof
-    const updatedOrder = await db.order.update({
-      where: { id: Number(id) },
-      data: { status, proof },
-    });
-
-    return NextResponse.json(updatedOrder);
+    return NextResponse.json(updatedOrder, { status: 200 });
   } catch (error) {
-    console.error("Error in updating order:", error);
+    console.error("Error accepting order:", error);
     return NextResponse.json(
-      { error: "An error occurred while processing the request." },
+      { error: error.message || "Failed to accept order." },
       { status: 500 }
     );
   }
 }
+
 export async function DELETE(request, { params }) {
   const { id } = params;
 

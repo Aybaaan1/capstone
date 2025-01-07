@@ -115,6 +115,14 @@ const ItemReservationPage = () => {
                     Orders List
                   </a>
                 </li>
+                <li>
+                  <a
+                    href="/admin/sales"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Sales Report
+                  </a>
+                </li>
               </ul>
             )}
           </li>
@@ -147,7 +155,7 @@ const ItemReservationPage = () => {
               href="/admin/item"
               className="block py-2 px-4 rounded-md bg-gray-900 text-white"
             >
-              Item Reservation Form
+              Return Items
             </a>
           </li>
         </ul>

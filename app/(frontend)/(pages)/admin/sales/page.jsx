@@ -24,14 +24,21 @@ ChartJS.register(
 
 const SalesPage = () => {
   const [salesData, setSalesData] = useState([]);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const [isReservationOpen, setIsReservationOpen] = useState(false);
 
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
         const response = await fetch("/api/sales");
         const data = await response.json();
-        if (Array.isArray(data)) {
-          setSalesData(data);
+
+        if (data?.items) {
+          setSalesData(data.items);
+          setTotalIncome(data.totalIncome || 0);
+          setTotalSales(data.totalSales || 0);
         } else {
           console.error("Invalid data format received:", data);
         }
@@ -43,12 +50,10 @@ const SalesPage = () => {
     fetchSalesData();
   }, []);
 
-  const labels = salesData.length > 0 ? salesData.map((item) => item.name) : [];
-  const sales = salesData.length > 0 ? salesData.map((item) => item.sales) : [];
-  const stocks =
-    salesData.length > 0 ? salesData.map((item) => item.stocks) : [];
-  const income =
-    salesData.length > 0 ? salesData.map((item) => item.income) : [];
+  const labels = salesData.map((item) => item.name);
+  const sales = salesData.map((item) => item.sales);
+  const stocks = salesData.map((item) => item.stocks);
+  const income = salesData.map((item) => item.income);
 
   const chartData = {
     labels,
@@ -79,7 +84,7 @@ const SalesPage = () => {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
+      <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6 ">
         <div className="logo mb-10">
           <h1 className="text-3xl font-bold tracking-wide">SSG CONNECT</h1>
         </div>
@@ -94,11 +99,47 @@ const SalesPage = () => {
           </li>
           <li>
             <button
-              onClick={() => {}}
-              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+              onClick={() => setIsPurchaseOpen(!isPurchaseOpen)} // Toggle the dropdown
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
               Purchase
             </button>
+            {isPurchaseOpen && ( // Show the dropdown if "isPurchaseOpen" is true
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/purchase"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Merchs List
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/orderrequests"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Order Requests
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/orderslist"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Orders List
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/sales"
+                    className="block py-2 px-4 rounded-md bg-gray-900 text-white"
+                  >
+                    Sales Report
+                  </a>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <a
@@ -109,11 +150,48 @@ const SalesPage = () => {
             </a>
           </li>
           <li>
-            <a
-              href="/admin/sales"
-              className="block py-2 px-4 rounded-md bg-gray-900 text-white"
+            {/* Reservation Dropdown */}
+            <button
+              onClick={() => setIsReservationOpen(!isReservationOpen)}
+              className="block w-full text-left py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white focus:outline-none"
             >
-              Sales
+              Reservation
+            </button>
+            {isReservationOpen && (
+              <ul className="ml-4 space-y-2">
+                <li>
+                  <a
+                    href="/admin/reserveitem"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Available Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/reserve"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Borrow Items
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/admin/item"
+                    className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+                  >
+                    Item Reservation Form
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+          <li>
+            <a
+              href="/admin/tambayayong"
+              className="block py-2 px-4 rounded-md hover:bg-gray-700 hover:text-white"
+            >
+              Tambayayong
             </a>
           </li>
         </ul>
@@ -124,6 +202,20 @@ const SalesPage = () => {
           <h2 className="text-3xl font-semibold text-black">Sales Report</h2>
         </header>
 
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold">Summary</h3>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="p-4 bg-blue-100 rounded-lg shadow">
+              <h4 className="text-lg font-medium">Total Income</h4>
+              <p className="text-2xl font-bold">₱{totalIncome.toFixed(2)}</p>
+            </div>
+            <div className="p-4 bg-green-100 rounded-lg shadow">
+              <h4 className="text-lg font-medium">Total Sales</h4>
+              <p className="text-2xl font-bold">{totalSales}</p>
+            </div>
+          </div>
+        </div>
+
         <div className="chart-container">
           {salesData.length > 0 ? (
             <Line data={chartData} />
@@ -133,7 +225,7 @@ const SalesPage = () => {
         </div>
 
         <div className="mt-8">
-          <h2 className="text-xl">Sales and Income Details</h2>
+          <h2 className="text-xl font-semibold">Sales and Income Details</h2>
           <table className="table-auto w-full mt-4">
             <thead>
               <tr>
@@ -149,7 +241,7 @@ const SalesPage = () => {
                   <td className="px-4 py-2">{item.name}</td>
                   <td className="px-4 py-2">{item.sales}</td>
                   <td className="px-4 py-2">{item.stocks}</td>
-                  <td className="px-4 py-2">${item.income}</td>
+                  <td className="px-4 py-2">₱{item.income.toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>
