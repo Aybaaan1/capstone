@@ -82,6 +82,27 @@ const SalesPage = () => {
     ],
   };
 
+  // Function to generate CSV file
+  const generateCSV = () => {
+    let csvContent = "Item, Sales Quantity, Stock Quantity, Income\n";
+    salesData.forEach((item) => {
+      csvContent += `${item.name}, ${item.sales}, ${
+        item.stocks
+      }, ${item.income.toFixed(2)}\n`;
+    });
+
+    // Adding total income and total sales at the end
+    csvContent += `\nTotal Sales, ${totalSales}\n`;
+    csvContent += `Total Income, ${totalIncome.toFixed(2)}\n`;
+
+    // Create a downloadable link and trigger a click event
+    const link = document.createElement("a");
+    link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+    link.target = "_blank";
+    link.download = "sales_report.csv";
+    link.click();
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6 ">
@@ -200,6 +221,12 @@ const SalesPage = () => {
       <main className="flex-1 p-10 bg-white">
         <header className="flex justify-between mb-8">
           <h2 className="text-3xl font-semibold text-black">Sales Report</h2>
+          <button
+            onClick={generateCSV}
+            className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600"
+          >
+            Download Sales Report
+          </button>
         </header>
 
         <div className="mb-8">

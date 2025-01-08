@@ -269,7 +269,7 @@ const Dashboard = () => {
 
           <input
             type="text"
-            placeholder="Search by UserId"
+            placeholder="Search by Id Number"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="border rounded-md p-2 ml-4"

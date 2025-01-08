@@ -7,7 +7,7 @@ const Dashboard = () => {
   const [assistances, setAssistances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
+  const [searchId, setSearchId] = useState("");
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState("");
@@ -108,7 +108,11 @@ const Dashboard = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+  const assistance = assistances.filter((item) => {
+    const matchesSearch = item.userId.toString().includes(searchId);
 
+    return matchesSearch;
+  });
   return (
     <div className="flex h-screen bg-gray-50">
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
@@ -229,7 +233,13 @@ const Dashboard = () => {
         <h2 className="text-3xl font-semibold text-black mb-8">
           Assistance Dashboard
         </h2>
-
+        <input
+          type="text"
+          placeholder="Search by User ID" // Updated placeholder
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+          className="border rounded-md mb-3 p-2 ml-4"
+        />
         {/* Assistance Table */}
         <section>
           <table className="min-w-full bg-white rounded-lg shadow-md">
@@ -265,7 +275,7 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {assistances.map((assistance) => (
+              {assistance.map((assistance) => (
                 <tr
                   key={assistance.id}
                   className="bg-white border-b hover:bg-gray-50"

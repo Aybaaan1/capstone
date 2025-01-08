@@ -7,6 +7,7 @@ const ReturnedItems = () => {
   const [error, setError] = useState("");
   const [isReservationOpen, setIsReservationOpen] = useState(false);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const [searchId, setSearchId] = useState("");
 
   useEffect(() => {
     const fetchReturnedItems = async () => {
@@ -79,7 +80,11 @@ const ReturnedItems = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+  const returnedItem = returnedItems.filter((item) => {
+    const matchesSearch = item.userId.toString().includes(searchId);
 
+    return matchesSearch;
+  });
   return (
     <div className="flex h-screen bg-gray-50">
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
@@ -196,6 +201,13 @@ const ReturnedItems = () => {
       </nav>
       <main className="flex-1 bg-white p-10">
         <h2 className="text-3xl font-semibold text-black mb-8">Return Items</h2>
+        <input
+          type="text"
+          placeholder="Search by User ID" // Updated placeholder
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+          className="border rounded-md mb-3 p-2 ml-4"
+        />
         <table className="min-w-full bg-white rounded-lg shadow-md">
           <thead className="bg-[rgb(255,211,70)] text-black">
             <tr>
@@ -220,7 +232,7 @@ const ReturnedItems = () => {
             </tr>
           </thead>
           <tbody>
-            {returnedItems.map((item) => (
+            {returnedItem.map((item) => (
               <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                 <td className="border px-4 py-3 text-sm text-gray-800">
                   {item.id}

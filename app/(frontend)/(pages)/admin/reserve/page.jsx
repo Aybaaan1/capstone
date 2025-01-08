@@ -7,6 +7,7 @@ const ReservationDashboard = () => {
   const [error, setError] = useState("");
   const [isReservationOpen, setIsReservationOpen] = useState(false);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const [searchId, setSearchId] = useState("");
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -61,7 +62,11 @@ const ReservationDashboard = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+  const reservation = reservations.filter((item) => {
+    const matchesSearch = item.userId.toString().includes(searchId);
 
+    return matchesSearch;
+  });
   return (
     <div className="flex h-screen bg-gray-50">
       <nav className="w-64 bg-[rgb(255,211,70)] text-black p-6">
@@ -181,7 +186,13 @@ const ReservationDashboard = () => {
         <h2 className="text-3xl font-semibold text-black mb-8">
           Borrow Items Request
         </h2>
-
+        <input
+          type="text"
+          placeholder="Search by User ID" // Updated placeholder
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+          className="border rounded-md mb-3 p-2 ml-4"
+        />
         <section>
           <table className="min-w-full bg-white rounded-lg shadow-md">
             <thead className="bg-[rgb(255,211,70)] text-black">
@@ -215,7 +226,7 @@ const ReservationDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {reservations.map((reservation) => (
+              {reservation.map((reservation) => (
                 <tr
                   key={reservation.id}
                   className="bg-white border-b hover:bg-gray-50"
