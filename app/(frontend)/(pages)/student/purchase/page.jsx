@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { uploadImage } from "@/lib/imageUpload";
 import { FaBell } from "react-icons/fa";
+
 // Fetch merchandise items from the API
 const fetchMerchItems = async () => {
   try {
@@ -49,7 +50,7 @@ export default function Purchase() {
   const [size, setSize] = useState("");
   const [status] = useState("pending");
   const [cartItems, setCartItems] = useState([]);
-
+  const [successMessage, setSuccessMessage] = useState("");
   // Fetch merchandise items on component mount
   useEffect(() => {
     const loadMerchItems = async () => {
@@ -177,6 +178,7 @@ export default function Purchase() {
       if (response.ok) {
         const data = await response.json();
         console.log("Order placed successfully:", data);
+        setSuccessMessage("Your order has been placed successfully!");
       } else {
         const errorData = await response.json();
         console.error("API Error:", errorData.error);
@@ -451,6 +453,12 @@ export default function Purchase() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-[800px] max-h-[90%] overflow-y-auto">
+            {/* Display success message */}
+            {successMessage && (
+              <div className="success-message text-green-400 text-center">
+                {successMessage}
+              </div>
+            )}
             {/* Modal Header */}
             <h2 className="text-lg font-bold text-center mb-4">
               Edit Cart & Payment

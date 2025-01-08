@@ -69,7 +69,7 @@ const UserProfileModal = ({ user, onClose }) => {
         {/* Profile Image */}
         <div className="flex flex-col items-center gap-2">
           <img
-            src={image || "/default-avatar.png"}
+            src={image || "/imgs/avatar.png"}
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover"
           />

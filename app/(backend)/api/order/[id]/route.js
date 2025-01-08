@@ -52,7 +52,7 @@ export async function PUT(request, { params }) {
       await db.merch.update({
         where: { id: merchId },
         data: {
-          stocks: merch.stocks - quantity,
+          stocks: merch.stocks - quantity + 1,
           sales: (merch.sales || 0) + quantity, // Increment sales by the order quantity
         },
       });
