@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Modal from "./Modal"; // Modal component
@@ -7,14 +7,14 @@ import SignIn from "./Signin"; // SignIn component
 import Registration from "./Registration"; // Registration component
 import { AlignRight } from "lucide-react";
 import { usePathname } from "next/navigation";
+import UserProfileModal from "./UserProfileModal";
 
 const Navbar = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession(); // Include status for loading state
   const router = useRouter();
   const pathname = usePathname();
 
-  console.log(pathname);
-
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showModal, setShowModal] = useState(false); // Modal visibility
   const [isRegistering, setIsRegistering] = useState(false); // Toggle between sign-in and registration
   const [showNav, setShowNav] = useState(false); // Toggle mobile nav
@@ -46,9 +46,16 @@ const Navbar = () => {
     { path: "About us", href: "/student/aboutus" },
   ];
 
+  // Wait until session is loaded
+  useEffect(() => {
+    if (status === "loading") {
+      return; // Don't render until session is ready
+    }
+  }, [status]);
+
   return (
     <div className="w-full h-20 bg-[rgb(255,211,70)] flex items-center justify-between lg:justify-around lg:px-0 px-10">
-      <img src="/imgs/ssglogo.png" alt="Logo" className="w-40 md:w-48 " />
+      <img src="/imgs/ssglogo.png" alt="Logo" className="w-40 md:w-48" />
 
       <nav className="hidden lg:flex items-center justify-between gap-5">
         {navs.map((nav) => (
@@ -61,6 +68,7 @@ const Navbar = () => {
           </button>
         ))}
       </nav>
+
       <div></div>
       {pathname !== "/student/purchase" && (
         <div>
@@ -81,6 +89,7 @@ const Navbar = () => {
           )}
         </div>
       )}
+
       {/* MOBILE REPONSIVE NAVBAR */}
       <div className="lg:hidden relative">
         <AlignRight
@@ -88,7 +97,7 @@ const Navbar = () => {
           onClick={() => setShowNav((prev) => !prev)}
         />
         {showNav && (
-          <nav className="z-20 absolute top-12 right-0 bg-white p-5 border border-gray-200  rounded-lg flex flex-col items-start gap-5">
+          <nav className="z-20 absolute top-12 right-0 bg-white p-5 border border-gray-200 rounded-lg flex flex-col items-start gap-5">
             {navs.map((nav) => (
               <button
                 key={nav.path}
@@ -117,6 +126,30 @@ const Navbar = () => {
         )}
       </div>
 
+      {/* Profile Image - Display only on homepage */}
+      {pathname === "/" && session && (
+        <div className="flex items-center gap-4 lg:flex-row flex-col">
+          {/* Profile Image */}
+          <img
+            src={session.user?.image || "/imgs/avatar.png"} // Fallback if image is not available
+            className="w-10 h-10 rounded-lg cursor-pointer"
+            onClick={() => setShowProfileModal(true)}
+            alt="Profile"
+          />
+
+          {/* Profile Modal */}
+          {showProfileModal && (
+            <Modal onClose={() => setShowProfileModal(false)}>
+              <UserProfileModal
+                user={session.user}
+                onClose={() => setShowProfileModal(false)}
+              />
+            </Modal>
+          )}
+
+          {/* Mobile view for profile */}
+        </div>
+      )}
       {/* Modal for Sign In and Registration */}
       {showModal && (
         <Modal onClose={() => setShowModal(false)}>

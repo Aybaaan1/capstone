@@ -1,43 +1,58 @@
 import { NextResponse } from "next/server";
 import db from "@/lib/db"; // Adjust the import based on your project structure
+import { uploadImage } from "@/lib/firebase"; // Import the image upload utility
 
 // PUT method to update user information or role
 export async function PUT(request, { params }) {
   const { id } = params;
-  const { role, email, idnumber, firstname, lastname, program } =
-    await request.json();
 
   try {
-    // Check if only the role is provided
-    if (
-      role !== undefined &&
-      (email === undefined ||
-        idnumber === undefined ||
-        firstname === undefined ||
-        lastname === undefined ||
-        program === undefined)
-    ) {
-      const updatedUserRole = await db.user.update({
-        where: { id: Number(id) },
-        data: { role }, // Update only the role
-      });
-      return NextResponse.json(updatedUserRole);
+    const body = await request.json();
+    const { role, email, idnumber, firstname, lastname, program, image } = body;
+
+    // Validate the ID
+    if (!id) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
     }
 
-    // If all fields for user information are provided, update the user details
-    if (email && idnumber && firstname && lastname && program) {
-      const updatedUserDetails = await db.user.update({
-        where: { id: Number(id) },
-        data: { email, idnumber, firstname, lastname, program },
-      });
-      return NextResponse.json(updatedUserDetails);
+    // Prepare the data object for update
+    const data = {};
+
+    // Handle role update
+    if (role !== undefined) {
+      data.role = role;
     }
 
-    // If neither is provided, return an error
-    return NextResponse.json(
-      { error: "No valid data provided for update" },
-      { status: 400 }
-    );
+    // Handle other fields update
+    if (email) data.email = email;
+    if (idnumber) data.idnumber = idnumber;
+    if (firstname) data.firstname = firstname;
+    if (lastname) data.lastname = lastname;
+    if (program) data.program = program;
+
+    // If an image URL is provided, no need to upload it again
+    if (image && image !== "") {
+      data.image = image; // Use the provided image URL
+    }
+
+    // If there's no valid data to update, return an error
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json(
+        { error: "No valid data provided for update" },
+        { status: 400 }
+      );
+    }
+
+    // Perform the update
+    const updatedUser = await db.user.update({
+      where: { id: Number(id) },
+      data,
+    });
+
+    return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating user:", error);
     return NextResponse.json(
@@ -46,6 +61,7 @@ export async function PUT(request, { params }) {
     );
   }
 }
+
 export async function DELETE(request, { params }) {
   const { id } = params;
 

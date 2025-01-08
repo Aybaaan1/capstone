@@ -98,9 +98,11 @@ export default function Home() {
           alt="ssg group pic"
         />
       </section>
-      <section className="text-black flex flex-col items-center justify-center py-16 px-15 md:px-40 gap-10">
-        <h1 className="font-bold text-4xl">About Us</h1>
-        <p>
+      <section className="text-black flex flex-col items-center justify-center py-16 px-6 md:px-20 lg:px-40 gap-6">
+        <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-center">
+          About Us
+        </h1>
+        <p className="text-sm md:text-base lg:text-lg text-center max-w-3xl">
           The SSG Connect is a comprehensive digital platform meticulously
           designed to streamline student services and enhance engagement within
           CTU Argao (CTU-AC). Through its innovative features and user-friendly
@@ -114,24 +116,25 @@ export default function Home() {
           making it more dynamic, efficient, and inclusive.
         </p>
       </section>
-      <section className=" text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10  ">
-        <h1 className="font-bold text-4xl text-black">
+
+      <section className="text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10">
+        <h1 className="font-bold text-4xl text-black text-center">
           University Merchandise
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-4/5">
           {Merchandise.map((merchs) => (
-            <div className="text-black flex flex-col gap-3 shadow-md py-9 px-5 rounded-xl">
+            <div className="text-black flex flex-col gap-3 shadow-md py-9 px-5 rounded-xl items-center">
               <Image
                 src={merchs.picture}
                 height={200}
                 width={200}
                 alt="Item picture"
-                className="w-full"
+                className="w-full sm:w-48 md:w-64 lg:w-80" // Adjusts image size at different screen widths
               />
               <p>{merchs.item}</p>
               <p>Price: P{merchs.price}</p>
               <div>
-                <button className="bg-primary text-white  px-3 py-2 rounded-full">
+                <button className="bg-primary text-white px-3 py-2 rounded-full">
                   Order now
                 </button>
               </div>
