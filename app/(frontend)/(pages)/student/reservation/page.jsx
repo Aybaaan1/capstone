@@ -2,14 +2,23 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import ReservationForm from "../../../(components)/_components/ReservationForm";
-
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 export default function Reservation() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isFormVisible, setFormVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const { data: session, statuss } = useSession();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (statuss === "loading") return; // If loading, don't do anything
+    if (session && session.user.role !== "STUDENT") {
+      router.push("/admin"); // Redirect to homepage if the role is not ADMIN
+    }
+  }, [session, statuss, router]);
   // Fetch items from API
   const fetchItems = async () => {
     try {

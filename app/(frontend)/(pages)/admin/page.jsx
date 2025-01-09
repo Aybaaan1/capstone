@@ -1,7 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const Dashboard = () => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -12,6 +16,15 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState(""); // New state for search query
   const [isReservationOpen, setIsReservationOpen] = useState(false);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+
+  useEffect(() => {
+    if (status === "loading") return; // If loading, don't do anything
+    if (session && session.user.role !== "ADMIN") {
+      router.push("/"); // Redirect to homepage if the role is not ADMIN
+    }
+  }, [session, status, router]);
+
+  // Rest of the component code
 
   useEffect(() => {
     const fetchUsers = async () => {

@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { signIn, useSession, getSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const SignIn = ({ switchToRegister, setIsOpen }) => {
@@ -11,14 +11,16 @@ const SignIn = ({ switchToRegister, setIsOpen }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession(); // Use session hook to get session
   const router = useRouter();
 
+  // Handle change in input fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle form submission for sign-in
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -33,32 +35,35 @@ const SignIn = ({ switchToRegister, setIsOpen }) => {
       // Check the result of the sign-in attempt
       if (result.error) {
         setError(result.error);
-        setSuccess(""); // Clear success message
+        setSuccess("");
         console.log("Login failed", result.error);
       } else {
         setSuccess("Login successful!");
-        setError(""); // Clear any previous error
+        setError("");
         console.log("Login succeeded", result);
 
-        // Attempt to get the session after login
-        const updatedSession = await getSession();
-        console.log("Updated session", updatedSession);
-
-        if (updatedSession?.user?.role === "ADMIN") {
-          router.push("/admin");
-        } else if (updatedSession?.user?.role === "STUDENT") {
-          router.push("/");
-        } else {
-          router.push("/signin");
-        }
-
         // Close the modal after successful login
-        setIsOpen(false);
+        setIsOpen(false); // Close modal if login is successful
       }
     } catch (error) {
       console.log("Error in handleSubmit:", error);
     }
   };
+
+  // Wait until session data is loaded before performing the redirect
+  useEffect(() => {
+    if (status === "loading") return; // Don't do anything while loading
+
+    if (session) {
+      if (session.user?.role === "ADMIN") {
+        router.push("/admin");
+      } else if (session.user?.role === "STUDENT") {
+        router.push("/student");
+      } else {
+        router.push("/signin");
+      }
+    }
+  }, [session, status, router]); // Re-run when session or status changes
 
   return (
     <div className="signin-container">

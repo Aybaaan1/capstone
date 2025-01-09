@@ -3,18 +3,25 @@ import React, { useState, useEffect } from "react";
 import TambayayongForm from "../../../(components)/_components/TambayayongForm";
 import { FaBell } from "react-icons/fa";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Tambayayong() {
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
-
   const [assistances, setAssistances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const { data: session, statuss } = useSession();
+  const userId = session?.user?.id;
+  const router = useRouter();
 
+  useEffect(() => {
+    if (statuss === "loading") return; // If loading, don't do anything
+    if (session && session.user.role !== "STUDENT") {
+      router.push("/admin"); // Redirect to homepage if the role is not ADMIN
+    }
+  }, [session, statuss, router]);
   useEffect(() => {
     const fetchAssistances = async () => {
       if (!userId) return; // Exit if userId is not available

@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
+
 import { uploadImage } from "@/lib/imageUpload";
 import { FaBell } from "react-icons/fa";
-
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 // Fetch merchandise items from the API
 const fetchMerchItems = async () => {
   try {
@@ -31,8 +32,6 @@ export default function Purchase() {
     return [];
   });
 
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -51,6 +50,17 @@ export default function Purchase() {
   const [status] = useState("pending");
   const [cartItems, setCartItems] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
+  const { data: session, statuss } = useSession();
+  const userId = session?.user?.id;
+  const router = useRouter();
+
+  useEffect(() => {
+    if (statuss === "loading") return; // If loading, don't do anything
+    if (session && session.user.role !== "STUDENT") {
+      router.push("/admin"); // Redirect to homepage if the role is not ADMIN
+    }
+  }, [session, statuss, router]);
+
   // Fetch merchandise items on component mount
   useEffect(() => {
     const loadMerchItems = async () => {

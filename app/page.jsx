@@ -102,7 +102,7 @@ export default function Home() {
         <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl text-center">
           About Us
         </h1>
-        <p className="text-sm md:text-base lg:text-lg text-center max-w-3xl">
+        <p className="text-sm md:text-base text-center max-w-3xl">
           The SSG Connect is a comprehensive digital platform meticulously
           designed to streamline student services and enhance engagement within
           CTU Argao (CTU-AC). Through its innovative features and user-friendly
@@ -116,14 +116,16 @@ export default function Home() {
           making it more dynamic, efficient, and inclusive.
         </p>
       </section>
-
       <section className="text-black w-full bg-slate-50 flex flex-col items-center justify-center py-16 gap-10">
         <h1 className="font-bold text-4xl text-black text-center">
           University Merchandise
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 w-4/5">
-          {Merchandise.map((merchs) => (
-            <div className="text-black flex flex-col gap-3 shadow-md py-9 px-5 rounded-xl items-center">
+          {Merchandise.map((merchs, index) => (
+            <div
+              key={index}
+              className="text-black flex flex-col gap-3 shadow-md py-9 px-5 rounded-xl items-center"
+            >
               <Image
                 src={merchs.picture}
                 height={200}
@@ -145,6 +147,7 @@ export default function Home() {
           Explore more
         </button>
       </section>
+
       <section className="relative w-full flex flex-col md:flex-row px-10 lg:px-16 py-10 gap-10 ">
         <div className="text-center px-2 flex-1">
           <h1 className="font-bold text-4xl mb-8">SSG Achievements</h1>
@@ -182,32 +185,7 @@ export default function Home() {
           )}
         </div>
       </section>
-      <section className="w-full p-10 md:p-20 bg-white">
-        <div className="flex bg-black p-6 md:p-10 rounded-md overflow-hidden">
-          <div className="flex-1 flex flex-col">
-            <h1 className="font-bold text-4xl text-slate-400 mb-10">
-              Find our locations
-            </h1>
-            <p className="text-slate-500 text-sm mb-8">
-              Lorem ipsum dolor sit amet, consertor adipscing elit, sed do
-              eiusmod tempor incidunt ut labore et dolore magna aliqua
-            </p>
-            <div>
-              <button className="text-white px-8 py-2 bg-primary rounded-3xl text-sm">
-                Locations & Hours
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 hidden md:flex items-center justify-center relative">
-            <Image
-              src={"/imgs/cta-img.png"}
-              width={500}
-              height={500}
-              className="translate-y-10 absolute -right-7"
-            />
-          </div>
-        </div>
-      </section>
+
       <section className="bg-slate-50 flex flex-col gap-10 md:flex-row items-center px-5 justify-around  py-10">
         <div className="flex-1 text-black p-10 flex flex-col gap-7">
           <h1 className="font-medium text-4xl">Follow us</h1>
@@ -217,18 +195,20 @@ export default function Home() {
             </p>
             <p className="text-slate-600">
               To stay updated with the latest news, promotions, and offerings
-              from the poke , make sure to follow us social media accounts.
-              Don't miss out on any updates
+              from the poke, make sure to follow us on our social media
+              accounts. Don't miss out on any updates
             </p>
           </div>
           <div className="flex pr-48 items-center gap-6">
-            {sociallinks.map((links) => (
-              <Image
-                src={links.image}
-                href={links.href}
-                height={40}
-                width={40}
-              />
+            {sociallinks.map((links, index) => (
+              <a key={index} href={links.href}>
+                <Image
+                  src={links.image}
+                  height={40}
+                  width={40}
+                  alt="Social Icon"
+                />
+              </a>
             ))}
           </div>
         </div>
@@ -237,6 +217,7 @@ export default function Home() {
           height={450}
           width={450}
           className="flex-1"
+          alt="Follow Us"
         />
       </section>
     </div>

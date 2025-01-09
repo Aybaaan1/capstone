@@ -57,7 +57,7 @@ const Navbar = () => {
     <div className="w-full h-20 bg-[rgb(255,211,70)] flex items-center justify-between lg:justify-around lg:px-0 px-10">
       <img src="/imgs/ssglogo.png" alt="Logo" className="w-40 md:w-48" />
 
-      <nav className="hidden lg:flex items-center justify-between gap-5">
+      <nav className="hidden lg:flex items-center justify-between gap-5 ml-10">
         {navs.map((nav) => (
           <button
             key={nav.path}

@@ -3,16 +3,15 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import LostFoundForm from "../../../(components)/_components/LostFoundForm";
 import { FaBell } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-
 const socialLinks = [
   { href: "https://www.facebook.com/SSGCTUArgao", image: "/imgs/facebook.png" },
   // Add more social links here if needed
 ];
 
 export default function LostFoundPage() {
-  const { data: session } = useSession();
-  const userId = session?.user?.id; // Get the user ID from the session
+  // Get the user ID from the session
 
   const [isLostFormClicked, setIsLostFormClicked] = useState(false);
   const [isFoundFormClicked, setIsFoundFormClicked] = useState(false);
@@ -20,7 +19,16 @@ export default function LostFoundPage() {
   const [lostItems, setLostItems] = useState([]);
   const [notifications, setNotifications] = useState([]); // Stores notifications for the user
   const [showNotifications, setShowNotifications] = useState(false); // Controls notification dropdown visibility
+  const { data: session, statuss } = useSession();
+  const userId = session?.user?.id;
+  const router = useRouter();
 
+  useEffect(() => {
+    if (statuss === "loading") return; // If loading, don't do anything
+    if (session && session.user.role !== "STUDENT") {
+      router.push("/admin"); // Redirect to homepage if the role is not ADMIN
+    }
+  }, [session, statuss, router]);
   useEffect(() => {
     const fetchItems = async () => {
       if (!userId) return; // Exit if userId is not available

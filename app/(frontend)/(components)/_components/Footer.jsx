@@ -4,15 +4,15 @@ import Image from "next/image";
 
 export default function Footer() {
   const sociallinks = [
-    { image: "/imgs/fb-icon.png", href: "/" },
-    { image: "/imgs/twitter-icon.png", href: "/" },
-    { image: "/imgs/instagram-icon.png", href: "/" },
-    { image: "/imgs/youtube-icon.png", href: "/" },
+    { image: "/imgs/fb-icon.png", href: "/", alt: "Facebook Icon" },
+    { image: "/imgs/twitter-icon.png", href: "/", alt: "Twitter Icon" },
+    { image: "/imgs/instagram-icon.png", href: "/", alt: "Instagram Icon" },
+    { image: "/imgs/youtube-icon.png", href: "/", alt: "YouTube Icon" },
   ];
 
   return (
     <section>
-      <div className="w-full bg-[#171A1FFF] flex flex-col-reverse md:flex-row items-center justify-around py-10 ">
+      <div className="w-full bg-[#171A1FFF] flex flex-col-reverse md:flex-row items-center justify-around py-10">
         <div className="text-white text-sm flex flex-col gap-4 md:gap-16">
           <div className="flex items-center justify-center gap-4">
             <Image
@@ -20,6 +20,7 @@ export default function Footer() {
               height={70}
               width={70}
               className="w-1/6 md:w-1/3"
+              alt="SSGConnect Logo"
             />
             <h1 className="font-bold text-slate-500 text-3xl md:text-4xl mt-2">
               SSGConnect
@@ -45,10 +46,12 @@ export default function Footer() {
           <div className="flex items-center justify-center md:justify-end gap-5">
             {sociallinks.map((links) => (
               <Image
+                key={links.href}
                 src={links.image}
                 href={links.href}
                 height={30}
                 width={30}
+                alt={links.alt} // Add alt attribute here
               />
             ))}
           </div>
