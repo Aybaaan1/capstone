@@ -276,7 +276,7 @@ const Purchase = () => {
       {/* Main Content */}
       <main className="flex-1 p-10">
         <header className="flex justify-between mb-5">
-          <h1 className="text-2xl font-medium">Purchase Dashboard</h1>
+          <h1 className="text-2xl font-medium">Order Request Dashboard</h1>
         </header>
 
         {/* Error Message */}

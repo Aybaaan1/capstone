@@ -25,6 +25,14 @@ model User {
   reserves             Reserve[]
 }
 
+model ValidatedUser {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  idnumber String @unique
+}
+
+
+
 model Merch {
   id     Int     @id @default(autoincrement())
   name   String

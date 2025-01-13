@@ -58,7 +58,7 @@ const SignIn = ({ switchToRegister, setIsOpen }) => {
       if (session.user?.role === "ADMIN") {
         router.push("/admin");
       } else if (session.user?.role === "STUDENT") {
-        router.push("/student");
+        router.push("/");
       } else {
         router.push("/signin");
       }
