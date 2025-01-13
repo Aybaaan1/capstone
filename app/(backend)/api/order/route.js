@@ -106,6 +106,7 @@ export async function GET(request) {
   try {
     const orders = await db.order.findMany({
       include: {
+        user: true,
         merch: {
           // Assuming "merch" is a relation in the "order" model
           select: {

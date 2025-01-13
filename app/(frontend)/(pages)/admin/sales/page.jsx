@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  LineElement,
-  PointElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -15,8 +14,7 @@ import {
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  LineElement,
-  PointElement,
+  BarElement,
   Title,
   Tooltip,
   Legend
@@ -26,6 +24,8 @@ const SalesPage = () => {
   const [salesData, setSalesData] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalSales, setTotalSales] = useState(0);
+  const [weeklySales, setWeeklySales] = useState([]);
+  const [monthlySales, setMonthlySales] = useState([]);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   const [isReservationOpen, setIsReservationOpen] = useState(false);
 
@@ -39,6 +39,9 @@ const SalesPage = () => {
           setSalesData(data.items);
           setTotalIncome(data.totalIncome || 0);
           setTotalSales(data.totalSales || 0);
+
+          // Process the weekly and monthly sales data
+          processSalesData(data.items);
         } else {
           console.error("Invalid data format received:", data);
         }
@@ -50,34 +53,66 @@ const SalesPage = () => {
     fetchSalesData();
   }, []);
 
+  const processSalesData = (data) => {
+    let weekly = [];
+    let monthly = [];
+
+    // Example: Suppose data contains fields like "sales", "date" for each item
+    data.forEach((item) => {
+      const week = getWeekOfYear(item.date); // Function to get the week number
+      const month = new Date(item.date).getMonth() + 1; // Month from 1 to 12
+
+      // Aggregate weekly sales
+      if (!weekly[week]) {
+        weekly[week] = 0;
+      }
+      weekly[week] += item.sales;
+
+      // Aggregate monthly sales
+      if (!monthly[month]) {
+        monthly[month] = 0;
+      }
+      monthly[month] += item.sales;
+    });
+
+    // Set the processed weekly and monthly sales data
+    setWeeklySales(weekly);
+    setMonthlySales(monthly);
+  };
+
   const labels = salesData.map((item) => item.name);
   const sales = salesData.map((item) => item.sales);
   const stocks = salesData.map((item) => item.stocks);
   const income = salesData.map((item) => item.income);
 
+  // Bar chart data structure
   const chartData = {
     labels,
     datasets: [
       {
         label: "Sales Quantity",
         data: sales,
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        fill: true,
+        backgroundColor: "rgba(75, 192, 192, 0.8)",
       },
       {
         label: "Stock Quantity",
         data: stocks,
-        borderColor: "rgba(153, 102, 255, 1)",
-        backgroundColor: "rgba(153, 102, 255, 0.2)",
-        fill: true,
+        backgroundColor: "rgba(153, 102, 255, 0.8)",
       },
       {
         label: "Income",
         data: income,
-        borderColor: "rgba(255, 159, 64, 1)",
-        backgroundColor: "rgba(255, 159, 64, 0.2)",
-        fill: true,
+        backgroundColor: "rgba(255, 159, 64, 0.8)",
+      },
+      {
+        label: "Weekly Sales",
+        data: Object.values(weeklySales),
+        backgroundColor: "rgba(255, 99, 132, 0.8)",
+      },
+      {
+        label: "Monthly Sales",
+        data: Object.values(monthlySales),
+        backgroundColor: "rgba(255, 159, 64, 0.5)",
       },
     ],
   };
@@ -245,7 +280,7 @@ const SalesPage = () => {
 
         <div className="chart-container">
           {salesData.length > 0 ? (
-            <Line data={chartData} />
+            <Bar data={chartData} />
           ) : (
             <p>Loading sales data...</p>
           )}

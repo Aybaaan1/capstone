@@ -333,6 +333,9 @@ const OrderList = () => {
                   User ID
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Name
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Merch Type
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
@@ -357,6 +360,9 @@ const OrderList = () => {
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     {order.userId}
+                  </td>
+                  <td className="border px-4 py-3 text-sm text-center">
+                    {order.user?.firstname}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     {getMerchType(order.merchId)} {/* Display the merch type */}

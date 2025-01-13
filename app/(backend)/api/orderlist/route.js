@@ -6,9 +6,11 @@ export async function GET() {
   try {
     const orders = await db.Order.findMany({
       where: {
-        status: "accepted", // Filter orders with 'accepted' status
+        status: "accepted",
+        // Filter orders with 'accepted' status
       },
       include: {
+        user: true,
         merch: {
           // Assuming "merch" is a relation in the "order" model
           select: {

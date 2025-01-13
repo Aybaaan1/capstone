@@ -358,6 +358,9 @@ const Purchase = () => {
                   User ID
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
+                  Name
+                </th>
+                <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
                   Merch Type {/* Added this column for merch type */}
                 </th>
                 <th className="border-gray-200 border p-3 text-left text-sm font-semibold">
@@ -382,6 +385,9 @@ const Purchase = () => {
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     {purchase.userId}
+                  </td>
+                  <td className="border px-4 py-3 text-sm text-center">
+                    {purchase.user?.firstname}
                   </td>
                   <td className="border px-4 py-3 text-sm text-center">
                     {getMerchType(purchase.merchId)}{" "}
